@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Canvas Layers Test</title>
+<title>UPenn AgDSS webclient</title>
 </head>
 <body>
 <section>
@@ -90,6 +90,7 @@ y += dy;
 function draw2() {
 ctx2.clearRect(0, 0, WIDTH, HEIGHT);
 ctx2.drawImage(city, 0, 0);
+ctx2.globalAlpha = 0.5;
 }
 
 function draw3() {
