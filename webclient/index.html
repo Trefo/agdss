@@ -1,0 +1,9 @@
+{% if latest_image_list %}
+    <ul>
+    {% for image in latest_image_list %}
+        <li><a href="/webclient/{{ image.id }}/">{{ image.name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No images are available.</p>
+{% endif %}
