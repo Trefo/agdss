@@ -1,11 +1,17 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.template import loader
+
 from .models import Image
 
 def index(request):
     latest_image_list = Image.objects.order_by('-pub_date')[:5]
-    context = {'latest_question_list': latest_image_list}
-    return render(request, 'webclient/index.html', context)
+    template = loader.get_template('webclient/index.html')
+    context = {
+        'latest_image_list': latest_image_list,
+    }
+    return HttpResponse(template.render(context, request))
+
 
 def detail(request, image_id):
     return HttpResponse("You're looking at image %s." % image_id)
