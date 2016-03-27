@@ -6,13 +6,13 @@
 </head>
 <body>
 <section>
-<div id="canvasesdiv" style="position:relative; width:400px; height:300px">
+<div id="canvasesdiv" style="position:relative; width:1200px; height:1920px">
 <canvas id="layer1"
 style="z-index: 1;
 position:absolute;
 left:0px;
 top:0px;
-" height="300px" width="400">
+" height="1920px" width="1200">
 This text is displayed if your browser does not support HTML5 Canvas.
 </canvas>
 <canvas id="layer2"
@@ -20,7 +20,7 @@ style="z-index: 2;
 position:absolute;
 left:0px;
 top:0px;
-" height="300px" width="400">
+" height="1920px" width="1200">
 This text is displayed if your browser does not support HTML5 Canvas.
 </canvas>
 <canvas id="layer3"
@@ -28,7 +28,7 @@ style="z-index: 3;
 position:absolute;
 left:0px;
 top:0px;
-" height="300px" width="400">
+" height="1920" width="1200">
 This text is displayed if your browser does not support HTML5 Canvas.
 </canvas>
 </div>
@@ -40,16 +40,16 @@ var layer3;
 var ctx1;
 var ctx2;
 var ctx3;
-var x = 400;
-var y = 300;
+var x = 1200;
+var y = 1920;
 var dx = 2;
 var dy = 4;
-var WIDTH = 400;
-var HEIGHT = 300;
+var WIDTH = 1200;
+var HEIGHT = 1920;
 var city = new Image();
 
 function init() {
-city.src ="city.png";
+city.src ="/static/image-store/frame0002_raw.jpg";
 layer1 = document.getElementById("layer1");
 ctx1 = layer1.getContext("2d");
 layer2 = document.getElementById("layer2");
