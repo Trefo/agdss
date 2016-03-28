@@ -1,6 +1,6 @@
-from django.shortcuts import render
-from django.http import HttpResponse
 from django.template import loader
+from django.http import *
+
 
 from .models import Image
 
@@ -13,12 +13,5 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 
-def detail(request, image_id):
-    return HttpResponse("You're looking at image %s." % image_id)
-
-def results(request, image_id):
-    response = "You're looking at the results of image %s."
-    return HttpResponse(response % image_id)
-
-def label(request, image_id):
-    return HttpResponse("You're labeling on image %s." % image_id)
+def applyLabels(request):
+    return HttpResponse(request.GET['label_list']);

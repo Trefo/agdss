@@ -5,41 +5,69 @@
     <title>AgDSS Web</title>
     <link rel="stylesheet" href="/static/scripts/paperjs/examples/css/style.css">
     <script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.js"></script>
-    <script type="text/paperscript" canvas="canvas">
+  <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script>
 
+ <script type="text/paperscript" canvas="canvas">
 var startPoint;
 var radius=1;
-var circlePath;
+window.circlePath;
+window.newLayer = new Layer();
+window.newLayer.activate();
+$(document).ready(function() {
+            $("#applyLabels").click(function() {
+                    var input_string = $("#applyLabelsForms").val();
+                    $.ajax({
+                        url : "/webclient/applyLabels",
+                        type : "GET",
+                        data : {
+                            image_name: "raw0007.png",
+                            category_name: "apples",
+                            label_list: window.newLayer.exportJSON()
+                            },
+                        success : function(data) {
+                            $('#debug').append(data);
+                        },
+                        error : function(xhr,errmsg,err) {
+                            alert(xhr.status + ": " + xhr.responseText);
+                        }
+                    });
+                    return false;
+            });
+ });
 
 function onMouseDown(event) {
     startPoint = event.point;
-    circlePath = new Path.Circle(startPoint, 1);
-    circlePath.fillColor = 'white'
-
+    window.circlePath = new Path.Circle(startPoint, 1);
+    window.circlePath.fillColor = 'white';
 }
 
 function onMouseDrag(event) {
     circlePath.removeSegments();
-    	radius = startPoint.getDistance(event.point);
-
-     circlePath = new Path.Circle(startPoint, radius);
-    circlePath.fillColor = 'white'
+    radius = startPoint.getDistance(event.point);
+    window.circlePath = new Path.Circle(startPoint, radius);
+    window.circlePath.fillColor = 'white';
 };
 
 function onMouseUp(event) {
   var element = document.getElementById("debug");
-  element.innerHTML = circlePath.exportJSON();
+  element.innerHTML = window.circlePath.exportJSON();
 }
-
 
 var raster = new Raster('/static/image-store/frame0000_raw.png');
 raster.position = view.center;
-
-
-    </script>
+</script>
 </head>
-<canvas id="canvas" resize></canvas>
+<body>
 <div id="debug">
+</div>
+<div id="controls">
+    <form method="post" name="applyLabelsForm" >
+        {% csrf_token %}
+        <input name="categoryName" id="categoryName" type="text">
+        <input id="applyLabels" type="button" value="send to server">
+        </form>
+
+<canvas id="canvas" resize></canvas>
 
 </div>
 </body>
