@@ -12,7 +12,9 @@ var myPath;
 
 function onMouseDown(event) {
 	myPath = new Path();
-	myPath.strokeColor = 'black';
+	myPath.strokeColor = 'red';
+	myPath.closed = true;
+	myPath.fillColor = '#ff0000';
 }
 
 function onMouseDrag(event) {
@@ -20,21 +22,24 @@ function onMouseDrag(event) {
 }
 
 function onMouseUp(event) {
+    myPath.smooth({ type: 'continuous' });
+    myPath.selected = false;
 	var myCircle = new Path.Circle({
 		center: event.point,
-		radius: 10
+		radius: 1
 	});
-	myCircle.strokeColor = 'black';
+	myCircle.strokeColor = 'yellow';
 	myCircle.fillColor = 'white';
+	alert(myPath.pathData);
 }
-        var raster = new Raster('/static/image-store/frame0000_raw.png');
-
-// Move the raster to the center of the view
+var raster = new Raster('/static/image-store/frame0000_raw.png');
 raster.position = view.center;
-// Scale the raster by 50%
-raster.scale(0.2);
+
     </script>
 </head>
     <canvas id="canvas" resize></canvas>
+<div id="debug">
+
+    </div>
 </body>
 </html>
