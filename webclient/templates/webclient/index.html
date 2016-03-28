@@ -1,45 +1,46 @@
-
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Phyllotaxis Raster</title>
+    <title>AgDSS Web</title>
     <link rel="stylesheet" href="/static/scripts/paperjs/examples/css/style.css">
     <script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.js"></script>
-      <script type="text/paperscript" canvas="canvas">
-var myPath;
+    <script type="text/paperscript" canvas="canvas">
+
+var startPoint;
+var radius=1;
+var circlePath;
 
 function onMouseDown(event) {
-	myPath = new Path();
-	myPath.strokeColor = 'red';
-	myPath.closed = true;
-	myPath.fillColor = '#ff0000';
+    startPoint = event.point;
+    circlePath = new Path.Circle(startPoint, 1);
+    circlePath.fillColor = 'white'
+
 }
 
 function onMouseDrag(event) {
-	myPath.add(event.point);
-}
+    circlePath.removeSegments();
+    	radius = startPoint.getDistance(event.point);
+
+     circlePath = new Path.Circle(startPoint, radius);
+    circlePath.fillColor = 'white'
+};
 
 function onMouseUp(event) {
-    myPath.smooth({ type: 'continuous' });
-    myPath.selected = false;
-	var myCircle = new Path.Circle({
-		center: event.point,
-		radius: 1
-	});
-	myCircle.strokeColor = 'yellow';
-	myCircle.fillColor = 'white';
-	alert(myPath.pathData);
+  var element = document.getElementById("debug");
+  element.innerHTML = circlePath.exportJSON();
 }
+
+
 var raster = new Raster('/static/image-store/frame0000_raw.png');
 raster.position = view.center;
 
+
     </script>
 </head>
-    <canvas id="canvas" resize></canvas>
+<canvas id="canvas" resize></canvas>
 <div id="debug">
 
-    </div>
+</div>
 </body>
 </html>
