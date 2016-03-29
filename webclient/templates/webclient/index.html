@@ -31,6 +31,7 @@ $(document).ready(function() {
                             window.labelsLayer.removeChildren();
                             window.labelsLayer.importJSON(data);
                             window.labelsLayer.fillColor = new Color(1, 0, 0);
+                            document.getElementById("debug").innerHTML = "";
                         },
                         error : function(xhr,errmsg,err) {
                             alert(xhr.status + ": " + xhr.responseText);
@@ -51,13 +52,13 @@ function onMouseDrag(event) {
     radius = startPoint.getDistance(event.point);
     window.circlePath = new Path.Circle(startPoint, radius);
     window.circlePath.fillColor = 'white';
+    window.circlePath.alpha = 0.5;
 };
 
 function onMouseUp(event) {
   var element = document.getElementById("debug");
   element.innerHTML = window.labelsLayer.exportJSON();
 }
-
 
 </script>
 </head>
@@ -70,9 +71,7 @@ function onMouseUp(event) {
         <input name="categoryName" id="categoryName" type="text">
         <input id="applyLabels" type="button" value="send to server">
         </form>
-
-<canvas id="canvas" resize></canvas>
-
 </div>
+<canvas id="canvas" resize></canvas>
 </body>
 </html>

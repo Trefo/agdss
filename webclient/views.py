@@ -1,5 +1,7 @@
 from django.template import loader
 from django.http import *
+from webclient.models import *
+from datetime import datetime
 
 
 from .models import Image
@@ -14,4 +16,15 @@ def index(request):
 
 
 def applyLabels(request):
-    return HttpResponse(request.GET['label_list']);
+    label_list_ = request.GET['label_list']
+    sourceType = ImageSourceType(description='machine')
+    sourceType.save()
+    parentImage_ = Image(name=request.GET['image_name'], path = '/static/image-store/', description = 'test generation at serverside', source = sourceType, pub_date=datetime.now())
+    parentImage_.save()
+    for labelJSON in label_list_:
+        print labelJSON
+        labelObject = ImageLabels(parentImage = parentImage_, labelShapes=labelJSON)
+        labelObject.save()
+    return HttpResponse(label_list_)
+
+

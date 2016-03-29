@@ -1,3 +1,6 @@
 from django.contrib import admin
+from webclient.models import Image, ImageLabels, ImageSourceType
 
-# Register your models here.
+admin.site.register(Image)
+admin.site.register(ImageLabels)
+admin.site.register(ImageSourceType)
