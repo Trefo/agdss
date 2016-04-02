@@ -6,4 +6,5 @@ from django.conf.urls.static import static
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^applyLabels$', 'webclient.views.applyLabels'),
+    url(r'^loadLabels$', 'webclient.views.loadLabels'),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

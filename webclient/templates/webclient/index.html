@@ -54,6 +54,25 @@ function onMouseDrag(event) {
 
 function onMouseUp(event) {
   var element = document.getElementById("debug");
+    $.ajax({
+            url : "/webclient/applyLabels",
+            type : "GET",
+            data : {
+                image_name: "raw0007.png",
+                category_name: "apples",
+                label_list: window.labelsLayer.exportJSON()
+                },
+            success : function(data) {
+                $('#debug').text(data);
+                window.labelsLayer.removeChildren();
+                window.labelsLayer.importJSON(data);
+                window.labelsLayer.fillColor = new Color(1, 0, 0);
+                document.getElementById("debug").innerHTML = "";
+            },
+            error : function(xhr,errmsg,err) {
+                alert(xhr.status + ": " + xhr.responseText);
+            }
+        });
 }
 </script>
 
@@ -61,7 +80,21 @@ function onMouseUp(event) {
 <script type="text/javascript">
 function onImageFormChange(){
     var myselect = document.getElementById("imageCombo");
-    alert(myselect.options[myselect.selectedIndex].value);
+    selectedImage = myselect.options[myselect.selectedIndex].value;
+    $.ajax({
+    url : "/webclient/loadLabels",
+            type : "GET",
+            data : {
+                image_name: selectedImage,
+                },
+            success : function(data) {
+
+                document.getElementById("debug").innerHTML = "SUCCESS";
+            },
+            error : function(xhr,errmsg,err) {
+                alert(xhr.status + ": " + xhr.responseText);
+            }
+        });
     }
 </script>
 

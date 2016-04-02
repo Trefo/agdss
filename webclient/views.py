@@ -31,3 +31,15 @@ def applyLabels(request):
     return HttpResponse(label_list_)
 
 
+def loadLabels(request):
+    label_list_ = request.GET['image_name']
+    sourceType = ImageSourceType(description='machine')
+    sourceType.save()
+    parentImage_ = Image(name=request.GET['image_name'], path = '/static/image-store/', description = 'test generation at serverside', source = sourceType, pub_date=datetime.now())
+    parentImage_.save()
+    for labelJSON in label_list_:
+        print labelJSON
+        labelObject = ImageLabels(parentImage = parentImage_, labelShapes=labelJSON)
+        labelObject.save()
+    return HttpResponse(label_list_)
+
