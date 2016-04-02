@@ -1,9 +1,9 @@
+from django.forms import forms
 from django.template import loader
 from django.http import *
 from webclient.models import *
 from datetime import datetime
 import os
-from os import path
 
 from .models import Image
 

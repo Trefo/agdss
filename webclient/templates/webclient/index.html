@@ -5,15 +5,12 @@
     <title>AgDSS Web</title>
     <link rel="stylesheet" href="/static/scripts/paperjs/examples/css/style.css">
     <script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.js"></script>
-  <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script>
+    <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script>
 
- <script type="text/paperscript" canvas="canvas">
+    <script type="text/paperscript" canvas="canvas">
 var startPoint;
 var radius=1;
-var raster = new Raster('/static/image-store/' + selected_image.name);
-raster.position = view.center;
 window.labelsLayer = new Layer();
-
 
 $(document).ready(function() {
             $("#applyLabels").click(function() {
@@ -58,27 +55,41 @@ function onMouseDrag(event) {
 function onMouseUp(event) {
   var element = document.getElementById("debug");
 }
-
 </script>
+
+
+<script type="text/javascript">
+function onImageFormChange(){
+    var myselect = document.getElementById("imageCombo");
+    alert(myselect.options[myselect.selectedIndex].value);
+    }
+</script>
+
+
 </head>
 <body>
-<div id="debug">
-    <select name="image">
-    {% for image in latest_image_list %}
+<div id="toolbars">
+    <select id="imageCombo" onchange="onImageFormChange()">
+        {% for image in latest_image_list %}
         {% ifequal image selected_image.name %}
-            <option value="{{image.key}}" selected="selected">{{image}}</option>
+        <option value="{{image}}" selected="selected">{{image}}</option>
         {% else %}
-            <option value="{{image.key}}">{{image}}</option>
+        <option value="{{image}}">{{image}}</option>
         {% endifequal %}
-    {% endfor %}
-</select>
+        {% endfor %}
+    </select>
+</div>
+<div id="debug">
+
 </div>
 <div id="controls">
+
+
     <form method="post" name="applyLabelsForm" >
         {% csrf_token %}
         <input name="categoryName" id="categoryName" type="text">
         <input id="applyLabels" type="button" value="send to server">
-        </form>
+    </form>
 </div>
 <canvas id="canvas" resize></canvas>
 </body>
