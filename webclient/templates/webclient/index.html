@@ -10,7 +10,7 @@
  <script type="text/paperscript" canvas="canvas">
 var startPoint;
 var radius=1;
-var raster = new Raster('/static/image-store/frame0000_raw.png');
+var raster = new Raster('/static/image-store/' + selected_image.name);
 raster.position = view.center;
 window.labelsLayer = new Layer();
 
@@ -57,13 +57,21 @@ function onMouseDrag(event) {
 
 function onMouseUp(event) {
   var element = document.getElementById("debug");
-  element.innerHTML = window.labelsLayer.exportJSON();
 }
 
 </script>
 </head>
 <body>
 <div id="debug">
+    <select name="image">
+    {% for image in latest_image_list %}
+        {% ifequal image selected_image.name %}
+            <option value="{{image.key}}" selected="selected">{{image}}</option>
+        {% else %}
+            <option value="{{image.key}}">{{image}}</option>
+        {% endifequal %}
+    {% endfor %}
+</select>
 </div>
 <div id="controls">
     <form method="post" name="applyLabelsForm" >

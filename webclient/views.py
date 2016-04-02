@@ -2,16 +2,19 @@ from django.template import loader
 from django.http import *
 from webclient.models import *
 from datetime import datetime
-
+import os
+from os import path
 
 from .models import Image
 
 def index(request):
-    latest_image_list = Image.objects.order_by('-pub_date')[:5]
+    latest_image_list = os.listdir('/home/jdas/Dropbox/Research/agriculture/agdss/image-store/')
     template = loader.get_template('webclient/index.html')
+
     context = {
         'latest_image_list': latest_image_list,
     }
+    print template.render(context, request)
     return HttpResponse(template.render(context, request))
 
 
