@@ -14,32 +14,26 @@ def index(request):
     context = {
         'latest_image_list': latest_image_list,
     }
-    print template.render(context, request)
     return HttpResponse(template.render(context, request))
 
 
 def applyLabels(request):
     label_list_ = request.GET['label_list']
-    sourceType = ImageSourceType(description='machine')
-    sourceType.save()
-    parentImage_ = Image(name=request.GET['image_name'], path = '/static/image-store/', description = 'test generation at serverside', source = sourceType, pub_date=datetime.now())
-    parentImage_.save()
+    #sourceType = ImageSourceType(description='machine')
+    #sourceType.save()
+    #parentImage_ = Image(name=request.GET['image_name'], path = '/static/image-store/', description = 'test generation at serverside', source = sourceType, pub_date=datetime.now())
+    #parentImage_.save()
+    image_name = request.GET['image_name']
+    parentImage_ = Image.objects.all().filter(name = image_name);
     for labelJSON in label_list_:
-        print labelJSON
-        labelObject = ImageLabels(parentImage = parentImage_, labelShapes=labelJSON)
+        labelObject = ImageLabels(parentImage = parentImage_[0], labelShapes=labelJSON)
         labelObject.save()
     return HttpResponse(label_list_)
 
 
 def loadLabels(request):
-    label_list_ = request.GET['image_name']
-    sourceType = ImageSourceType(description='machine')
-    sourceType.save()
-    parentImage_ = Image(name=request.GET['image_name'], path = '/static/image-store/', description = 'test generation at serverside', source = sourceType, pub_date=datetime.now())
-    parentImage_.save()
-    for labelJSON in label_list_:
-        print labelJSON
-        labelObject = ImageLabels(parentImage = parentImage_, labelShapes=labelJSON)
-        labelObject.save()
-    return HttpResponse(label_list_)
+    parentImage_ = request.GET['image_name']
+    image = Image.objects.all().filter(name = parentImage_)
+    label_list = ImageLabels.objects.all().filter(parentImage=image[0])
+    return HttpResponse(label_list[0].labelShapes)
 

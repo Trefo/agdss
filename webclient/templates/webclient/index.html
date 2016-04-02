@@ -10,6 +10,7 @@
     <script type="text/paperscript" canvas="canvas">
 var startPoint;
 var radius=1;
+var raster=null;
 window.labelsLayer = new Layer();
 
 $(document).ready(function() {
@@ -53,26 +54,7 @@ function onMouseDrag(event) {
 };
 
 function onMouseUp(event) {
-  var element = document.getElementById("debug");
-    $.ajax({
-            url : "/webclient/applyLabels",
-            type : "GET",
-            data : {
-                image_name: "raw0007.png",
-                category_name: "apples",
-                label_list: window.labelsLayer.exportJSON()
-                },
-            success : function(data) {
-                $('#debug').text(data);
-                window.labelsLayer.removeChildren();
-                window.labelsLayer.importJSON(data);
-                window.labelsLayer.fillColor = new Color(1, 0, 0);
-                document.getElementById("debug").innerHTML = "";
-            },
-            error : function(xhr,errmsg,err) {
-                alert(xhr.status + ": " + xhr.responseText);
-            }
-        });
+
 }
 </script>
 
@@ -81,6 +63,9 @@ function onMouseUp(event) {
 function onImageFormChange(){
     var myselect = document.getElementById("imageCombo");
     selectedImage = myselect.options[myselect.selectedIndex].value;
+
+    raster = new paper.Raster('/static/image-store/' + selectedImage);
+    raster.position = paper.view.center;
     $.ajax({
     url : "/webclient/loadLabels",
             type : "GET",
