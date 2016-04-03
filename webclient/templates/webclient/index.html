@@ -18,11 +18,13 @@ $(document).ready(function() {
                     var input_string = $("#applyLabelsForms").val();
                     $.ajax({
                         url : "/webclient/applyLabels",
-                        type : "GET",
+                        type : "POST",
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
                         data : {
                             image_name: "raw0007.png",
                             category_name: "apples",
-                            label_list: window.labelsLayer.exportJSON()
+                            label_list: JSON.stringify(window.labelsLayer.exportJSON())
                             },
                         success : function(data) {
                             $('#debug').text(data);

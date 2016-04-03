@@ -16,5 +16,6 @@ class Image(models.Model):
 
 class ImageLabels(models.Model):
     parentImage = models.ForeignKey(Image, on_delete=models.CASCADE)
-    labelShapes = models.CharField(max_length=5000)
+    labelShapes = models.TextField(max_length=10000)
+
 
