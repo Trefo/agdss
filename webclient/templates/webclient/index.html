@@ -11,26 +11,28 @@
 var startPoint;
 var radius=1;
 var raster=null;
-window.labelsLayer = new Layer();
+var labelsLayer = new Layer();
 
 $(document).ready(function() {
             $("#applyLabels").click(function() {
-                    var input_string = $("#applyLabelsForms").val();
+                    var input_string = $("#categoryName").val();
+                    alert(input_string);
+                     var myselect = document.getElementById("imageCombo");
+                    selectedImage = myselect.options[myselect.selectedIndex].value;
                     $.ajax({
                         url : "/webclient/applyLabels",
                         type : "POST",
-                        contentType: 'application/json; charset=utf-8',
-                        dataType: 'json',
-                        data : {
-                            image_name: "raw0007.png",
-                            category_name: "apples",
-                            label_list: JSON.stringify(window.labelsLayer.exportJSON())
-                            },
+                        dataType: 'text',
+                        data : JSON.stringify({
+                            image_name: selectedImage,
+                            category_name: input_string,
+                            label_list: JSON.stringify(labelsLayer.exportJSON())
+                            }),
                         success : function(data) {
                             $('#debug').text(data);
-                            window.labelsLayer.removeChildren();
-                            window.labelsLayer.importJSON(data);
-                            window.labelsLayer.fillColor = new Color(1, 0, 0);
+                            labelsLayer.removeChildren();
+                            labelsLayer.importJSON(data);
+                            labelsLayer.fillColor = new Color(1, 0, 0);
                             document.getElementById("debug").innerHTML = "";
                         },
                         error : function(xhr,errmsg,err) {
@@ -65,9 +67,10 @@ function onMouseUp(event) {
 function onImageFormChange(){
     var myselect = document.getElementById("imageCombo");
     selectedImage = myselect.options[myselect.selectedIndex].value;
-
     raster = new paper.Raster('/static/image-store/' + selectedImage);
     raster.position = paper.view.center;
+        alert("here 1");
+
     $.ajax({
     url : "/webclient/loadLabels",
             type : "GET",
@@ -75,8 +78,14 @@ function onImageFormChange(){
                 image_name: selectedImage,
                 },
             success : function(data) {
+                labelsLayer = new paper.Layer();
+                if(data){
+                   /* alert('here');
 
-                document.getElementById("debug").innerHTML = "SUCCESS";
+                    window.labelsLayer.importJSON(data);
+                    window.labelsLayer.fillColor = new Color(1, 0, 0);*/
+                }
+                document.getElementById("debug").innerHTML = data;
             },
             error : function(xhr,errmsg,err) {
                 alert(xhr.status + ": " + xhr.responseText);
@@ -89,7 +98,7 @@ function onImageFormChange(){
 </head>
 <body>
 <div id="toolbars">
-    <select id="imageCombo" onchange="onImageFormChange()">
+    <select id="imageCombo"  onchange="onImageFormChange()">
         {% for image in latest_image_list %}
         {% ifequal image selected_image.name %}
         <option value="{{image}}" selected="selected">{{image}}</option>

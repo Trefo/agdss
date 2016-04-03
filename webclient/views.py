@@ -1,8 +1,8 @@
-from django.shortcuts import render_to_response
 from django.template import loader
 from django.http import *
 from django.views.decorators.csrf import csrf_exempt
-
+import json
+from django.http import JsonResponse
 
 from webclient.models import *
 from datetime import datetime
@@ -24,39 +24,43 @@ def index(request):
 
 @csrf_exempt
 def applyLabels(request):
-    print request.POST['label_list']
-    # label_list_ = dict['label_list']
-    # image_name = dict['image_name']
+    dict = json.load(request)
+    label_list_ = dict['label_list']
+    image_name = dict['image_name']
+    category_name = dict['category_name']
     parentImage_ = Image.objects.all().filter(name = image_name);
     if not parentImage_:
         sourceType = ImageSourceType(description='machine')
         sourceType.save()
-        parentImage_ = Image(name=request.GET['image_name'], path = '/static/image-store/', description = 'test generation at serverside', source = sourceType, pub_date=datetime.now())
+        parentImage_ = Image(name=image_name, path = '/static/image-store/', description = category_name, source = sourceType, pub_date=datetime.now())
         parentImage_.save()
     else:
-        for labelJSON in label_list_:
-            labelObject = ImageLabels(parentImage = parentImage_[0], labelShapes=labelJSON)
-            print labelJSON
-            labelObject.save()
-    csrfContext = RequestContext(request)
-    return render_to_response(label_list_, csrfContext)
+        print dir(label_list_)
+        labelObject = ImageLabels(parentImage = parentImage_[0], labelShapes=label_list_)
+        labelObject.save()
+
+    return JsonResponse(label_list_[0],safe=False)
 
 
 def loadLabels(request):
     parentImage_ = request.GET['image_name']
+    print parentImage_
+
     image = Image.objects.all().filter(name = parentImage_)
     if not image:
+        print 'why here?'
         sourceType = ImageSourceType(description='machine')
         sourceType.save()
         parentImage_ = Image(name=parentImage_, path='/static/image-store/',description='test generation at serverside', source=sourceType, pub_date=datetime.now())
         parentImage_.save()
     else:
         label_list = ImageLabels.objects.all().filter(parentImage=image[0])
-    if not label_list:
-        label_list_ = ''
-    else:
-        label_list_ = label_list[0].labelShapes
-    return HttpResponse(label_list_)
+
+    responseText = ''
+    for label in label_list:
+        responseText = responseText + label.labelShapes
+
+    return JsonResponse(responseText, safe=False)
 
 
 def purge(request):
