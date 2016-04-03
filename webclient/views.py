@@ -35,10 +35,9 @@ def applyLabels(request):
         parentImage_ = Image(name=image_name, path = '/static/image-store/', description = category_name, source = sourceType, pub_date=datetime.now())
         parentImage_.save()
     else:
-        print dir(label_list_)
         labelObject = ImageLabels(parentImage = parentImage_[0], labelShapes=label_list_)
         labelObject.save()
-
+    print label_list_
     return JsonResponse(label_list_[0],safe=False)
 
 
@@ -57,9 +56,7 @@ def loadLabels(request):
         label_list = ImageLabels.objects.all().filter(parentImage=image[0])
 
     responseText = ''
-    for label in label_list:
-        responseText = responseText + label.labelShapes
-
+    responseText = responseText + label_list[0].labelShapes
     return JsonResponse(responseText, safe=False)
 
 

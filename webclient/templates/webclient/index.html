@@ -16,8 +16,7 @@ var labelsLayer = new Layer();
 $(document).ready(function() {
             $("#applyLabels").click(function() {
                     var input_string = $("#categoryName").val();
-                    alert(input_string);
-                     var myselect = document.getElementById("imageCombo");
+                    var myselect = document.getElementById("imageCombo");
                     selectedImage = myselect.options[myselect.selectedIndex].value;
                     $.ajax({
                         url : "/webclient/applyLabels",
@@ -26,14 +25,14 @@ $(document).ready(function() {
                         data : JSON.stringify({
                             image_name: selectedImage,
                             category_name: input_string,
-                            label_list: JSON.stringify(labelsLayer.exportJSON())
+                            label_list: JSON.stringify(window.labelsLayer.exportJSON())
                             }),
                         success : function(data) {
                             $('#debug').text(data);
-                            labelsLayer.removeChildren();
-                            labelsLayer.importJSON(data);
-                            labelsLayer.fillColor = new Color(1, 0, 0);
-                            document.getElementById("debug").innerHTML = "";
+                            if(window.labelsLayer.hasChildren()){
+                                window.labelsLayer.removeChildren();
+                            }
+                            window.labelsLayer.importJSON(JSON.parse(data));
                         },
                         error : function(xhr,errmsg,err) {
                             alert(xhr.status + ": " + xhr.responseText);
@@ -65,12 +64,13 @@ function onMouseUp(event) {
 
 <script type="text/javascript">
 function onImageFormChange(){
+     if(!window.labelsLayer){
+        window.labelsLayer = new paper.Layer();
+     }
     var myselect = document.getElementById("imageCombo");
     selectedImage = myselect.options[myselect.selectedIndex].value;
     raster = new paper.Raster('/static/image-store/' + selectedImage);
     raster.position = paper.view.center;
-        alert("here 1");
-
     $.ajax({
     url : "/webclient/loadLabels",
             type : "GET",
@@ -78,20 +78,20 @@ function onImageFormChange(){
                 image_name: selectedImage,
                 },
             success : function(data) {
-                labelsLayer = new paper.Layer();
                 if(data){
-                   /* alert('here');
-
-                    window.labelsLayer.importJSON(data);
-                    window.labelsLayer.fillColor = new Color(1, 0, 0);*/
+                    //$('#debug').text(data);
+                    if(window.labelsLayer.hasChildren()){
+                            window.labelsLayer.removeChildren();
+                            }
+                    window.labelsLayer.importJSON(JSON.parse(data));
                 }
-                document.getElementById("debug").innerHTML = data;
             },
             error : function(xhr,errmsg,err) {
                 alert(xhr.status + ": " + xhr.responseText);
             }
         });
     }
+
 </script>
 
 
