@@ -28,7 +28,7 @@ $(document).ready(function() {
                             label_list: JSON.stringify(window.labelsLayer.exportJSON())
                             }),
                         success : function(data) {
-                            $('#debug').text(data);
+                            //$('#debug').text(data);
                             if(window.labelsLayer.hasChildren()){
                                 window.labelsLayer.removeChildren();
                             }
@@ -68,8 +68,9 @@ function onImageFormChange(){
         window.labelsLayer = new paper.Layer();
      }
     var myselect = document.getElementById("imageCombo");
+    path='/webclient/static/image-store/'
     selectedImage = myselect.options[myselect.selectedIndex].value;
-    raster = new paper.Raster('/static/image-store/' + selectedImage);
+    raster = new paper.Raster(path + selectedImage);
     raster.position = paper.view.center;
     $.ajax({
     url : "/webclient/loadLabels",
@@ -82,6 +83,10 @@ function onImageFormChange(){
                     //$('#debug').text(data);
                     if(window.labelsLayer.hasChildren()){
                             window.labelsLayer.removeChildren();
+                            }else{
+                                var myselect = document.getElementById("imageCombo");
+                                raster = new paper.Raster(path + selectedImage);
+                                raster.position = paper.view.center;
                             }
                     window.labelsLayer.importJSON(JSON.parse(data));
                 }
@@ -120,6 +125,6 @@ function onImageFormChange(){
         <input id="applyLabels" type="button" value="send to server">
     </form>
 </div>
-<canvas id="canvas" resize></canvas>
+<canvas id="canvas" width="2500" height="1000"></canvas>
 </body>
 </html>
