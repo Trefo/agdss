@@ -44,16 +44,18 @@ $(document).ready(function() {
 
 function onMouseDown(event) {
     startPoint = event.point;
-    window.circlePath = new Path.Circle(startPoint, 1);
-    window.circlePath.fillColor = 'white';
+    window.circlePath = new Path.Rectangle(startPoint, 1);
+    window.circlePath.strokeColor = 'yellow';
+    window.circlePath.strokeWidth = 3;
+
 }
 
 function onMouseDrag(event) {
     circlePath.removeSegments();
-    radius = startPoint.getDistance(event.point);
-    window.circlePath = new Path.Circle(startPoint, radius);
-    window.circlePath.fillColor = 'white';
-    window.circlePath.alpha = 0.5;
+    window.circlePath = new Path.Rectangle(startPoint, event.point);
+    window.circlePath.strokeColor = 'yellow';
+
+    window.circlePath.strokeWidth = 3;
 };
 
 function onMouseUp(event) {
