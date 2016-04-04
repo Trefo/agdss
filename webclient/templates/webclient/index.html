@@ -23,12 +23,13 @@
     background: #ccc;
 }
 </style>
-    <script type="text/paperscript" canvas="canvas">
+
+<script type="text/paperscript" canvas="canvas">
 var startPoint;
-var radius=1;
 var raster=null;
 var labelsLayer = new Layer();
-var selected = false;
+var isActive = false;
+var aboveExistingLabel = false;
 
 $(document).ready(function() {
             $("#applyLabels").click(function() {
@@ -60,23 +61,43 @@ $(document).ready(function() {
  });
 
 function onMouseDown(event) {
+    if(!aboveExistingLabel){
     startPoint = event.point;
-     window.circlePath = new Path.Rectangle(startPoint, event.point);
+    isActive = true;
+    window.circlePath = new Path.Rectangle(startPoint, event.point);
+    }
 }
 
 function onMouseDrag(event) {
-    window.circlePath = new Path.Rectangle(startPoint, event.point);
-    window.circlePath.strokeColor = 'yellow';
-    window.circlePath.fillColor = 'black';
-    window.circlePath.strokeWidth = 5;
-    window.circlePath.opacity = 0.5;
+    if(isActive){
+        newPath = new Path.Rectangle(startPoint, event.point);
+        newPath.strokeColor = 'yellow';
+        newPath.fillColor = 'green';
+        newPath.strokeWidth = 5;
+        newPath.opacity = 0.5;
+        newPath.onMouseEnter= function(event){
+            aboveExistingLabel = true;
+            window.circlePath = newPath;
+            }
+        newPath.onMouseLeave= function(event){
+            aboveExistingLabel = false;
+            }
+        window.circlePath.remove();
+        window.circlePath = newPath;
+
+     }else{
+            window.circlePath.position = event.point;
+        }
 
 }
 
 function onMouseUp(event) {
     window.circlePath.opacity = 0.5;
-
+    isActive = false;
 }
+
+
+
 </script>
 
 
