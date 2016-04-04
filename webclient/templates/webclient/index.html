@@ -71,16 +71,18 @@ function onMouseDown(event) {
 function onMouseDrag(event) {
     if(isActive){
         newPath = new Path.Rectangle(startPoint, event.point);
-        newPath.strokeColor = 'yellow';
-        newPath.fillColor = 'green';
-        newPath.strokeWidth = 5;
-        newPath.opacity = 0.5;
+        newPath.strokeColor = 'orange';
+        newPath.fillColor = 'black';
+        newPath.strokeWidth = 4;
+        newPath.opacity = 0.6;
         newPath.onMouseEnter= function(event){
             aboveExistingLabel = true;
+            this.fillColor = 'red';
             window.circlePath = this;
             }
         newPath.onMouseLeave= function(event){
             aboveExistingLabel = false;
+            this.fillColor = 'black';
             }
         window.circlePath.remove();
         window.circlePath = newPath;
