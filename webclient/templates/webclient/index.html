@@ -141,6 +141,7 @@ function onImageFormChange(){
 
 </head>
 <body>
+<div id="main>">
 <div id="toolbars">
     <select id="imageCombo"  onchange="onImageFormChange()">
         {% for image in latest_image_list %}
@@ -152,9 +153,7 @@ function onImageFormChange(){
         {% endfor %}
     </select>
 </div>
-<div id="debug">
 
-</div>
 <div id="controls">
     <form method="post" name="applyLabelsForm" >
         {% csrf_token %}
@@ -162,6 +161,10 @@ function onImageFormChange(){
         <input id="applyLabels" type="button" value="send to server">
     </form>
 </div>
-<canvas id="canvas" width="3000" height="3000"></canvas>
+<canvas id="canvas" resize></canvas>
+<div id="debug">
+
+</div>
+</div>
 </body>
 </html>

@@ -37,8 +37,7 @@ def applyLabels(request):
     else:
         labelObject = ImageLabels(parentImage = parentImage_[0], labelShapes=label_list_)
         labelObject.save()
-    print label_list_
-    return JsonResponse(label_list_[0],safe=False)
+    return JsonResponse(label_list_,safe=False)
 
 
 def loadLabels(request):
