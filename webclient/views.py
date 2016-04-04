@@ -42,6 +42,7 @@ def applyLabels(request):
 
 def loadLabels(request):
     parentImage_ = request.GET['image_name']
+    label_list = []
     print parentImage_
 
     image = Image.objects.all().filter(name = parentImage_)
