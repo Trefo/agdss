@@ -28,6 +28,7 @@ var startPoint;
 var radius=1;
 var raster=null;
 var labelsLayer = new Layer();
+var selected = false;
 
 $(document).ready(function() {
             $("#applyLabels").click(function() {
@@ -60,21 +61,20 @@ $(document).ready(function() {
 
 function onMouseDown(event) {
     startPoint = event.point;
-    window.circlePath = new Path.Rectangle(startPoint, 1);
-    window.circlePath.strokeColor = 'yellow';
-    window.circlePath.strokeWidth = 7;
-
+     window.circlePath = new Path.Rectangle(startPoint, event.point);
 }
 
 function onMouseDrag(event) {
-    circlePath.removeSegments();
     window.circlePath = new Path.Rectangle(startPoint, event.point);
     window.circlePath.strokeColor = 'yellow';
+    window.circlePath.fillColor = 'black';
+    window.circlePath.strokeWidth = 5;
+    window.circlePath.opacity = 0.5;
 
-    window.circlePath.strokeWidth = 7;
-};
+}
 
 function onMouseUp(event) {
+    window.circlePath.opacity = 0.5;
 
 }
 </script>
