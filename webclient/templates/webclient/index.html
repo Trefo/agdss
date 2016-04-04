@@ -46,7 +46,7 @@ $(document).ready(function() {
                             label_list: JSON.stringify(window.labelsLayer.exportJSON())
                             }),
                         success : function(data) {
-                            //$('#debug').text(data);
+                            $('#debug').text(data);
                             if(window.labelsLayer.hasChildren()){
                                 window.labelsLayer.removeChildren();
                             }
@@ -87,7 +87,7 @@ function onMouseDrag(event) {
 
      }else{
             window.circlePath.position = event.point;
-        }
+     }
 
 }
 
