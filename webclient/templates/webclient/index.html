@@ -77,7 +77,7 @@ function onMouseDrag(event) {
         newPath.opacity = 0.5;
         newPath.onMouseEnter= function(event){
             aboveExistingLabel = true;
-            window.circlePath = newPath;
+            window.circlePath = this;
             }
         newPath.onMouseLeave= function(event){
             aboveExistingLabel = false;
