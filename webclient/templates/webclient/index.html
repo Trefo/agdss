@@ -62,7 +62,7 @@ function onMouseDown(event) {
     startPoint = event.point;
     window.circlePath = new Path.Rectangle(startPoint, 1);
     window.circlePath.strokeColor = 'yellow';
-    window.circlePath.strokeWidth = 3;
+    window.circlePath.strokeWidth = 7;
 
 }
 
@@ -71,7 +71,7 @@ function onMouseDrag(event) {
     window.circlePath = new Path.Rectangle(startPoint, event.point);
     window.circlePath.strokeColor = 'yellow';
 
-    window.circlePath.strokeWidth = 3;
+    window.circlePath.strokeWidth = 7;
 };
 
 function onMouseUp(event) {
