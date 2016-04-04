@@ -71,10 +71,10 @@ function onMouseDown(event) {
 function onMouseDrag(event) {
     if(isActive){
         newPath = new Path.Rectangle(startPoint, event.point);
-        newPath.strokeColor = 'orange';
+        newPath.strokeColor = 'white';
         newPath.fillColor = 'black';
         newPath.strokeWidth = 4;
-        newPath.opacity = 0.6;
+        newPath.opacity = 0.7;
         newPath.onMouseEnter= function(event){
             aboveExistingLabel = true;
             this.fillColor = 'red';
