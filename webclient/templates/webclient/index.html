@@ -33,11 +33,12 @@
                         label_list: JSON.stringify(window.labelsLayer.exportJSON())
                     }),
                     success : function(data) {
-                        $('#debug').text(data);
+                        //$('#debug').text(data);
                         if(window.labelsLayer.hasChildren()){
                             window.labelsLayer.removeChildren();
                         }
-                        window.labelsLayer.importJSON(JSON.parse(data));
+                        //window.labelsLayer.importJSON(JSON.parse(data));
+                        onImageFormChange();
                     },
                     error : function(xhr,errmsg,err) {
                         alert(xhr.status + ": " + xhr.responseText);
