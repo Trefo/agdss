@@ -29,26 +29,29 @@ def applyLabels(request):
     image_name = dict['image_name']
     category_name = dict['category_name']
     sourceType = ''
+    categoryType = ''
     parentImage_ = Image.objects.all().filter(name = image_name);
-    if not parentImage_:
-        categoryTypeList = CategoryType.objects.all().filter(description=category_name);
-        if(categoryTypeList):
-            categoryType = categoryTypeList[0]
-        else:
-            categoryType = CategoryType(category_name=category_name,pub_date=datetime.now())
-            categoryType.save()
+    categoryTypeList = CategoryType.objects.all().filter(category_name=category_name);
+    if (categoryTypeList):
+        categoryType = categoryTypeList[0]
+    else:
+        categoryType = CategoryType(category_name=category_name, pub_date=datetime.now())
+        categoryType.save()
 
-        sourceTypeList = ImageSourceType.objects.all().filter(description="human");
-        if (sourceTypeList):
-            sourceType = sourceTypeList[0]
-        else:
-            sourceType = ImageSourceType(description="human",pub_date=datetime.now())
-            sourceType.save()
+    sourceTypeList = ImageSourceType.objects.all().filter(description="human");
+    if (sourceTypeList):
+        sourceType = sourceTypeList[0]
+    else:
+        sourceType = ImageSourceType(description="human", pub_date=datetime.now())
+        sourceType.save()
+
+
+    if not parentImage_:
 
         parentImage_ = Image(name=image_name, path = '/static/image-store/', description = "development test", source = sourceType, pub_date=datetime.now())
         parentImage_.save()
     else:
-        labelObject = ImageLabels(parentImage = parentImage_[0], labelShapes=label_list_,pub_date=datetime.now())
+        labelObject = ImageLabels(parentImage = parentImage_[0], labelShapes=label_list_,pub_date=datetime.now(),categoryType=categoryType)
         labelObject.save()
     return JsonResponse(label_list_,safe=False)
 
@@ -56,13 +59,18 @@ def applyLabels(request):
 def loadLabels(request):
     parentImage_ = request.GET['image_name']
     label_list = []
-    print parentImage_
+    sourceType = ''
+    categoryType = ''
+    sourceTypeList = ImageSourceType.objects.all().filter(description="human");
+    if (sourceTypeList):
+        sourceType = sourceTypeList[0]
+    else:
+        sourceType = ImageSourceType(description="human", pub_date=datetime.now())
+        sourceType.save()
+
 
     image = Image.objects.all().filter(name = parentImage_)
     if not image:
-        print 'why here?'
-        sourceType = ImageSourceType(description='machine',pub_date=datetime.now())
-        sourceType.save()
         parentImage_ = Image(name=parentImage_, path='/static/image-store/',description='test generation at serverside', source=sourceType, pub_date=datetime.now())
         parentImage_.save()
     else:
@@ -78,5 +86,6 @@ def purge(request):
     Image.objects.all().delete()
     ImageLabels.objects.all().delete()
     ImageSourceType.objects.all().delete()
+    CategoryType.objects.all().delete()
     return HttpResponse("PURGED TABLES!")
 

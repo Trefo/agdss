@@ -7,17 +7,20 @@
     <script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.js"></script>
     <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script>
     <style>
+        #canvasDiv{
+            width: 800px;
+            height: 600px;
+        }
         #canvas {
             position:relative;
-            width: 2000px;
-            height: 1000px;
-            margin: 10px;
-            padding: 10px;
-            background: #ccc;
-            overflow-x: auto;
-            overflow-y: auto;
-            resize: both;
-        }
+            margin: 0px;
+            padding: 0px;
+            background: grey;
+            overflow-x: scroll;
+            overflow-y: scroll;
+            resize: inherit;
+
+            }
     </style>
 
     <script type="text/paperscript" canvas="canvas">
