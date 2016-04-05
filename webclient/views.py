@@ -28,14 +28,27 @@ def applyLabels(request):
     label_list_ = dict['label_list']
     image_name = dict['image_name']
     category_name = dict['category_name']
+    sourceType = ''
     parentImage_ = Image.objects.all().filter(name = image_name);
     if not parentImage_:
-        sourceType = ImageSourceType(description='machine')
-        sourceType.save()
-        parentImage_ = Image(name=image_name, path = '/static/image-store/', description = category_name, source = sourceType, pub_date=datetime.now())
+        categoryTypeList = CategoryType.objects.all().filter(description=category_name);
+        if(categoryTypeList):
+            categoryType = categoryTypeList[0]
+        else:
+            categoryType = CategoryType(category_name=category_name,pub_date=datetime.now())
+            categoryType.save()
+
+        sourceTypeList = ImageSourceType.objects.all().filter(description="human");
+        if (sourceTypeList):
+            sourceType = sourceTypeList[0]
+        else:
+            sourceType = ImageSourceType(description="human",pub_date=datetime.now())
+            sourceType.save()
+
+        parentImage_ = Image(name=image_name, path = '/static/image-store/', description = "development test", source = sourceType, pub_date=datetime.now())
         parentImage_.save()
     else:
-        labelObject = ImageLabels(parentImage = parentImage_[0], labelShapes=label_list_)
+        labelObject = ImageLabels(parentImage = parentImage_[0], labelShapes=label_list_,pub_date=datetime.now())
         labelObject.save()
     return JsonResponse(label_list_,safe=False)
 
@@ -48,12 +61,12 @@ def loadLabels(request):
     image = Image.objects.all().filter(name = parentImage_)
     if not image:
         print 'why here?'
-        sourceType = ImageSourceType(description='machine')
+        sourceType = ImageSourceType(description='machine',pub_date=datetime.now())
         sourceType.save()
         parentImage_ = Image(name=parentImage_, path='/static/image-store/',description='test generation at serverside', source=sourceType, pub_date=datetime.now())
         parentImage_.save()
     else:
-        label_list = ImageLabels.objects.all().filter(parentImage=image[0])
+        label_list = ImageLabels.objects.all().filter(parentImage=image[0],)
 
     responseText = ''
     if(label_list):
@@ -64,5 +77,6 @@ def loadLabels(request):
 def purge(request):
     Image.objects.all().delete()
     ImageLabels.objects.all().delete()
+    ImageSourceType.objects.all().delete()
     return HttpResponse("PURGED TABLES!")
 
