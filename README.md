@@ -1,2 +1,2 @@
 # agdss
-Django based Decision support system for robotic sampling in precision agriculture
+Django based Agricultural Decision Support System (AgDSS) for robotic sampling in precision agriculture
