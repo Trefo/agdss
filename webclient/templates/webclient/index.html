@@ -101,6 +101,8 @@
         function onImageFormChange() {
             if (!window.labelsLayer) {
                 window.labelsLayer = new paper.Layer();
+            }else{
+                raster.remove();
             }
             var myselect = document.getElementById("imageCombo");
             path = '/webclient/static/image-store/'
@@ -116,19 +118,10 @@
                 },
                 success: function (data) {
                     if (data) {
-                        //$('#debug').text(data);
-                        if (window.labelsLayer.hasChildren()) {
-                            window.labelsLayer.removeChildren();
-                        } else {
-                            raster.remove();
-                            var myselect = document.getElementById("imageCombo");
-                            raster = new paper.Raster(path + selectedImage);
-                            raster.position = paper.view.center;
-                        }
-
                         window.labelsLayer.importJSON(JSON.parse(data));
                     }
                 },
+
                 error: function (xhr, errmsg, err) {
                     alert(xhr.status + ": " + xhr.responseText);
                 }
