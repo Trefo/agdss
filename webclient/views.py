@@ -75,11 +75,11 @@ def loadLabels(request):
         parentImage_ = Image(name=parentImage_, path='/static/image-store/',description='test generation at serverside', source=sourceType, pub_date=datetime.now())
         parentImage_.save()
     else:
-        label_list = ImageLabels.objects.all().filter(parentImage=image[0],)
+        label_list = ImageLabels.objects.all().filter(parentImage=image[0]).order_by('pub_date').last()
 
     responseText = ''
     if(label_list):
-        responseText = responseText + label_list[0].labelShapes
+        responseText = responseText + label_list.labelShapes
     return JsonResponse(responseText, safe=False)
 
 
