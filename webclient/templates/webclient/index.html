@@ -6,167 +6,165 @@
     <link rel="stylesheet" href="/static/scripts/paperjs/examples/css/style.css">
     <script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.js"></script>
     <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script>
-<style>
-#body {
-    width: 100%;
-    height: 100%;
-    background: #fff;
-}
-#canvas {
-    position:absolute;
-    width: 2000px;
-    height: 300px;
-    margin: 0;
-    padding: 10px;
-    overflow-x: scroll;
-    overflow-y: scroll;
-    background: #ccc;
-}
-</style>
+    <style>
+        #canvas {
+            position:relative;
+            width: 2000px;
+            height: 1000px;
+            margin: 10px;
+            padding: 10px;
+            background: #ccc;
+            overflow-x: auto;
+            overflow-y: auto;
+            resize: both;
+        }
+    </style>
 
-<script type="text/paperscript" canvas="canvas">
-var startPoint;
-var raster=null;
-var labelsLayer = new Layer();
-var isActive = false;
-var aboveExistingLabel = false;
+    <script type="text/paperscript" canvas="canvas">
+        var startPoint;
+        var raster=null;
+        var labelsLayer = new Layer();
+        var isActive = false;
+        var aboveExistingLabel = false;
 
-$(document).ready(function() {
+        $(document).ready(function() {
             $("#applyLabels").click(function() {
-                    var input_string = $("#categoryName").val();
-                    var myselect = document.getElementById("imageCombo");
-                    selectedImage = myselect.options[myselect.selectedIndex].value;
-                    $.ajax({
-                        url : "/webclient/applyLabels",
-                        type : "POST",
-                        dataType: 'text',
-                        data : JSON.stringify({
-                            image_name: selectedImage,
-                            category_name: input_string,
-                            label_list: JSON.stringify(window.labelsLayer.exportJSON())
-                            }),
-                        success : function(data) {
-                            $('#debug').text(data);
-                            if(window.labelsLayer.hasChildren()){
-                                window.labelsLayer.removeChildren();
-                            }
-                            window.labelsLayer.importJSON(JSON.parse(data));
-                        },
-                        error : function(xhr,errmsg,err) {
-                            alert(xhr.status + ": " + xhr.responseText);
-                        }
-                    });
-                    return false;
-            });
- });
-
-function onMouseDown(event) {
-    if(!aboveExistingLabel){
-    startPoint = event.point;
-    isActive = true;
-    window.circlePath = new Path.Rectangle(startPoint, event.point);
-    }
-}
-
-function onMouseDrag(event) {
-    if(isActive){
-        newPath = new Path.Rectangle(startPoint, event.point);
-        newPath.strokeColor = 'yellow';
-        newPath.strokeWidth = 4;
-        newPath.opacity = 0.5;
-        newPath.onMouseEnter= function(event){
-            aboveExistingLabel = true;
-            this.fillColor = 'red';
-            window.circlePath = this;
-            }
-        newPath.onMouseLeave= function(event){
-            aboveExistingLabel = false;
-            this.fillColor = 'cyan';
-            }
-        window.circlePath.remove();
-        window.circlePath = newPath;
-
-     }else{
-            window.circlePath.position = event.point;
-     }
-
-}
-
-function onMouseUp(event) {
-    window.circlePath.opacity = 0.3;
-    isActive = false;
-    window.circlePath.fillColor = 'magenta';
-}
-
-
-
-</script>
-
-
-<script type="text/javascript">
-function onImageFormChange(){
-     if(!window.labelsLayer){
-        window.labelsLayer = new paper.Layer();
-     }
-    var myselect = document.getElementById("imageCombo");
-    path='/webclient/static/image-store/'
-    selectedImage = myselect.options[myselect.selectedIndex].value;
-    raster = new paper.Raster(path + selectedImage);
-    raster.position = paper.view.center;
-    $.ajax({
-    url : "/webclient/loadLabels",
-            type : "GET",
-            data : {
-                image_name: selectedImage,
-                },
-            success : function(data) {
-                if(data){
-                    //$('#debug').text(data);
-                    if(window.labelsLayer.hasChildren()){
+                var input_string = $("#categoryName").val();
+                var myselect = document.getElementById("imageCombo");
+                selectedImage = myselect.options[myselect.selectedIndex].value;
+                $.ajax({
+                    url : "/webclient/applyLabels",
+                    type : "POST",
+                    dataType: 'text',
+                    data : JSON.stringify({
+                        image_name: selectedImage,
+                        category_name: input_string,
+                        label_list: JSON.stringify(window.labelsLayer.exportJSON())
+                    }),
+                    success : function(data) {
+                        $('#debug').text(data);
+                        if(window.labelsLayer.hasChildren()){
                             window.labelsLayer.removeChildren();
-                            }else{
-                                var myselect = document.getElementById("imageCombo");
-                                raster = new paper.Raster(path + selectedImage);
-                                raster.position = paper.view.center;
-                            }
-                    window.labelsLayer.importJSON(JSON.parse(data));
-                }
-            },
-            error : function(xhr,errmsg,err) {
-                alert(xhr.status + ": " + xhr.responseText);
-            }
+                        }
+                        window.labelsLayer.importJSON(JSON.parse(data));
+                    },
+                    error : function(xhr,errmsg,err) {
+                        alert(xhr.status + ": " + xhr.responseText);
+                    }
+                });
+                return false;
+            });
         });
-    }
 
-</script>
+        function onMouseDown(event) {
+            if(!aboveExistingLabel){
+                startPoint = event.point;
+                isActive = true;
+                window.circlePath = new Path.Rectangle(startPoint, event.point);
+            }
+        }
+
+        function onMouseDrag(event) {
+            if(isActive){
+                newPath = new Path.Rectangle(startPoint, event.point);
+                newPath.strokeColor = 'yellow';
+                newPath.strokeWidth = 4;
+                newPath.opacity = 0.5;
+                newPath.onMouseEnter= function(event){
+                    aboveExistingLabel = true;
+                    this.fillColor = 'red';
+                    window.circlePath = this;
+                }
+                newPath.onMouseLeave= function(event){
+                    aboveExistingLabel = false;
+                    this.fillColor = 'cyan';
+                }
+                window.circlePath.remove();
+                window.circlePath = newPath;
+
+            }else{
+                window.circlePath.position = event.point;
+            }
+
+        }
+
+        function onMouseUp(event) {
+            window.circlePath.opacity = 0.3;
+            isActive = false;
+            window.circlePath.fillColor = 'magenta';
+        }
+
+
+
+    </script>
+
+
+    <script type="text/javascript">
+        function onImageFormChange(){
+            if(!window.labelsLayer){
+                window.labelsLayer = new paper.Layer();
+            }
+            var myselect = document.getElementById("imageCombo");
+            path='/webclient/static/image-store/'
+            selectedImage = myselect.options[myselect.selectedIndex].value;
+            raster = new paper.Raster(path + selectedImage);
+            raster.position = paper.view.center;
+            $.ajax({
+                url : "/webclient/loadLabels",
+                type : "GET",
+                data : {
+                    image_name: selectedImage,
+                },
+                success : function(data) {
+                    if(data){
+                        //$('#debug').text(data);
+                        if(window.labelsLayer.hasChildren()){
+                            window.labelsLayer.removeChildren();
+                        }else{
+                            var myselect = document.getElementById("imageCombo");
+                            raster = new paper.Raster(path + selectedImage);
+                            raster.position = paper.view.center;
+                        }
+                        window.labelsLayer.importJSON(JSON.parse(data));
+                    }
+                },
+                error : function(xhr,errmsg,err) {
+                    alert(xhr.status + ": " + xhr.responseText);
+                }
+            });
+        }
+
+    </script>
 
 
 </head>
 <body>
 <div id="main>">
-<div id="toolbars">
-    <select id="imageCombo"  onchange="onImageFormChange()">
-        {% for image in latest_image_list %}
-        {% ifequal image selected_image.name %}
-        <option value="{{image}}" selected="selected">{{image}}</option>
-        {% else %}
-        <option value="{{image}}">{{image}}</option>
-        {% endifequal %}
-        {% endfor %}
-    </select>
-</div>
+    <div id="toolbars">
+        <select id="imageCombo"  onchange="onImageFormChange()">
+            {% for image in latest_image_list %}
+                {% ifequal image selected_image.name %}
+                    <option value="{{image}}" selected="selected">{{image}}</option>
+                {% else %}
+                    <option value="{{image}}">{{image}}</option>
+                {% endifequal %}
+            {% endfor %}
+        </select>
+    </div>
 
-<div id="controls">
-    <form method="post" name="applyLabelsForm" >
-        {% csrf_token %}
-        <input name="categoryName" id="categoryName" type="text">
-        <input id="applyLabels" type="button" value="send to server">
-    </form>
-</div>
-<canvas id="canvas" resize></canvas>
-<div id="debug">
+    <div id="controls">
+        <form method="post" name="applyLabelsForm" >
+            {% csrf_token %}
+            <input name="categoryName" id="categoryName" type="text">
+            <input id="applyLabels" type="button" value="submit">
+        </form>
+    </div>
+    <div id="canvasDiv">
+        <canvas id="canvas"></canvas>
+    </div>
+    <div id="debug">
 
-</div>
+    </div>
 </div>
 </body>
 </html>
