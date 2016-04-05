@@ -19,6 +19,7 @@ def index(request):
 
     context = {
         'latest_image_list': latest_image_list,
+        'selected_image': latest_image_list[0],
     }
     return HttpResponse(template.render(context, request))
 

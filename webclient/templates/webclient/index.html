@@ -6,22 +6,10 @@
     <link rel="stylesheet" href="/static/scripts/paperjs/examples/css/style.css">
     <script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.js"></script>
     <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script>
-    <style>
-        #canvasDiv{
-            width: 800px;
-            height: 600px;
-        }
-        #canvas {
-            position:relative;
-            margin: 0px;
-            padding: 0px;
-            background: grey;
-            overflow-x: scroll;
-            overflow-y: scroll;
-            resize: inherit;
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 
-            }
-    </style>
 
     <script type="text/paperscript" canvas="canvas">
         var startPoint;
@@ -70,8 +58,8 @@
         function onMouseDrag(event) {
             if(isActive){
                 newPath = new Path.Rectangle(startPoint, event.point);
-                newPath.strokeColor = 'yellow';
-                newPath.strokeWidth = 4;
+                newPath.strokeColor = 'white';
+                newPath.strokeWidth = 3;
                 newPath.opacity = 0.5;
                 newPath.onMouseEnter= function(event){
                     aboveExistingLabel = true;
@@ -82,6 +70,10 @@
                     aboveExistingLabel = false;
                     this.fillColor = 'cyan';
                 }
+                newPath.onDoubleClick = function(event) {
+                    isActive = false;
+                    this.remove();
+                }
                 window.circlePath.remove();
                 window.circlePath = newPath;
 
@@ -90,6 +82,8 @@
             }
 
         }
+
+
 
         function onMouseUp(event) {
             window.circlePath.opacity = 0.3;
@@ -103,27 +97,28 @@
 
 
     <script type="text/javascript">
-        function onImageFormChange(){
-            if(!window.labelsLayer){
+        function onImageFormChange() {
+            if (!window.labelsLayer) {
                 window.labelsLayer = new paper.Layer();
             }
             var myselect = document.getElementById("imageCombo");
-            path='/webclient/static/image-store/'
+            path = '/webclient/static/image-store/'
             selectedImage = myselect.options[myselect.selectedIndex].value;
             raster = new paper.Raster(path + selectedImage);
-            raster.position = paper.view.center;
+            raster.position = paper.view.center
+
             $.ajax({
-                url : "/webclient/loadLabels",
-                type : "GET",
-                data : {
+                url: "/webclient/loadLabels",
+                type: "GET",
+                data: {
                     image_name: selectedImage,
                 },
-                success : function(data) {
-                    if(data){
+                success: function (data) {
+                    if (data) {
                         //$('#debug').text(data);
-                        if(window.labelsLayer.hasChildren()){
+                        if (window.labelsLayer.hasChildren()) {
                             window.labelsLayer.removeChildren();
-                        }else{
+                        } else {
                             var myselect = document.getElementById("imageCombo");
                             raster = new paper.Raster(path + selectedImage);
                             raster.position = paper.view.center;
@@ -131,7 +126,7 @@
                         window.labelsLayer.importJSON(JSON.parse(data));
                     }
                 },
-                error : function(xhr,errmsg,err) {
+                error: function (xhr, errmsg, err) {
                     alert(xhr.status + ": " + xhr.responseText);
                 }
             });
@@ -146,7 +141,7 @@
     <div id="toolbars">
         <select id="imageCombo"  onchange="onImageFormChange()">
             {% for image in latest_image_list %}
-                {% ifequal image selected_image.name %}
+                {% ifequal image selected_image %}
                     <option value="{{image}}" selected="selected">{{image}}</option>
                 {% else %}
                     <option value="{{image}}">{{image}}</option>
@@ -163,8 +158,9 @@
         </form>
     </div>
     <div id="canvasDiv">
-        <canvas id="canvas"></canvas>
+        <canvas id="canvas" resize></canvas>
     </div>
+
     <div id="debug">
 
     </div>
