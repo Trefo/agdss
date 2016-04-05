@@ -13,7 +13,7 @@
 
     <script type="text/paperscript" canvas="canvas">
         var startPoint;
-        var raster=null;
+        var raster;
         var labelsLayer = new Layer();
         var isActive = false;
         var aboveExistingLabel = false;
@@ -120,10 +120,12 @@
                         if (window.labelsLayer.hasChildren()) {
                             window.labelsLayer.removeChildren();
                         } else {
+                            raster.remove();
                             var myselect = document.getElementById("imageCombo");
                             raster = new paper.Raster(path + selectedImage);
                             raster.position = paper.view.center;
                         }
+
                         window.labelsLayer.importJSON(JSON.parse(data));
                     }
                 },
