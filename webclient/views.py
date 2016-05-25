@@ -14,7 +14,7 @@ import os
 from .models import Image
 
 def index(request):
-    latest_image_list = os.listdir('/Users/jdas/Dropbox/Research/agriculture/agdss/image-store/')
+    latest_image_list = os.listdir('C:/Users/Sandeep/PythonProjects/static_stuff/image-store') # '/Users/jdas/Dropbox/Research/agriculture/agdss/image-store/')
     template = loader.get_template('webclient/index.html')
 
     context = {
