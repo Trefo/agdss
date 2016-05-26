@@ -16,3 +16,9 @@
 6. To create admin credentials (required to access /admin), run `python manage.py createsuperuser` and enter the requested information.
 7. To start server, run `python manage.py runserver`.
 8. The webapp can then be accessed at [http://localhost:8000](http://localhost:8000). For a list of available pages, see the file agdss/urls.py.
+
+
+
+##TODO
+1. Update paths to work from config file
+2. Category selection menu rather than field in tagging page
