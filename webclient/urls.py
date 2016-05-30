@@ -8,9 +8,10 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^results$', views.results, name='results'),
 
-    #GET/PUSH URLs
+    #GET/POST URLs
     url(r'^applyLabels$', 'webclient.views.applyLabels'),
     url(r'^loadLabels$', 'webclient.views.loadLabels'),
     url(r'^purge$', 'webclient.views.purge'),
+    url(r'^addImage$', 'webclient.views.addImage'),
 
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

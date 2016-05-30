@@ -3,6 +3,7 @@ from django.http import *
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 from webclient.models import *
 from datetime import datetime
@@ -14,7 +15,7 @@ import os
 from .models import Image
 
 def index(request):
-    latest_image_list = os.listdir('C:/Users/Sandeep\Dropbox/kumar-prec-ag/tag_images') # '/Users/jdas/Dropbox/Research/agriculture/agdss/image-store/')
+    latest_image_list = os.listdir('C:/Users/Sandeep/Dropbox/kumar-prec-ag/tag_images') # '/Users/jdas/Dropbox/Research/agriculture/agdss/image-store/')
     template = loader.get_template('webclient/index.html')
 
     context = {
@@ -54,7 +55,7 @@ def applyLabels(request):
 
     if not parentImage_:
 
-        parentImage_ = Image(name=image_name, path = '/static/image-store/', description = "development test", source = sourceType, pub_date=datetime.now())
+        parentImage_ = Image(name=image_name, path = '/static/tag_images/', description = "development test", source = sourceType, pub_date=datetime.now())
         parentImage_.save()
     else:
         labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,pub_date=datetime.now(),categoryType=categoryType)
@@ -77,7 +78,7 @@ def loadLabels(request):
 
     image = Image.objects.all().filter(name = parentImage_)
     if not image:
-        parentImage_ = Image(name=parentImage_, path='/static/image-store/',description='test generation at serverside', source=sourceType, pub_date=datetime.now())
+        parentImage_ = Image(name=parentImage_, path='/static/tag_images/',description='test generation at serverside', source=sourceType, pub_date=datetime.now())
         parentImage_.save()
     else:
         label_list = ImageLabel.objects.all().filter(parentImage=image[0]).order_by('pub_date').last()
@@ -94,4 +95,24 @@ def purge(request):
     ImageSourceType.objects.all().delete()
     CategoryType.objects.all().delete()
     return HttpResponse("PURGED TABLES!")
+
+
+'''
+Request: JSON
+{
+    path: location of image (not including image name itself. E.g. '/home/self/image-location/'). REQUIRED
+    image-name:name of image REQUIRED
+    description: A description NOT REQUIRED
+    source_description: Description of image_source. NOT REQUIRED
+}
+
+'''
+@csrf_exempt
+@require_POST
+def addImage(request):
+    sourceType = ImageSourceType(description=request.POST.get('source_description', default="human"), pub_date=datetime.now())
+    sourceType.save()
+    img = Image(name=request.POST['image-name'], path=request.POST['path'], description=request.POST.get('description', default=''), source=sourceType, pub_date=datetime.now())
+    img.save()
+    return HttpResponse("Added image" + request.POST['image-name'])
 
