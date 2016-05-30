@@ -27,6 +27,7 @@ Send a POST to /webclient/addImage with parameters:
   * `description`: A description NOT REQUIRED
   * `source_description`: Description of image_source. NOT REQUIRED
 Note that this POST request can be sent from anywhere. In the future it will require some method of authentication.
+
 ##TODO
 1. Update paths to work from config file
 2. Category selection menu rather than field in tagging page
