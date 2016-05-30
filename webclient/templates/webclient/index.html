@@ -105,27 +105,32 @@
                 raster.remove();
             }
             var myselect = document.getElementById("imageCombo");
-            path = '/webclient/static/tag_images/'
+            //path = '/webclient/static/tag_images/'
             selectedImage = myselect.options[myselect.selectedIndex].value;
-            raster = new paper.Raster(path + selectedImage);
-            //raster.position = paper.view.center
             $.ajax({
-                url: "/webclient/loadLabels",
+                url: "/webclient/getInfo",
                 type: "GET",
+                dataType: "json",
                 data: {
-                    image_name: selectedImage,
+                    image_name: selectedImage
                 },
-                success: function (data) {
+                success: function (response) {
+                    console.log(response);
+                    data = response.labels;
                     if (data) {
                         window.labelsLayer.importJSON(JSON.parse(data));
                         console.log(data);
                     }
+                    path = response.path;
+                    raster = new paper.Raster(path + selectedImage);
+                    //raster.position = paper.view.center
                 },
 
                 error: function (xhr, errmsg, err) {
                     alert(xhr.status + ": " + xhr.responseText);
                 }
             });
+
 
         }
 
@@ -140,9 +145,9 @@
         <select id="imageCombo"  onchange="onImageFormChange()">
             {% for image in latest_image_list %}
                 {% ifequal image selected_image %}
-                    <option value="{{image}}" selected="selected">{{image}}</option>
+                    <option value="{{image.name}}" selected="selected">{{image.name}}</option>
                 {% else %}
-                    <option value="{{image}}">{{image}}</option>
+                    <option value="{{image.name}}">{{image.name}}</option>
                 {% endifequal %}
             {% endfor %}
         </select>

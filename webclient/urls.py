@@ -13,5 +13,6 @@ urlpatterns = [
     url(r'^loadLabels$', 'webclient.views.loadLabels'),
     url(r'^purge$', 'webclient.views.purge'),
     url(r'^addImage$', 'webclient.views.addImage'),
+    url(r'^getInfo$', 'webclient.views.getInfo'),
 
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
