@@ -22,10 +22,10 @@
 
 ##Adding Images
 Send a POST to /webclient/addImage with parameters:
-  * path: location of image (not including image name itself. E.g. '/home/self/image-location/'). REQUIRED
-  * image-name:name of image REQUIRED
-  * description: A description NOT REQUIRED
-  * source_description: Description of image_source. NOT REQUIRED
+  * `path`: location of image (not including image name itself. E.g. '/home/self/image-location/'). REQUIRED
+  * `image-name`: name of image REQUIRED
+  * `description`: A description NOT REQUIRED
+  * `source_description`: Description of image_source. NOT REQUIRED
 Note that this POST request can be sent from anywhere. In the future it will require some method of authentication.
 ##TODO
 1. Update paths to work from config file
