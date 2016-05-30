@@ -105,11 +105,10 @@
                 raster.remove();
             }
             var myselect = document.getElementById("imageCombo");
-            path = '/webclient/static/image-store/'
+            path = '/webclient/static/tag_images/'
             selectedImage = myselect.options[myselect.selectedIndex].value;
             raster = new paper.Raster(path + selectedImage);
-            raster.position = paper.view.center
-
+            //raster.position = paper.view.center
             $.ajax({
                 url: "/webclient/loadLabels",
                 type: "GET",
@@ -119,6 +118,7 @@
                 success: function (data) {
                     if (data) {
                         window.labelsLayer.importJSON(JSON.parse(data));
+                        console.log(data);
                     }
                 },
 
@@ -126,6 +126,7 @@
                     alert(xhr.status + ": " + xhr.responseText);
                 }
             });
+
         }
 
 
@@ -154,8 +155,14 @@
             <input id="applyLabels" type="button" value="submit">
         </form>
     </div>
+
     <div id="canvasDiv">
-        <canvas id="canvas" resize></canvas>
+        <!--<canvas id="canvas" resize></canvas> -->
+        <canvas id="canvas"></canvas>
+
+    </div>
+    <div id="submitImage">
+        <button id="next">Submit</button>
     </div>
 
     <div id="debug">

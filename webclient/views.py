@@ -14,7 +14,7 @@ import os
 from .models import Image
 
 def index(request):
-    latest_image_list = os.listdir('C:/Users/Sandeep/PythonProjects/static_stuff/image-store') # '/Users/jdas/Dropbox/Research/agriculture/agdss/image-store/')
+    latest_image_list = os.listdir('C:/Users/Sandeep\Dropbox/kumar-prec-ag/tag_images') # '/Users/jdas/Dropbox/Research/agriculture/agdss/image-store/')
     template = loader.get_template('webclient/index.html')
 
     context = {
@@ -52,7 +52,7 @@ def applyLabels(request):
         parentImage_ = Image(name=image_name, path = '/static/image-store/', description = "development test", source = sourceType, pub_date=datetime.now())
         parentImage_.save()
     else:
-        labelObject = ImageLabels(parentImage = parentImage_[0], labelShapes=label_list_,pub_date=datetime.now(),categoryType=categoryType)
+        labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,pub_date=datetime.now(),categoryType=categoryType)
         labelObject.save()
     return JsonResponse(label_list_,safe=False)
 
@@ -75,7 +75,7 @@ def loadLabels(request):
         parentImage_ = Image(name=parentImage_, path='/static/image-store/',description='test generation at serverside', source=sourceType, pub_date=datetime.now())
         parentImage_.save()
     else:
-        label_list = ImageLabels.objects.all().filter(parentImage=image[0]).order_by('pub_date').last()
+        label_list = ImageLabel.objects.all().filter(parentImage=image[0]).order_by('pub_date').last()
 
     responseText = ''
     if(label_list):
@@ -85,7 +85,7 @@ def loadLabels(request):
 
 def purge(request):
     Image.objects.all().delete()
-    ImageLabels.objects.all().delete()
+    ImageLabel.objects.all().delete()
     ImageSourceType.objects.all().delete()
     CategoryType.objects.all().delete()
     return HttpResponse("PURGED TABLES!")

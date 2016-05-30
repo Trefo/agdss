@@ -31,7 +31,7 @@ class Image(models.Model):
         return 'Name: ' + self.name
 
 
-class ImageLabels(models.Model):
+class ImageLabel(models.Model):
     parentImage = models.ForeignKey(Image, on_delete=models.CASCADE)
     categoryType = models.ForeignKey(CategoryType, on_delete=models.CASCADE)
     labelShapes = models.TextField(max_length=10000)

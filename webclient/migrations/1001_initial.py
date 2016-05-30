@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='ImageLabels',
+            name='ImageLabel',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('labelShapes', models.TextField(max_length=10000)),
