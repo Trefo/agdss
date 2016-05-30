@@ -23,6 +23,11 @@ def index(request):
     }
     return HttpResponse(template.render(context, request))
 
+
+def results(request):
+    template = loader.get_template('webclient/results.html')
+    context = {}
+    return HttpResponse(template.render(context, request))
 @csrf_exempt
 def applyLabels(request):
     dict = json.load(request)
