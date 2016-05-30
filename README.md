@@ -14,6 +14,8 @@
   * If on Windows, one may be required to create a Firewall inbound rule allowing traffic on port 5432 as it is closed by default. This may not be necessary, but attempt if there is a problem. 
 5. Run `python manage.py migrate`.
 6. To create admin credentials (required to access /admin), run `python manage.py createsuperuser` and enter the requested information.
+7. TEMPORARY: Set `STATIC_ROOT` to parent directory of images (in agdss/settings.py).
+8. TEMPORARY: Place all images directly in directory named `tag_images` which is a child of the `STATIC_ROOT` directory.
 7. To start server, run `python manage.py runserver`.
 8. The webapp can then be accessed at [http://localhost:8000](http://localhost:8000). For a list of available pages, see the file agdss/urls.py.
 
