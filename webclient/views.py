@@ -122,6 +122,8 @@ def getInfo(request):
     return JsonResponse(response, safe=False)
 
 
+#TODO: Remove csrf_exempt
+@csrf_exempt
 def purge(request):
     Image.objects.all().delete()
     ImageLabel.objects.all().delete()
@@ -146,12 +148,30 @@ Request: POST
 @csrf_exempt
 @require_POST
 def addImage(request):
-    sourceType = ImageSourceType(description=request.POST.get('source_description', default="human"), pub_date=datetime.now())
-    sourceType.save()
-    categoryType = CategoryType(category_name=request.POST.get('category', 'unknown'))
-    categoryType.save()
-    img = Image(name=request.POST['image-name'], path=request.POST['path'], description=request.POST.get('description', default=''), source=sourceType, pub_date=datetime.now())
-    img.save()
+    #Get or create ImageSourceType
+    desc = request.POST.get('source_description', default="human")
+    imageSourceTypeList = ImageSourceType.objects.all().filter(description = desc)
+    if imageSourceTypeList:
+        sourceType = imageSourceTypeList[0]
+    else:
+        sourceType = ImageSourceType(description=request.POST.get('source_description', default="human"), pub_date=datetime.now())
+        sourceType.save()
+
+    #Get CategoryType entry or add one if necessary.
+    cn = request.POST.get('category', 'unknown')
+    categoryTypeList = CategoryType.objects.all().filter(category_name = cn)
+    if categoryTypeList:
+        categoryType = categoryTypeList[0]
+    else:
+        categoryType = CategoryType(category_name=request.POST.get('category', 'unknown'))
+        categoryType.save()
+
+    imageList = Image.objects.all().filter(name=request.POST['image-name'], path=request.POST['path'], description=request.POST.get('description', default=''), source=sourceType)
+    if imageList:
+        img = imageList[0]
+    else:
+        img = Image(name=request.POST['image-name'], path=request.POST['path'], description=request.POST.get('description', default=''), source=sourceType)
+        img.save()
     imgLabel = ImageLabel(parentImage=img, categoryType=categoryType, pub_date=datetime.now())
     imgLabel.save()
     return HttpResponse("Added image " + request.POST['image-name'])
