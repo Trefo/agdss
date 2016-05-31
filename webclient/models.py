@@ -5,7 +5,7 @@ from django.db import models
 
 
 class CategoryType(models.Model):
-    category_name = models.CharField(default='unknown', max_length=100)
+    category_name = models.CharField(default='unknown', max_length=100, unique=True)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
 
     def __unicode__(self):
@@ -13,7 +13,7 @@ class CategoryType(models.Model):
 
 
 class ImageSourceType(models.Model):
-    description = models.CharField(default='unknown',max_length=200)
+    description = models.CharField(default='unknown',max_length=200, unique=True)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
 
     def __unicode__(self):
@@ -26,7 +26,8 @@ class Image(models.Model):
     description = models.CharField(max_length=500)
     source = models.ForeignKey(ImageSourceType, on_delete=models.CASCADE)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
-
+    #TODO: Cascade if last entry is deleted
+    categoryTypes = models.ManyToManyField(CategoryType)
     def __unicode__(self):
         return 'Name: ' + self.name
 

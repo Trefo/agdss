@@ -20,7 +20,8 @@
 
         $(document).ready(function() {
             $("#applyLabels").click(function() {
-                var input_string = $("#categoryName").html();
+                var updated_category = $("#categories").val();
+                console.log(updated_category);
                 var myselect = document.getElementById("imageCombo");
                 selectedImage = myselect.options[myselect.selectedIndex].value;
                 $.ajax({
@@ -29,7 +30,7 @@
                     dataType: 'text',
                     data : JSON.stringify({
                         image_name: selectedImage,
-                        category_name: input_string,
+                        category_name: updated_category,
                         label_list: JSON.stringify(window.labelsLayer.exportJSON())
                     }),
                     success : function(data) {
@@ -126,7 +127,16 @@
                     raster.position = paper.view.center;
                     //paper.view.scale(1.5);
 
-                    $('#categoryName').html(response.category);
+                    var output = [];
+
+                    //Category selection setup
+                    $('#categories')[0].options.length = 0;
+                    $.each(response.categories, function(i, val)
+                    {
+                      output.push('<option value="'+ val +'">'+ val +'</option>');
+                    });
+                    $('#categories').html(output.join(''));
+                    //$('#categoryName').html(response.categories[0]);
                 },
 
                 error: function (xhr, errmsg, err) {
@@ -161,6 +171,7 @@
             {% csrf_token %}
             <!--<input name="categoryName" id="categoryName" type="text"> -->
                 <div id="categoryWord">Category: </div>
+                <select id="categories"></select>
                 <div name="categoryName" id="categoryName"></div>
             <input id="applyLabels" type="button" value="submit">
         </form>

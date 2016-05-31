@@ -118,7 +118,7 @@ def getInfo(request):
     else:
         response['labels'] = ''
     response['path'] = image[0].path
-    response['category'] = ImageLabel.objects.all().filter(parentImage=image[0])[0].categoryType.category_name
+    response['categories'] = [c.category_name for c in image[0].categoryTypes.all()]
     return JsonResponse(response, safe=False)
 
 
@@ -148,6 +148,11 @@ Request: POST
 @csrf_exempt
 @require_POST
 def addImage(request):
+    #Validate input
+    if not ('image-name' in request.POST and  'path' in request.POST and 'category' in request.POST):
+        return HttpResponseBadRequest("Missing required input")
+
+
     #Get or create ImageSourceType
     desc = request.POST.get('source_description', default="human")
     imageSourceTypeList = ImageSourceType.objects.all().filter(description = desc)
@@ -172,7 +177,8 @@ def addImage(request):
     else:
         img = Image(name=request.POST['image-name'], path=request.POST['path'], description=request.POST.get('description', default=''), source=sourceType)
         img.save()
-    imgLabel = ImageLabel(parentImage=img, categoryType=categoryType, pub_date=datetime.now())
-    imgLabel.save()
+    img.categoryTypes.add(categoryType)
+    #imgLabel = ImageLabel(parentImage=img, categoryType=categoryType, pub_date=datetime.now())
+    #imgLabel.save()
     return HttpResponse("Added image " + request.POST['image-name'])
 
