@@ -113,14 +113,19 @@ def getInfo(request):
         label_list = ImageLabel.objects.all().filter(parentImage=image[0]).order_by('pub_date').last()
 
     response = {}
-    if not label_list:
+    if label_list:
         response['labels'] = json.loads(label_list.labelShapes)
     else:
         response['labels'] = ''
     response['path'] = image[0].path
-    response['categories'] = [c.category_name for c in image[0].categoryTypes.all()]
+    response['categories'] = [c.category_name for c in image[0].categoryType.all()]
     return JsonResponse(response, safe=False)
 
+
+
+@require_GET
+def getNextImage(request):
+    return
 
 #TODO: Remove csrf_exempt
 @csrf_exempt
@@ -177,8 +182,47 @@ def addImage(request):
     else:
         img = Image(name=request.POST['image-name'], path=request.POST['path'], description=request.POST.get('description', default=''), source=sourceType)
         img.save()
-    img.categoryTypes.add(categoryType)
+    img.categoryType.add(categoryType)
     #imgLabel = ImageLabel(parentImage=img, categoryType=categoryType, pub_date=datetime.now())
     #imgLabel.save()
     return HttpResponse("Added image " + request.POST['image-name'])
 
+
+
+'''
+Request: POST
+{
+    path: location of image (not including image name itself. E.g. '/home/self/image-location/'). REQUIRED
+    image-name:name of image REQUIRED
+    description: A description CHANGED IF INCLUDED
+    source_description: Description of image_source. CHANGED IF INCLUDED
+    add_category: Category of the image (e.g. 'apple') to be added to the list. UPDATED IF INCLUDED
+    remove_category: Category of the image (e.g. 'apple') to be added to the list. UPDATED IF INCLUDED
+}
+
+'''
+@csrf_exempt
+@require_POST
+def updateImage(request):
+    #Validate input
+    if not ('image-name' in request.POST and  'path' in request.POST):
+        return HttpResponseBadRequest("Missing required input")
+    image = Image.objects.all().filter(name = request.POST['image-name'], path=request.POST['path'])[0]
+    if 'description' in request.POST:
+        image.description = request.POST['description']
+    if 'source-description' in request.POST:
+        image.description = request.POST['source-description']
+    if 'add_category' in request.POST:
+        cats = CategoryType.objects.all().filter(category_name=request.POST['add_category'])
+        if not cats or not image.filter(categoryType=cats[0]):
+            if cats:
+                cat = cats[0]
+            else:
+                cat = CategoryType(category_name=request.POST['add_category'])
+                cat.save()
+            image.categoryType.add(cat)
+    if 'remove_category' in request.POST:
+        cats = CategoryType.objects.all().filter(category_name=request.POST['remove_category'])
+        if cats and image.filter(categoryType=cats[0]):
+            image.categoryType.remove(cat)
+    return HttpResponse("Made changes")

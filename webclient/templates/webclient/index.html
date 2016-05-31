@@ -12,7 +12,7 @@
 
 
     <script type="text/paperscript" canvas="canvas">
-        var startPoint;
+       var startPoint;
         var raster;
         var labelsLayer = new paper.Layer();
         var isActive = false;
@@ -158,9 +158,9 @@
         <select id="imageCombo"  onchange="onImageFormChange()">
             {% for image in latest_image_list %}
                 {% ifequal image selected_image %}
-                    <option value="{{image.name}}" selected="selected">{{image.name}}</option>
+                    <option value="{'name': {{image.name}}, 'path': {{ image.path }}}" selected="selected">{{image.name}}</option>
                 {% else %}
-                    <option value="{{image.name}}">{{image.name}}</option>
+                    <option value="{'name': {{image.name}}, 'path': {{ image.path }}">{{image.name}}</option>
                 {% endifequal %}
             {% endfor %}
         </select>
@@ -182,9 +182,9 @@
         <canvas id="canvas"></canvas>
 
     </div>
-    <div id="submitImage">
+    <!--<div id="submitImage">
         <button id="next">Submit</button>
-    </div>
+    </div> -->
 
     <div id="debug">
 
