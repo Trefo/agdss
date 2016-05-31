@@ -112,13 +112,13 @@ def getInfo(request):
     else:
         label_list = ImageLabel.objects.all().filter(parentImage=image[0]).order_by('pub_date').last()
 
-    responseTextJSON = ''
-    if(label_list): #?
-        responseTextJSON = json.loads('' + label_list.labelShapes)
     response = {}
-    response['labels'] = responseTextJSON
-    print(responseTextJSON)
+    if not label_list:
+        response['labels'] = json.loads(label_list.labelShapes)
+    else:
+        response['labels'] = ''
     response['path'] = image[0].path
+    response['category'] = ImageLabel.objects.all().filter(parentImage=image[0])[0].categoryType.category_name
     return JsonResponse(response, safe=False)
 
 
@@ -130,6 +130,8 @@ def purge(request):
     return HttpResponse("PURGED TABLES!")
 
 
+
+#TODO: Check for bad input
 '''
 Request: POST
 {

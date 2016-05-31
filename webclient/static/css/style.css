@@ -16,5 +16,12 @@ button #next {
 }
 
 div #canvasDiv {
-    position: fixed;
+    position: absolute;
+}
+
+
+canvas #canvas {
+    height: 1000px;
+    width: 700px;
+    position:absolute;
 }

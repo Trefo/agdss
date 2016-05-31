@@ -14,13 +14,13 @@
     <script type="text/paperscript" canvas="canvas">
         var startPoint;
         var raster;
-        var labelsLayer = new Layer();
+        var labelsLayer = new paper.Layer();
         var isActive = false;
         var aboveExistingLabel = false;
 
         $(document).ready(function() {
             $("#applyLabels").click(function() {
-                var input_string = $("#categoryName").val();
+                var input_string = $("#categoryName").html();
                 var myselect = document.getElementById("imageCombo");
                 selectedImage = myselect.options[myselect.selectedIndex].value;
                 $.ajax({
@@ -123,7 +123,10 @@
                     }
                     path = response.path;
                     raster = new paper.Raster(path + selectedImage);
-                    //raster.position = paper.view.center
+                    raster.position = paper.view.center;
+                    //paper.view.scale(1.5);
+
+                    $('#categoryName').html(response.category);
                 },
 
                 error: function (xhr, errmsg, err) {
@@ -156,7 +159,9 @@
     <div id="controls">
         <form method="post" name="applyLabelsForm" >
             {% csrf_token %}
-            <input name="categoryName" id="categoryName" type="text">
+            <!--<input name="categoryName" id="categoryName" type="text"> -->
+                <div id="categoryWord">Category: </div>
+                <div name="categoryName" id="categoryName"></div>
             <input id="applyLabels" type="button" value="submit">
         </form>
     </div>
