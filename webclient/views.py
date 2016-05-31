@@ -146,7 +146,11 @@ Request: POST
 def addImage(request):
     sourceType = ImageSourceType(description=request.POST.get('source_description', default="human"), pub_date=datetime.now())
     sourceType.save()
+    categoryType = CategoryType(category_name=request.POST[catgory], pub_date=datetime.now())
+    categoryType.save()
     img = Image(name=request.POST['image-name'], path=request.POST['path'], description=request.POST.get('description', default=''), source=sourceType, pub_date=datetime.now())
     img.save()
+    imgLabel = ImageLabel(parentImage=img, categoryType=categoryType, pub_date=datetime.now())
+    imgLabel.save()
     return HttpResponse("Added image " + request.POST['image-name'])
 
