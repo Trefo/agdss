@@ -190,7 +190,8 @@ def addImage(request):
     #Validate input
     if not ('image_name' in request.POST and  'path' in request.POST and 'category' in request.POST):
         return HttpResponseBadRequest("Missing required input")
-
+    if request.POST['category'] == '':
+        return HttpResponseBadRequest("Missing category")
 
     #Get or create ImageSourceType
     desc = request.POST.get('source_description', default="human")
