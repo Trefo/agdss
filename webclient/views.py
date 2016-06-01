@@ -35,10 +35,11 @@ def applyLabels(request):
     dict = json.load(request)
     label_list_ = dict['label_list']
     image_name = dict['image_name']
+    path = dict['path']
     category_name = dict['category_name']
     sourceType = ''
     categoryType = ''
-    parentImage_ = Image.objects.all().filter(name = image_name);
+    parentImage_ = Image.objects.all().filter(name=image_name, path=path);
     categoryTypeList = CategoryType.objects.all().filter(category_name=category_name);
     if (categoryTypeList):
         categoryType = categoryTypeList[0]
@@ -54,13 +55,12 @@ def applyLabels(request):
         sourceType.save()
 
 
-    if not parentImage_:
-
-        parentImage_ = Image(name=image_name, path = '/static/tag_images/', description = "development test", source = sourceType, pub_date=datetime.now())
-        parentImage_.save()
-    else:
-        labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,pub_date=datetime.now(),categoryType=categoryType)
-        labelObject.save()
+#    if not parentImage_:
+#        parentImage_ = Image(name=image_name, path = '/static/tag_images/', description = "development test", source = sourceType, pub_date=datetime.now())
+#        parentImage_.save()
+ #   else:
+    labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,pub_date=datetime.now(),categoryType=categoryType)
+    labelObject.save()
     return JsonResponse(label_list_,safe=False)
 
 
@@ -93,6 +93,8 @@ def loadLabels(request):
 
 @require_GET
 def getInfo(request):
+    if not 'image_name' in request.GET or not 'path' in request.GET:
+        return HttpResponseBadRequest("Missing 'image_name or 'path'")
     parentImage_ = request.GET['image_name']
     label_list = []
     sourceType = ''
@@ -107,10 +109,11 @@ def getInfo(request):
 
     image = Image.objects.all().filter(name = parentImage_)
     if not image:
-        parentImage_ = Image(name=parentImage_, path='/static/tag_images/',description='test generation at serverside', source=sourceType, pub_date=datetime.now())
-        parentImage_.save()
-    else:
-        label_list = ImageLabel.objects.all().filter(parentImage=image[0]).order_by('pub_date').last()
+        return HttpResponseBadRequest("Could not find image with name " + request.GET['image_name'] + " and path " + request.GET['path'])
+        #img = Image(name=parentImage_, path='/static/tag_images/',description='test generation at serverside', source=sourceType, pub_date=datetime.now())
+        #img.save()
+    #else:
+    label_list = ImageLabel.objects.all().filter(parentImage=image[0]).order_by('pub_date').last()
 
     response = {}
     if label_list:

@@ -21,15 +21,14 @@
         $(document).ready(function() {
             $("#applyLabels").click(function() {
                 var updated_category = $("#categories").val();
-                console.log(updated_category);
-                var myselect = document.getElementById("imageCombo");
-                selectedImage = myselect.options[myselect.selectedIndex].value;
+                selectedImage = JSON.parse($('#imageCombo').val().toString());
                 $.ajax({
                     url : "/webclient/applyLabels",
                     type : "POST",
                     dataType: 'text',
                     data : JSON.stringify({
-                        image_name: selectedImage,
+                        image_name: selectedImage.image_name,
+                        path: selectedImage.path,
                         category_name: updated_category,
                         label_list: JSON.stringify(window.labelsLayer.exportJSON())
                     }),
@@ -105,25 +104,22 @@
             }else{
                 raster.remove();
             }
-            var myselect = document.getElementById("imageCombo");
-            //path = '/webclient/static/tag_images/'
-            selectedImage = myselect.options[myselect.selectedIndex].value;
+            //var myselect = document.getElementById("imageCombo");
+            selectedImage = JSON.parse($('#imageCombo').val().toString());
             $.ajax({
                 url: "/webclient/getInfo",
                 type: "GET",
                 dataType: "json",
                 data: {
-                    image_name: selectedImage
+                    image_name: selectedImage.image_name,
+                    path: selectedImage.path
                 },
                 success: function (response) {
-                    console.log(response);
                     data = response.labels;
                     if (data) {
                         window.labelsLayer.importJSON(JSON.parse(data));
-                        console.log(data);
                     }
-                    path = response.path;
-                    raster = new paper.Raster(path + selectedImage);
+                    raster = new paper.Raster(selectedImage.path + selectedImage.image_name);
                     raster.position = paper.view.center;
                     //paper.view.scale(1.5);
 
@@ -158,9 +154,9 @@
         <select id="imageCombo"  onchange="onImageFormChange()">
             {% for image in latest_image_list %}
                 {% ifequal image selected_image %}
-                    <option value="{'name': {{image.name}}, 'path': {{ image.path }}}" selected="selected">{{image.name}}</option>
+                    <option value='{"image_name": "{{image.name}}", "path": "{{ image.path }}"}' selected="selected">{{image.name}}</option>
                 {% else %}
-                    <option value="{'name': {{image.name}}, 'path': {{ image.path }}">{{image.name}}</option>
+                    <option value='{"image_name": "{{image.name}}", "path": "{{ image.path }}"}'>{{image.name}}</option>
                 {% endifequal %}
             {% endfor %}
         </select>
