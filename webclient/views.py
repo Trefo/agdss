@@ -177,7 +177,7 @@ def purge(request):
 Request: POST
 {
     path: location of image (not including image name itself. E.g. '/home/self/image-location/'). REQUIRED
-    image-name:name of image REQUIRED
+    image_name:name of image REQUIRED
     description: A description NOT REQUIRED
     source_description: Description of image_source. NOT REQUIRED
     category: Category of the image (e.g. 'apple'). REQUIRED.
@@ -188,7 +188,7 @@ Request: POST
 @require_POST
 def addImage(request):
     #Validate input
-    if not ('image-name' in request.POST and  'path' in request.POST and 'category' in request.POST):
+    if not ('image_name' in request.POST and  'path' in request.POST and 'category' in request.POST):
         return HttpResponseBadRequest("Missing required input")
 
 
@@ -210,16 +210,16 @@ def addImage(request):
         categoryType = CategoryType(category_name=request.POST.get('category', 'unknown'))
         categoryType.save()
 
-    imageList = Image.objects.all().filter(name=request.POST['image-name'], path=request.POST['path'], description=request.POST.get('description', default=''), source=sourceType)
+    imageList = Image.objects.all().filter(name=request.POST['image_name'], path=request.POST['path'], description=request.POST.get('description', default=''), source=sourceType)
     if imageList:
         img = imageList[0]
     else:
-        img = Image(name=request.POST['image-name'], path=request.POST['path'], description=request.POST.get('description', default=''), source=sourceType)
+        img = Image(name=request.POST['image_name'], path=request.POST['path'], description=request.POST.get('description', default=''), source=sourceType)
         img.save()
     img.categoryType.add(categoryType)
     #imgLabel = ImageLabel(parentImage=img, categoryType=categoryType, pub_date=datetime.now())
     #imgLabel.save()
-    return HttpResponse("Added image " + request.POST['image-name'])
+    return HttpResponse("Added image " + request.POST['image_name'] + '\n')
 
 
 
@@ -227,7 +227,7 @@ def addImage(request):
 Request: POST
 {
     path: location of image (not including image name itself. E.g. '/home/self/image-location/'). REQUIRED
-    image-name:name of image REQUIRED
+    image_name:name of image REQUIRED
     description: A description CHANGED IF INCLUDED
     source_description: Description of image_source. CHANGED IF INCLUDED
     add_category: Category of the image (e.g. 'apple') to be added to the list. UPDATED IF INCLUDED
@@ -239,9 +239,9 @@ Request: POST
 @require_POST
 def updateImage(request):
     #Validate input
-    if not ('image-name' in request.POST and  'path' in request.POST):
+    if not ('image_name' in request.POST and  'path' in request.POST):
         return HttpResponseBadRequest("Missing required input")
-    image = Image.objects.all().filter(name = request.POST['image-name'], path=request.POST['path'])[0]
+    image = Image.objects.all().filter(name = request.POST['image_name'], path=request.POST['path'])[0]
     if 'description' in request.POST:
         image.description = request.POST['description']
     if 'source-description' in request.POST:
