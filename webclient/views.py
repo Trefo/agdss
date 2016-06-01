@@ -129,7 +129,22 @@ def getInfo(request):
 
 @require_GET
 def getNewImage(request):
+    if not 'image_name' in request.GET or not 'path' in request.GET:
+        return HttpResponseBadRequest("Missing image name or path")
+    if len(Image.objects.all()) == 0:
+        return HttpResponseBadRequest("No images in database")
+
+
+    #Choose image
     img = choice(Image.objects.all())
+    if len(Image.objects.all()) > 1:
+        currentImg = Image.objects.all().filter(name=request.GET['image_name'], path=request.GET['path'])[0]
+        while img is currentImg:
+            img = choice(Image.objects.all())
+    print(img is currentImg)
+    print(img.name + ' ' + img.path)
+    print(currentImg.name + ' ' + currentImg.path)
+
     label_list = ImageLabel.objects.all().filter(parentImage=img).order_by('pub_date').last()
     response = {
         'path': img.path,
@@ -140,6 +155,7 @@ def getNewImage(request):
         response['labels'] = label_list.labelShapes
     else:
         response['labels'] = ''
+
     return JsonResponse(response)
 
 
