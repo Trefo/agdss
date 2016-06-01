@@ -38,7 +38,7 @@
                             window.labelsLayer.removeChildren();
                         }
                         //window.labelsLayer.importJSON(JSON.parse(data));
-                        onImageFormChange();
+                        getNewImage();
                     },
                     error : function(xhr,errmsg,err) {
                         alert(xhr.status + ": " + xhr.responseText);
@@ -119,20 +119,7 @@
                     if (data) {
                         window.labelsLayer.importJSON(JSON.parse(data));
                     }
-                    raster = new paper.Raster(selectedImage.path + selectedImage.image_name);
-                    raster.position = paper.view.center;
-                    //paper.view.scale(1.5);
-
-                    var output = [];
-
-                    //Category selection setup
-                    $('#categories')[0].options.length = 0;
-                    $.each(response.categories, function(i, val)
-                    {
-                      output.push('<option value="'+ val +'">'+ val +'</option>');
-                    });
-                    $('#categories').html(output.join(''));
-                    //$('#categoryName').html(response.categories[0]);
+                    displayImage(selectedImage.image_name, selectedImage.path, response.categories)
                 },
 
                 error: function (xhr, errmsg, err) {
@@ -143,12 +130,60 @@
 
         }
 
+        function getNewImage() {
+            if (!window.labelsLayer) {
+                window.labelsLayer = new paper.Layer();
+            }else{
+                raster.remove();
+            }
+            $.ajax({
+                url: "/webclient/getNewImage",
+                type: "GET",
+                dataType: "json",
+                success: function (response) {
+                    console.log(response)
+                    data = response.labels;
+                    if (data) {
+                        displayLabels(response.labels)
+                    }
+                    displayImage(response.image_name, response.path, response.categories)
+
+                },
+
+                error: function (xhr, errmsg, err) {
+                    alert(xhr.status + ": " + xhr.responseText);
+                }
+            });
+
+        }
+        //TODO: Input validation and error checking
+        function displayImage(image_name, image_path, categories) {
+            raster = new paper.Raster(image_path + image_name);
+            raster.position = paper.view.center;
+            //paper.view.scale(1.5);
+
+            //Category selection setup
+            var output = [];
+            $('#categories')[0].options.length = 0;
+            $.each(categories, function(i, val)
+            {
+              output.push('<option value="'+ val +'">'+ val +'</option>');
+            });
+            $('#categories').html(output.join(''));
+            //$('#categoryName').html(response.categories[0]);
+        }
+
+        //TODO: Make work for both JSON string and JSON object
+        function displayLabels(labels) {
+            window.labelsLayer.importJSON(JSON.parse(data));
+        }
+
 
     </script>
 
 
 </head>
-<body onload="onImageFormChange()">
+<body onload="getNewImage()">
 <div id="main>">
     <div id="toolbars">
         <select id="imageCombo"  onchange="onImageFormChange()">

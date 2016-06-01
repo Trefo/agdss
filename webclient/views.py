@@ -9,6 +9,8 @@ from webclient.models import *
 from datetime import datetime
 from django.template import RequestContext
 
+from random import choice
+
 import os
 
 
@@ -125,10 +127,21 @@ def getInfo(request):
     return JsonResponse(response, safe=False)
 
 
-
 @require_GET
-def getNextImage(request):
-    return
+def getNewImage(request):
+    img = choice(Image.objects.all())
+    label_list = ImageLabel.objects.all().filter(parentImage=img).order_by('pub_date').last()
+    response = {
+        'path': img.path,
+        'image_name': img.name,
+        'categories': [c.category_name for c in img.categoryType.all()]
+            }
+    if label_list:
+        response['labels'] = label_list.labelShapes
+    else:
+        response['labels'] = ''
+    return JsonResponse(response)
+
 
 #TODO: Remove csrf_exempt
 @csrf_exempt

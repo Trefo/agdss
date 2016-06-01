@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^addImage$', 'webclient.views.addImage'),
     url(r'^updateImage$', 'webclient.views.updateImage'),
     url(r'^getInfo$', 'webclient.views.getInfo'),
+  url(r'^getNewImage$', 'webclient.views.getNewImage'),
 
 
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
