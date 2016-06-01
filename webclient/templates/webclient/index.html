@@ -98,6 +98,7 @@
 
 
     <script type="text/javascript">
+        var currentImage = {};
         function onImageFormChange() {
             if (!window.labelsLayer) {
                 window.labelsLayer = new paper.Layer();
@@ -136,15 +137,17 @@
             }else{
                 raster.remove();
             }
-            selectedImage = JSON.parse($('#imageCombo').val().toString());
+
+            selectedImage = JSON.parse($('#imageCombo').val());
             $.ajax({
                 url: "/webclient/getNewImage",
                 type: "GET",
                 dataType: "json",
-                data: {
+                data: currentImage,
+                /*{
                     image_name: selectedImage.image_name,
                     path: selectedImage.path
-                },
+                }, */
                 success: function (response) {
                     console.log(response)
                     data = response.labels;
@@ -152,7 +155,7 @@
                         displayLabels(response.labels)
                     }
                     displayImage(response.image_name, response.path, response.categories)
-
+                    currentImage = response
                 },
 
                 error: function (xhr, errmsg, err) {

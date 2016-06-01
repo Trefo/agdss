@@ -20,11 +20,13 @@ def index(request):
     #latest_image_list = os.listdir('C:/Users/Sandeep/Dropbox/kumar-prec-ag/tag_images') # '/Users/jdas/Dropbox/Research/agriculture/agdss/image-store/')
     latest_image_list = Image.objects.all()
     template = loader.get_template('webclient/index.html')
-
-    context = {
-        'latest_image_list': latest_image_list,
-        'selected_image': latest_image_list[0],
-    }
+    if latest_image_list:
+        context = {
+            'latest_image_list': latest_image_list,
+            'selected_image': latest_image_list[0],
+        }
+    else:
+        context = {}
     return HttpResponse(template.render(context, request))
 
 
@@ -130,20 +132,20 @@ def getInfo(request):
 @require_GET
 def getNewImage(request):
     if not 'image_name' in request.GET or not 'path' in request.GET:
-        return HttpResponseBadRequest("Missing image name or path")
+        hasPrior = False
+    else:
+        hasPrior = True
+        #return HttpResponseBadRequest("Missing image name or path")
+
     if len(Image.objects.all()) == 0:
         return HttpResponseBadRequest("No images in database")
 
 
     #Choose image
-    img = choice(Image.objects.all())
-    if len(Image.objects.all()) > 1:
-        currentImg = Image.objects.all().filter(name=request.GET['image_name'], path=request.GET['path'])[0]
-        while img is currentImg:
-            img = choice(Image.objects.all())
-    print(img is currentImg)
-    print(img.name + ' ' + img.path)
-    print(currentImg.name + ' ' + currentImg.path)
+    if len(Image.objects.all()) > 1 and hasPrior:
+        img = choice(Image.objects.all().exclude(name=request.GET['image_name'], path=request.GET['path']))
+    else:
+        img = choice(Image.objects.all())
 
     label_list = ImageLabel.objects.all().filter(parentImage=img).order_by('pub_date').last()
     response = {
