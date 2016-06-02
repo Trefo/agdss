@@ -202,7 +202,8 @@ def addImage(request):
     #Validate input
     if not ('image_name' in request.POST and  'path' in request.POST and 'category' in request.POST):
         return HttpResponseBadRequest("Missing required input")
-
+    if request.POST['category'] == '':
+        return HttpResponseBadRequest("Missing category")
 
     #Get or create ImageSourceType
     desc = request.POST.get('source_description', default="human")
@@ -231,7 +232,7 @@ def addImage(request):
     img.categoryType.add(categoryType)
     #imgLabel = ImageLabel(parentImage=img, categoryType=categoryType, pub_date=datetime.now())
     #imgLabel.save()
-    return HttpResponse("Added image " + request.POST['image_name'])
+    return HttpResponse("Added image " + request.POST['image_name'] + '\n')
 
 
 
