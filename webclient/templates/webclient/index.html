@@ -52,13 +52,13 @@
             if(!aboveExistingLabel){
                 startPoint = event.point;
                 isActive = true;
-                window.circlePath = new Path.Rectangle(startPoint, event.point);
+                window.circlePath = new Path.Circle(startPoint, startPoint.getDistance(event.point));
             }
         }
 
         function onMouseDrag(event) {
             if(isActive){
-                newPath = new Path.Rectangle(startPoint, event.point);
+                newPath = new Path.Circle(startPoint, startPoint.getDistance(event.point));
                 newPath.strokeColor = 'yellow';
                 newPath.strokeWidth = 3;
                 newPath.opacity = 0.5;
