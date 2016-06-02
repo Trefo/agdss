@@ -166,7 +166,7 @@ def getNewImage(request):
         'categories': [c.category_name for c in img.categoryType.all()]
             }
     if label_list:
-        response['labels'] = label_list.labelShapes
+        response['labels'   ] = label_list.labelShapes
     else:
         response['labels'] = ''
 
