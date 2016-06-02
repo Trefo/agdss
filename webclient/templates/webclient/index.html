@@ -54,6 +54,7 @@
                 isActive = true;
                 window.circlePath = new Path.Circle(startPoint, startPoint.getDistance(event.point));
             }
+
         }
 
         function onMouseDrag(event) {
@@ -63,9 +64,11 @@
                 newPath.strokeWidth = 3;
                 newPath.opacity = 0.5;
                 newPath.onMouseEnter= function(event){
-                    aboveExistingLabel = true;
-                    this.fillColor = 'red';
-                    window.circlePath = this;
+                    if(!isActive) {
+                        aboveExistingLabel = true;
+                        this.fillColor = 'red';
+                        window.circlePath = this;
+                    }
                 }
                 newPath.onMouseLeave= function(event){
                     aboveExistingLabel = false;
@@ -73,11 +76,11 @@
                 }
                 newPath.onDoubleClick = function(event) {
                     isActive = false;
+                    aboveExistingLabel = false;
                     this.remove();
                 }
                 window.circlePath.remove();
                 window.circlePath = newPath;
-
             }else{
                 window.circlePath.position = event.point;
             }
