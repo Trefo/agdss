@@ -5,13 +5,17 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_GET
 
+from agdss.settings import STATIC_ROOT, STATIC_URL
 from webclient.models import *
 from datetime import datetime
 from django.template import RequestContext
+from django.core.validators import URLValidator
+import django.core.exceptions
+from django.core.exceptions import ValidationError
 
 from random import choice
 
-import os
+import os.path
 
 from .models import Image
 from django.db.models import Count
@@ -205,6 +209,25 @@ def addImage(request):
     if request.POST['category'] == '':
         return HttpResponseBadRequest("Missing category")
 
+    #Determine wheter 'path' is URL or file path
+    url_check = URLValidator()
+    try:
+        url_check(request.POST['path'])
+    except ValidationError, e:
+        #Convert Filepath to webpath if necessary
+        ##Check if path is in STATIC_ROOT (https://stackoverflow.com/questions/3812849/how-to-check-whether-a-directory-is-a-sub-directory-of-another-directory)
+        root = os.path.join(os.path.realpath(STATIC_ROOT), '')
+        path_dir = os.path.realpath(request.POST['path'])
+
+        if not os.path.commonprefix([root, path_dir]) == root:
+            return HttpResponseBadRequest(
+                "Image in unreachable location. Make sure that it is in a subdirectory of " + STATIC_ROOT)
+        path = os.path.relpath(path_dir, root)
+        path = '/webclient' + STATIC_URL + path
+
+    if path[-1] != '/':
+        path += '/'
+
     #Get or create ImageSourceType
     desc = request.POST.get('source_description', default="human")
     imageSourceTypeList = ImageSourceType.objects.all().filter(description = desc)
@@ -223,11 +246,11 @@ def addImage(request):
         categoryType = CategoryType(category_name=request.POST.get('category', 'unknown'))
         categoryType.save()
 
-    imageList = Image.objects.all().filter(name=request.POST['image_name'], path=request.POST['path'], description=request.POST.get('description', default=''), source=sourceType)
+    imageList = Image.objects.all().filter(name=request.POST['image_name'], path=path, description=request.POST.get('description', default=''), source=sourceType)
     if imageList:
         img = imageList[0]
     else:
-        img = Image(name=request.POST['image_name'], path=request.POST['path'], description=request.POST.get('description', default=''), source=sourceType)
+        img = Image(name=request.POST['image_name'], path=path, description=request.POST.get('description', default=''), source=sourceType)
         img.save()
     img.categoryType.add(categoryType)
     #imgLabel = ImageLabel(parentImage=img, categoryType=categoryType, pub_date=datetime.now())
