@@ -53,14 +53,16 @@
             if(!aboveExistingLabel){
                 startPoint = event.point;
                 isActive = true;
-                window.circlePath = new Path.Circle(startPoint, startPoint.getDistance(event.point));
+                var center = (startPoint + event.point)/2
+                window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
             }
 
         }
 
         function onMouseDrag(event) {
             if(isActive){
-                newPath = new Path.Circle(startPoint, startPoint.getDistance(event.point));
+                var center = (startPoint + event.point)/2
+                newPath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
                 newPath.strokeColor = 'yellow';
                 newPath.strokeWidth = 3;
                 newPath.opacity = 0.5;
