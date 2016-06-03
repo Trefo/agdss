@@ -65,7 +65,7 @@ def applyLabels(request):
  #   else:
     labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,pub_date=datetime.now(),categoryType=categoryType)
     labelObject.save()
-    return JsonResponse(label_list_,safe=False)
+    return HttpResponse(label_list_)
 
 
 def loadLabels(request):

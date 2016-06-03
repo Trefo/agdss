@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>AgDSS Web</title>
-    <link rel="stylesheet" href="/static/scripts/paperjs/examples/css/style.css">
+    <!--<link rel="stylesheet" href="/static/scripts/paperjs/examples/css/style.css"> -->
+    <link rel="stylesheet" href="/static/css/style.css">
     <script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.js"></script>
     <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
@@ -21,16 +22,16 @@
         $(document).ready(function() {
             $("#applyLabels").click(function() {
                 var updated_category = $("#categories").val();
-                selectedImage = JSON.parse($('#imageCombo').val().toString());
+                //selectedImage = JSON.parse($('#imageCombo').val().toString());
                 $.ajax({
                     url : "/webclient/applyLabels",
                     type : "POST",
                     dataType: 'text',
                     data : JSON.stringify({
-                        image_name: selectedImage.image_name,
-                        path: selectedImage.path,
+                        image_name: currentImage.image_name,
+                        path: currentImage.path,
                         category_name: updated_category,
-                        label_list: JSON.stringify(window.labelsLayer.exportJSON())
+                        label_list: window.labelsLayer.exportSVG({embedImages: false, asString: true})
                     }),
                     success : function(data) {
                         //$('#debug').text(data);
@@ -141,7 +142,7 @@
                 raster.remove();
             }
 
-            selectedImage = JSON.parse($('#imageCombo').val());
+            //selectedImage = JSON.parse($('#imageCombo').val());
             $.ajax({
                 url: "/webclient/getNewImage",
                 type: "GET",
@@ -169,9 +170,9 @@
         }
         //TODO: Input validation and error checking
         function displayImage(image_name, image_path, categories) {
+
             raster = new paper.Raster(image_path + image_name);
             raster.position = paper.view.center;
-            //paper.view.scale(1.5);
 
             //Category selection setup
             var output = [];
@@ -182,11 +183,12 @@
             });
             $('#categories').html(output.join(''));
             //$('#categoryName').html(response.categories[0]);
+            console.log(raster.size);
         }
 
         //TODO: Make work for both JSON string and JSON object
         function displayLabels(labels) {
-            window.labelsLayer.importJSON(JSON.parse(data));
+            //window.labelsLayer.importJSON(JSON.parse(data));
         }
 
 
@@ -221,7 +223,7 @@
 
     <div id="canvasDiv">
         <!--<canvas id="canvas" resize></canvas> -->
-        <canvas id="canvas"></canvas>
+        <canvas id="canvas" width="1920" height="1080"></canvas>
 
     </div>
     <!--<div id="submitImage">

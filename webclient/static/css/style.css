@@ -1,10 +1,13 @@
-html,
-body {
-    margin: 0;
-    /*overflow: hidden; */
-    height: 100%;
-}
+html, body {
+    /*margin: 0;
+    overflow: hidden;
+    height: 100%; */
 
+}
+div #toolbars {
+    visibility: hidden;
+    display:none;
+}
 /* Scale canvas with resize attribute to full size
 canvas[resize] {
     width: 80%;
@@ -16,12 +19,10 @@ button #next {
 }
 
 div #canvasDiv {
-    position: absolute;
+
 }
 
 
-canvas #canvas {
-    height: 1000px;
-    width: 700px;
-    position:absolute;
+#canvas {
+
 }
