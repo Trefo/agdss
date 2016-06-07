@@ -12,229 +12,25 @@
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 
 
-    <script type="text/paperscript" canvas="canvas">
-       var startPoint;
-        var raster;
-        var labelsLayer = new paper.Layer();
-        var isActive = false;
-        var aboveExistingLabel = false;
 
-        $(document).ready(function() {
-            $("#applyLabels").click(function() {
-                var updated_category = $("#categories").val();
-                //selectedImage = JSON.parse($('#imageCombo').val().toString());
-                $.ajax({
-                    url : "/webclient/applyLabels",
-                    type : "POST",
-                    dataType: 'text',
-                    data : JSON.stringify({
-                        image_name: currentImage.image_name,
-                        path: currentImage.path,
-                        category_name: updated_category,
-                        label_list: window.labelsLayer.exportSVG({embedImages: false, asString: true})
-                    }),
-                    success : function(data) {
-                        //$('#debug').text(data);
-                        if(window.labelsLayer.hasChildren()){
-                            window.labelsLayer.removeChildren();
-                        }
-                        //window.labelsLayer.importJSON(JSON.parse(data));
-                        getNewImage();
-                    },
-                    error : function(xhr,errmsg,err) {
-                        alert(xhr.status + ": " + xhr.responseText);
-                    }
-                });
-                return false;
-            });
-        });
-
-        function onMouseDown(event) {
-            if(!aboveExistingLabel){
-                startPoint = event.point;
-                isActive = true;
-                var center = (startPoint + event.point)/2
-                window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
-            }
-
-        }
-
-        function onMouseDrag(event) {
-            if(isActive){
-                var center = (startPoint + event.point)/2
-                newPath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
-                newPath.strokeColor = 'yellow';
-                newPath.strokeWidth = 3;
-                newPath.opacity = 0.5;
-                newPath.onMouseEnter= function(event){
-                    if(!isActive) {
-                        aboveExistingLabel = true;
-                        this.fillColor = 'red';
-                        window.circlePath = this;
-                    }
-                }
-                newPath.onMouseLeave= function(event){
-                    aboveExistingLabel = false;
-                    this.fillColor = 'grey';
-                }
-                newPath.onDoubleClick = function(event) {
-                    isActive = false;
-                    aboveExistingLabel = false;
-                    this.remove();
-                }
-                window.circlePath.remove();
-                window.circlePath = newPath;
-            }else{
-                window.circlePath.position = event.point;
-            }
-
-        }
-
-
-
-        function onMouseUp(event) {
-            window.circlePath.opacity = 0.3;
-            isActive = false;
-            window.circlePath.fillColor = 'grey';
-        }
-
-
-
-    </script>
-
-
-    <script type="text/javascript">
-        var currentImage = {};
-        function onImageFormChange() {
-            if (!window.labelsLayer) {
-                window.labelsLayer = new paper.Layer();
-            }else{
-                raster.remove();
-            }
-            //var myselect = document.getElementById("imageCombo");
-            selectedImage = JSON.parse($('#imageCombo').val().toString());
-            $.ajax({
-                url: "/webclient/getInfo",
-                type: "GET",
-                dataType: "json",
-                data: {
-                    image_name: selectedImage.image_name,
-                    path: selectedImage.path
-                },
-                success: function (response) {
-                    data = response.labels;
-                    if (data) {
-                        window.labelsLayer.importJSON(JSON.parse(data));
-                    }
-                    displayImage(selectedImage.image_name, selectedImage.path, response.categories)
-                },
-
-                error: function (xhr, errmsg, err) {
-                    alert(xhr.status + ": " + xhr.responseText);
-                }
-            });
-
-
-        }
-
-        function getNewImage() {
-            if (!window.labelsLayer) {
-                window.labelsLayer = new paper.Layer();
-            }else{
-                raster.remove();
-            }
-
-            //selectedImage = JSON.parse($('#imageCombo').val());
-            $.ajax({
-                url: "/webclient/getNewImage",
-                type: "GET",
-                dataType: "json",
-                data: currentImage,
-                /*{
-                    image_name: selectedImage.image_name,
-                    path: selectedImage.path
-                }, */
-                success: function (response) {
-                    console.log(response)
-                    data = response.labels;
-                    if (data) {
-                        displayLabels(response.labels)
-                    }
-                    displayImage(response.image_name, response.path, response.categories)
-                    currentImage = response
-                },
-
-                error: function (xhr, errmsg, err) {
-                    alert(xhr.status + ": " + xhr.responseText);
-                }
-            });
-
-        }
-        //TODO: Input validation and error checking
-        function displayImage(image_name, image_path, categories) {
-
-            raster = new paper.Raster(image_path + image_name);
-            raster.position = paper.view.center;
-
-            //Category selection setup
-            var output = [];
-            $('#categories')[0].options.length = 0;
-            $.each(categories, function(i, val)
-            {
-              output.push('<option value="'+ val +'">'+ val +'</option>');
-            });
-            $('#categories').html(output.join(''));
-            //$('#categoryName').html(response.categories[0]);
-            console.log(raster.size);
-        }
-
-        //TODO: Make work for both JSON string and JSON object
-        function displayLabels(labels) {
-            //window.labelsLayer.importJSON(JSON.parse(data));
-        }
-
-
-    </script>
 
 
 </head>
 <body onload="getNewImage()">
 <div id="main>">
-    <div id="toolbars">
-        <select id="imageCombo"  onchange="onImageFormChange()">
-            {% for image in latest_image_list %}
-                {% ifequal image selected_image %}
-                    <option value='{"image_name": "{{image.name}}", "path": "{{ image.path }}"}' selected="selected">{{image.name}}</option>
-                {% else %}
-                    <option value='{"image_name": "{{image.name}}", "path": "{{ image.path }}"}'>{{image.name}}</option>
-                {% endifequal %}
-            {% endfor %}
-        </select>
-    </div>
 
-    <div id="controls">
-        <form method="post" name="applyLabelsForm" >
-            {% csrf_token %}
-            <!--<input name="categoryName" id="categoryName" type="text"> -->
-                <div id="categoryWord">Category: </div>
-                <select id="categories"></select>
-                <div name="categoryName" id="categoryName"></div>
-            <input id="applyLabels" type="button" value="submit">
-        </form>
-    </div>
-
-    <div id="canvasDiv">
-        <!--<canvas id="canvas" resize></canvas> -->
-        <canvas id="canvas" width="1920" height="1080"></canvas>
+    <div id="info">
+        <h2>Instructions</h2>
+        <p>
+            <ol>
+                <li>Choose category to label</li>
+                <li>Click and drag to select region. Labels can be dragged around. Double click to delete an area.</li>
+            </ol>
+        </p>
+        <p>Start labeling <a href="label">here</a></p>
 
     </div>
-    <!--<div id="submitImage">
-        <button id="next">Submit</button>
-    </div> -->
 
-    <div id="debug">
-
-    </div>
 </div>
 </body>
 </html>

@@ -20,10 +20,17 @@ import os.path
 from .models import Image
 from django.db.models import Count
 
+
 def index(request):
+    template = loader.get_template('webclient/index.html')
+    context = {}
+    return HttpResponse(template.render(context, request))
+
+
+def label(request):
     #latest_image_list = os.listdir('C:/Users/Sandeep/Dropbox/kumar-prec-ag/tag_images') # '/Users/jdas/Dropbox/Research/agriculture/agdss/image-store/')
     latest_image_list = Image.objects.all()
-    template = loader.get_template('webclient/index.html')
+    template = loader.get_template('webclient/label.html')
     if latest_image_list:
         context = {
             'latest_image_list': latest_image_list,
