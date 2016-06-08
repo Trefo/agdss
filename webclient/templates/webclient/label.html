@@ -173,15 +173,12 @@
         //TODO: Input validation and error checking
         function displayImage(image_name, image_path, categories) {
 
+            //Add new image and resize canvas to fit image
             img = new Image();
             img.src = image_path + image_name;
-            document.getElementById('canvas').width = img.naturalWidth;
-            document.getElementById('canvas').height = img.naturalHeight;
-            console.log(img);
-            console.log(img.naturalWidth + ' ' + img.naturalHeight);
+            paper.view.setViewSize(img.naturalWidth, img.naturalHeight)
             raster = new paper.Raster(img);
             raster.position = paper.view.center;
-            paper.view.update({force:true});
 
             //Category selection setup
             var output = [];
