@@ -175,8 +175,8 @@
 
             raster = new paper.Raster(image_path + image_name);
             raster.onLoad = function(){
-                $('#canvas').width = raster.width;
-                $('#canvas').height = raster.height;
+                document.getElementById('canvas').width = raster.width;
+                document.getElementById('canvas').height = raster.height;
             };
             raster.position = paper.view.center;
 
