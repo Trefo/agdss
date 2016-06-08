@@ -179,6 +179,7 @@
             document.getElementById('canvas').height = img.naturalHeight;
             console.log(img);
             console.log(img.naturalWidth + ' ' + img.naturalHeight);
+            $('body').append(img);
             raster = new paper.Raster(img);
             raster.position = paper.view.center;
 
