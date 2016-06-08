@@ -190,6 +190,8 @@
             $('#categories').html(output.join(''));
             //$('#categoryName').html(response.categories[0]);
             console.log(raster.size);
+
+            $('#image_name').html("Image name: " + image_name);
         }
 
         //TODO: Make work for both JSON string and JSON object
@@ -220,14 +222,15 @@
         <form method="post" name="applyLabelsForm" >
             {% csrf_token %}
             <!--<input name="categoryName" id="categoryName" type="text"> -->
-                <div id="categoryWord">Category: </div>
+                <span id="categoryWord">Category: </span>
                 <select id="categories"></select>
-                <div name="categoryName" id="categoryName"></div>
+                <span name="categoryName" id="categoryName"></span>
             <input id="applyLabels" type="button" value="submit">
         </form>
     </div>
 
     <div id="canvasDiv">
+        <div id="image_name_div"><h3 id="image_name"></h3></div>
         <!--<canvas id="canvas" resize></canvas> -->
         <canvas id="canvas" width="1920" height="1080"></canvas>
 
