@@ -173,11 +173,11 @@
         //TODO: Input validation and error checking
         function displayImage(image_name, image_path, categories) {
 
-            raster = new paper.Raster(image_path + image_name);
-            raster.onLoad = function(){
-                document.getElementById('canvas').width = raster.width;
-                document.getElementById('canvas').height = raster.height;
-            };
+            img = new Image();
+            img.src = image_path + image_name;
+            document.getElementById('canvas').width = img.width;
+            document.getElementById('canvas').height = img.height;
+            raster = new paper.Raster(img);
             raster.position = paper.view.center;
 
             //Category selection setup
