@@ -175,10 +175,13 @@
 
             img = new Image();
             img.src = image_path + image_name;
-            document.getElementById('canvas').width = img.width;
-            document.getElementById('canvas').height = img.height;
+            document.getElementById('canvas').width = img.naturalWidth;
+            document.getElementById('canvas').height = img.naturalHeight;
+            console.log(img);
+            console.log(img.naturalWidth + ' ' + img.naturalHeight);
             raster = new paper.Raster(img);
             raster.position = paper.view.center;
+
 
             //Category selection setup
             var output = [];
