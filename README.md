@@ -7,7 +7,7 @@
 1. Required software:
   * Python2 (Python3 untested)
   * Django
-  * Postgres (or other database, though using another database requires changing code). Set port to 5432 (or change code to reflect chosen port).
+  * Postgres (or other database, though using another database requires changing code). Set port to 5432 (or change code to reflect chosen port). (Setup information: [https://help.ubuntu.com/community/PostgreSQL](here))
   * psycopg2 (required for Postgres)
 2. Clone this repo (and navigate to it).
 3. Create a (Postgres) database called `agdss` which has a user `aguser` with a password `aguser` (with all permissions). To change these configurations, see `DATABASE` in aguser/settings.py.
