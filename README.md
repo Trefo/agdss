@@ -12,7 +12,7 @@
 2. Clone this repo (and navigate to it).
 3. Create a (Postgres) database called `agdss` which has a user `aguser` with a password `aguser` (with all permissions). To change these configurations, see `DATABASE` in aguser/settings.py.
   * If on Windows, one may be required to create a Firewall inbound rule allowing traffic on port 5432 as it is closed by default. This may not be necessary, but attempt if there is a problem. 
-5. Run `python manage.py migrate`.
+5. Run `python manage.py makemigrations` followed by `python manage.py migrate`.
 6. To create admin credentials (required to access /admin), run `python manage.py createsuperuser` and enter the requested information.
 7. TEMPORARY: Set `STATIC_ROOT` to parent directory of images (in agdss/settings.py).
 8. TEMPORARY: Place all images directly in directory named `tag_images` which is a child of the `STATIC_ROOT` directory.
