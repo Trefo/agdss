@@ -176,13 +176,22 @@
             //Add new image and resize canvas to fit image
             img = new Image();
             img.src = image_path + image_name;
-            img.one("load", function() {
-                  paper.view.setViewSize(img.naturalWidth, img.naturalHeight)
+
+            function setup_images() {
+                paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
                 raster = new paper.Raster(img);
                 raster.position = paper.view.center;
-                }).each(function() {
-                  if(this.complete) $(this).load();
-                });
+            };
+            if(img.complete) {
+                setup_images();
+            }else {
+              img.addEventListener('load', setup_images);
+              img.addEventListener('error', function() {
+                  alert('Error loading image')
+              })
+            }
+
+
 
 
             //Category selection setup
@@ -200,9 +209,6 @@
             $('#image_info_name').html("Image name: " + image_name);
             $('#image_info_path').html("Image path: " + image_path);
 
-            if(raster.width == 0 && raster.height == 0) {
-                alert("Error loading image. Perhaps try refreshing page?");
-            }
         }
 
         //TODO: Make work for both JSON string and JSON object
