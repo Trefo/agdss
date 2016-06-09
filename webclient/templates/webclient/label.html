@@ -188,6 +188,8 @@
               img.addEventListener('load', setup_images);
               img.addEventListener('error', function() {
                   alert('Error loading image')
+
+
               })
             }
 
@@ -203,7 +205,6 @@
             });
             $('#categories').html(output.join(''));
             //$('#categoryName').html(response.categories[0]);
-            console.log(raster.size);
 
             $('#image_name').html("Image name: " + image_name);
             $('#image_info_name').html("Image name: " + image_name);
