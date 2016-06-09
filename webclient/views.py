@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_GET
 
 from agdss.settings import STATIC_ROOT, STATIC_URL
+from grappelli.tests.test_switch import SwitchTests
 from webclient.models import *
 from datetime import datetime
 from django.template import RequestContext
@@ -23,6 +24,11 @@ from django.db.models import Count
 
 def index(request):
     template = loader.get_template('webclient/index.html')
+    context = {}
+    return HttpResponse(template.render(context, request))
+
+def view_label(request):
+    template = loader.get_template('webclient/view_label.html')
     context = {}
     return HttpResponse(template.render(context, request))
 
@@ -78,26 +84,30 @@ def applyLabels(request):
     labelObject.save()
     return HttpResponse(label_list_)
 
-
+@require_GET
 def loadLabels(request):
+    if 'image_name' not in request.GET or 'path' not in request.GET:
+        print(request.GET['path'] + ' ' + request.GET['image_name'])
+        return HttpResponseBadRequest('Path and Image Name required')
+
     parentImage_ = request.GET['image_name']
     label_list = []
     sourceType = ''
     categoryType = ''
-    sourceTypeList = ImageSourceType.objects.all().filter(description="human");
-    if (sourceTypeList):
-        sourceType = sourceTypeList[0]
-    else:
-        sourceType = ImageSourceType(description="human", pub_date=datetime.now())
-        sourceType.save()
+    # sourceTypeList = ImageSourceType.objects.all().filter(description="human");
+    # if (sourceTypeList):
+    #     sourceType = sourceTypeList[0]
+    # else:
+    #     sourceType = ImageSourceType(description="human", pub_date=datetime.now())
+    #     sourceType.save()
 
-
-    image = Image.objects.all().filter(name = parentImage_)
+    image = Image.objects.all().filter(name=request.GET['image_name'], path=request.GET['path'])
+    # if not image:
+    #     parentImage_ = Image(name=parentImage_, path='/static/tag_images/',description='test generation at serverside', source=sourceType, pub_date=datetime.now())
+    #     parentImage_.save()
     if not image:
-        parentImage_ = Image(name=parentImage_, path='/static/tag_images/',description='test generation at serverside', source=sourceType, pub_date=datetime.now())
-        parentImage_.save()
-    else:
-        label_list = ImageLabel.objects.all().filter(parentImage=image[0]).order_by('pub_date').last()
+        return HttpResponseBadRequest("No such image found")
+    label_list = ImageLabel.objects.all().filter(parentImage=image[0]).order_by('pub_date').last()
 
     responseText = ''
     if(label_list):
@@ -108,7 +118,7 @@ def loadLabels(request):
 
 @require_GET
 def getInfo(request):
-    if not 'image_name' in request.GET or not 'path' in request.GET:
+    if 'image_name' not in request.GET or 'path' not in request.GET:
         return HttpResponseBadRequest("Missing 'image_name or 'path'")
     parentImage_ = request.GET['image_name']
     label_list = []
@@ -132,9 +142,9 @@ def getInfo(request):
 
     response = {}
     if label_list:
-        response['labels'] = json.loads(label_list.labelShapes)
+        response['label'] = label_list.labelShapes
     else:
-        response['labels'] = ''
+        response['label'] = ''
     response['path'] = image[0].path
     response['categories'] = [c.category_name for c in image[0].categoryType.all()]
     return JsonResponse(response, safe=False)
@@ -164,7 +174,7 @@ def getNewImage(request):
 
     #Least number of labels which was not just seen
     img = Image.objects.all()
-    if hasPrior:
+    if hasPrior and len(Image.objects.all()) > 1:
         img = img.exclude(name=request.GET['image_name'], path=request.GET['path'])
     img = img.annotate(count=Count('imagelabel')).order_by('count')[0]
 

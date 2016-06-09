@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Labels</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.js"></script>
+    <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+
+    <script type="text/paperscript" canvas="canvas">
+       var startPoint;
+        var raster;
+        var labelsLayer = new paper.Layer();
+        var isActive = false;
+        var aboveExistingLabel = false;
+
+        $(document).ready(function() {
+            $("#get_label").click(function() {
+                $.ajax({
+                    url : "/webclient/getInfo",
+                    type: "GET",
+                    dataType: 'json',
+                    data : {
+                        image_name: $('#get_info #image_name').val(),
+                        path: $('#get_info #path').val()
+                    },
+                    success : function(data) {
+                        //$('#debug').text(data);
+                        //window.labelsLayer.importJSON(JSON.parse(data));
+                        displayImage($('#get_info #image_name').val(), $('#get_info #path').val(), data.label)
+                    },
+                    error : function(xhr,errmsg,err) {
+                        alert(xhr.status + ": " + xhr.responseText);
+                    }
+                });
+                return false;
+            });
+        });
+
+
+        function displayImage(image_name, image_path, label) {
+            console.log(image_name + ' ' + image_path + ' ' + label);
+            if (!window.labelsLayer) {
+                window.labelsLayer = new paper.Layer();
+            }else{
+                raster.remove();
+            }
+            //Add new image and resize canvas to fit image
+            img = new Image();
+            img.src = image_path + image_name;
+            paper.view.setViewSize(img.naturalWidth, img.naturalHeight)
+            raster = new paper.Raster(img);
+            raster.position = paper.view.center;
+            raster.importSVG(label);
+
+            //Category selection setup
+            var output = [];
+            if(raster.width == 0 && raster.height == 0) {
+                alert("Error loading image. Perhaps try again?");
+            }
+
+    }
+    </script>
+</head>
+<body>
+    <div id="get_info">
+        <form method="get" name="get_label_form">
+            Path:<br>
+            <input type="text" name="path" id="path"> <br>
+            Image Name:<br>
+            <input type="text" name="image_name" id="image_name"><br>
+            <input type="submit" id="get_label" value="submit">
+        </form>
+
+    </div>
+
+    <div id="canvasDiv">
+        <div id="image_name_div"><h3 id="image_name"></h3></div>
+        <!--<canvas id="canvas" resize></canvas> -->
+        <canvas id="canvas" width="1920" height="1080"></canvas>
+
+        <div id="image_info">
+            <p id="image_info_name"></p>
+            <p id="image_info_path"></p>
+        </div>
+
+    </div>
+</body>
+</html>

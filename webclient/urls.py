@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^label$', views.label, name='label'),
     url(r'^results$', views.results, name='results'),
+    url(r'^view_label$', views.view_label, name='view_label'),
 
     #GET/POST URLs
     url(r'^applyLabels$', 'webclient.views.applyLabels'),
