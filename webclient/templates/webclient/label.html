@@ -5,7 +5,8 @@
     <title>AgDSS Web</title>
     <!--<link rel="stylesheet" href="/static/scripts/paperjs/examples/css/style.css"> -->
     <link rel="stylesheet" href="/static/css/style.css">
-    <script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.js"></script>
+    <script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.min.js"></script>
+    <script type="text/javascript" src="/static/scripts/spinjs/spin.min.js"></script>
     <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
@@ -138,6 +139,21 @@
         }
 
         function getNewImage() {
+            if (typeof spinner == 'undefined') {
+                var opts = {
+                  lines: 13, length: 28, width: 14, radius: 42, scale: 1,
+                    corners: 1, color: '#000', opacity: 0.15, rotate: 0,
+                    direction: 1, speed: 1, trail: 31, fps: 20, zIndex: 2e9,
+                    className: 'spinner', top: '50%', left: '50%', shadow: true,
+                    hwaccel: false, position: 'absolute'
+                };
+                 var spinLocation = document.getElementById("canvasDiv");
+                spinner =  new Spinner(opts);
+                //spinner.spin(spinLocation);
+            }
+            else {
+                spinner.spin();
+            }
             if (!window.labelsLayer) {
                 window.labelsLayer = new paper.Layer();
             }else{
@@ -168,7 +184,7 @@
                     alert(xhr.status + ": " + xhr.responseText);
                 }
             });
-
+            spinner.stop()
         }
         //TODO: Input validation and error checking
         function displayImage(image_name, image_path, categories) {
