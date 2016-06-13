@@ -7,10 +7,9 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.min.js"></script>
     <script type="text/javascript" src="/static/scripts/spinjs/spin.min.js"></script>
-    <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+   <!-- <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script> -->
+    <script type='text/javascript' src='/static/scripts/jQuery/jquery-3.0.0.min.js'></script>
+    <!--<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"> -->
 
 
     <script type="text/paperscript" canvas="canvas">
@@ -147,12 +146,14 @@
                     className: 'spinner', top: '50%', left: '50%', shadow: true,
                     hwaccel: false, position: 'absolute'
                 };
-                 var spinLocation = document.getElementById("canvasDiv");
+                // var spinLocation = document.getElementById('canvasDiv');
+                 var spinLocation = document.body;
                 spinner =  new Spinner(opts);
-                //spinner.spin(spinLocation);
+                spinner.spin(spinLocation);
             }
             else {
-                spinner.spin();
+                //spinner.spin(document.getElementById("canvasDiv"));
+                spinner.spin(document.body);
             }
             if (!window.labelsLayer) {
                 window.labelsLayer = new paper.Layer();
