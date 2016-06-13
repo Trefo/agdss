@@ -1,25 +1,18 @@
-from django.template import loader
-from django.http import *
-from django.views.decorators.csrf import csrf_exempt
 import json
+import os.path
+from datetime import datetime
+
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
+from django.db.models import Count
+from django.http import *
 from django.http import JsonResponse
+from django.template import loader
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 
 from agdss.settings import STATIC_ROOT, STATIC_URL
-from grappelli.tests.test_switch import SwitchTests
-from webclient.models import *
-from datetime import datetime
-from django.template import RequestContext
-from django.core.validators import URLValidator
-import django.core.exceptions
-from django.core.exceptions import ValidationError
-
-from random import choice
-
-import os.path
-
 from .models import Image
-from django.db.models import Count
 
 
 def index(request):
@@ -238,7 +231,7 @@ def addImage(request):
 
         if not os.path.commonprefix([root, path_dir]) == root:
             return HttpResponseBadRequest(
-                "Image in unreachable location. Make sure that it is in a subdirectory of " + STATIC_ROOT)
+                "Image in unreachable location. Make sure that it is in a subdirectory of " + STATIC_ROOT +".\n")
         path = os.path.relpath(path_dir, root)
         path = '/webclient' + STATIC_URL + path
 

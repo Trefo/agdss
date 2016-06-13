@@ -172,7 +172,6 @@
                     path: selectedImage.path
                 }, */
                 success: function (response) {
-                    console.log(response)
                     data = response.labels;
                     if (data) {
                         displayLabels(response.labels)
@@ -198,6 +197,7 @@
                 paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
                 raster = new paper.Raster(img);
                 raster.position = paper.view.center;
+                paper.view.update();
             };
             if(img.complete) {
                 setup_images();
@@ -205,13 +205,8 @@
               img.addEventListener('load', setup_images);
               img.addEventListener('error', function() {
                   alert('Error loading image')
-
-
               })
             }
-
-
-
 
             //Category selection setup
             var output = [];
@@ -241,17 +236,17 @@
 </head>
 <body onload="getNewImage()">
 <div id="main>">
-    <div id="toolbars">
+    <!--<div id="toolbars">
         <select id="imageCombo"  onchange="onImageFormChange()">
-            {% for image in latest_image_list %}
-                {% ifequal image selected_image %}
-                    <option value='{"image_name": "{{image.name}}", "path": "{{ image.path }}"}' selected="selected">{{image.name}}</option>
-                {% else %}
-                    <option value='{"image_name": "{{image.name}}", "path": "{{ image.path }}"}'>{{image.name}}</option>
-                {% endifequal %}
-            {% endfor %}
+            {#% for image in latest_image_list %#}
+                {#% ifequal image selected_image %#}
+                    <option value='{"image_name": "{#  #}{image.name}}", "path": "{#  #}{ image.path }}"}' selected="selected">{#  #}{image.name}}</option>
+                {#% else %#}
+                    <option value='{"image_name": "{#  #}{image.name}}", "path": "{#  #}{ image.path }}"}'>{#  #}{image.name}}</option>
+                {#% endifequal %#}
+            {#% endfor %#}
         </select>
-    </div>
+    </div> -->
 
     <div id="controls">
         <form method="post" name="applyLabelsForm" >
