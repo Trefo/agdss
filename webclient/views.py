@@ -11,8 +11,8 @@ from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 
-from agdss.settings import STATIC_ROOT, STATIC_URL
-from .models import Image
+from django.conf import settings
+from .models import *
 
 
 def index(request):
@@ -226,14 +226,14 @@ def addImage(request):
     except ValidationError, e:
         #Convert Filepath to webpath if necessary
         ##Check if path is in STATIC_ROOT (https://stackoverflow.com/questions/3812849/how-to-check-whether-a-directory-is-a-sub-directory-of-another-directory)
-        root = os.path.join(os.path.realpath(STATIC_ROOT), '')
+        root = os.path.join(os.path.realpath(settings.STATIC_ROOT), '')
         path_dir = os.path.realpath(request.POST['path'])
 
         if not os.path.commonprefix([root, path_dir]) == root:
             return HttpResponseBadRequest(
-                "Image in unreachable location. Make sure that it is in a subdirectory of " + STATIC_ROOT +".\n")
+                "Image in unreachable location. Make sure that it is in a subdirectory of " + settings.STATIC_ROOT +".\n")
         path = os.path.relpath(path_dir, root)
-        path = '/webclient' + STATIC_URL + path
+        path = '/webclient' + settings.STATIC_URL + path
 
     if path[-1] != '/':
         path += '/'
