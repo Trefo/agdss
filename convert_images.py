@@ -6,10 +6,14 @@ from django.conf import settings
 
 def convertSVGtoPNG(file, filename):
     #Convert copy of image to new format
-    with WandImage(file).clone() as img:
-        img.format = 'png'
-        img.save(filename=(settings.STATIC_ROOT +  filename + '.png'))
-
+    try:
+        with WandImage(file=file, format='SVG').clone() as img:
+            img.format = 'png'
+            #img.save(filename=(settings.STATIC_ROOT +  filename + '.png'))
+            img.save(filename=('C:/Users/Sandeep/Dropbox/kumar-prec-ag/test.png'))
+            print("converted Image")
+    except:
+        print('Failed to convert')
 
 def labelToSVGString(str):
     height = 386
@@ -19,8 +23,9 @@ def labelToSVGString(str):
     SVGStringFile.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>' \
        '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
        '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" ' \
-       'xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve" height=%i ' \
-        ' width=%i>%s</svg>' %(height, width, str))
+       'xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve" height="%i" ' \
+        ' width="%i">%s</svg>' %(height, width, str))
+    SVGStringFile.seek(0)
     return SVGStringFile
 
 def convertSVGs(LabelList):

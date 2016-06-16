@@ -306,3 +306,11 @@ def updateImage(request):
         if cats and image.filter(categoryType=cats[0]):
             image.categoryType.remove(cat)
     return HttpResponse("Made changes")
+
+
+@csrf_exempt
+@require_POST
+def convertAll(request):
+    from convert_images import convertAll
+    convertAll()
+    return HttpResponse('Ok')
