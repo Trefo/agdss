@@ -50,11 +50,14 @@
         });
 
         function onMouseDown(event) {
-            if(!aboveExistingLabel){
+            if(!aboveExistingLabel){ //Create new label
                 startPoint = event.point;
                 isActive = true;
                 var center = (startPoint + event.point)/2
                 window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
+            }
+            else {
+                dragStartPoint = event.point;
             }
 
         }
@@ -62,6 +65,7 @@
         function onMouseDrag(event) {
             if(isActive){
                 var center = (startPoint + event.point)/2
+                //newPath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
                 newPath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
                 newPath.strokeColor = 'yellow';
                 newPath.strokeWidth = 3;
@@ -85,7 +89,8 @@
                 window.circlePath.remove();
                 window.circlePath = newPath;
             }else{
-                window.circlePath.position = event.point;
+                window.circlePath.position += event.point - dragStartPoint;
+                dragStartPoint = event.point;
             }
 
         }
