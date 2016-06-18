@@ -25,7 +25,7 @@ def convertSVGtoPNG(file, filename):
             #img.negate()
 
             img.format = 'png'
-            img.save(filename=(settings.STATIC_ROOT +  'temp/' + filename + '.png'))
+            img.save(filename=(settings.STATIC_ROOT +  'labels/' + filename + '.png'))
             print("converted Image")
     except wand.exceptions.CoderError as e:
         print('Failed to convert: ' + str(e))
