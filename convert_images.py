@@ -60,7 +60,7 @@ def convertSVGs(LabelList):
     #convertSVGtoPNG(labelToSVGString(LabelList[3].labelShapes), 'name')
     #return
     for label in LabelList:
-        convertSVGtoPNG(labelToSVGString(label.labelShapes), 'P%iL%i%s' %(label.parentImage.id, label.id,label.parentImage.name))
+        convertSVGtoPNG(labelToSVGString(label.labelShapes), 'P%iL%iI%s' %(label.parentImage.id, label.id,label.parentImage.name))
 
 
 def convertAll():
