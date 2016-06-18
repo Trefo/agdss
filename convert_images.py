@@ -22,7 +22,7 @@ def convertSVGtoPNG(file, filename):
             #Convert to black and white
             img.negate()
             img.threshold(0)
-            img.negate()
+            #img.negate()
 
             img.format = 'png'
             img.save(filename=(settings.STATIC_ROOT +  'temp/' + filename + '.png'))
@@ -59,8 +59,8 @@ def labelToSVGString(str):
 def convertSVGs(LabelList):
     #convertSVGtoPNG(labelToSVGString(LabelList[3].labelShapes), 'name')
     #return
-    for i, label in enumerate(LabelList):
-        convertSVGtoPNG(labelToSVGString(label.labelShapes), 'name' + str(i))
+    for label in LabelList:
+        convertSVGtoPNG(labelToSVGString(label.labelShapes), 'P%iL%i%s' %(label.parentImage.id, label.id,label.parentImage.name))
 
 
 def convertAll():
