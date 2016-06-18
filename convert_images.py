@@ -11,8 +11,8 @@ def convertSVGtoPNG(file, filename):
     if not file:
         #TODO: Some error checking
         return
-    print '%r' %file.read()
-    file.seek(0)
+    print file.getvalue()
+    print len(file.getvalue())
     try:
         with WandImage(file=file) as img:
             img.format = 'png'
@@ -31,17 +31,21 @@ def labelToSVGString(str):
     if result == None:
         #TODO: Some errory stuff
         return
-    height = result.group('height')
-    width = result.group('width')
+
+    #Requires encoding as unicode format does not work
+    height = result.group('height').encode('utf-8')
+    width = result.group('width').encode('utf-8')
+    print height + " " + width
+    print type(height)
+    print type('test')
     if height == None or width == None:
         #TODO: Do some error stuff
         return
     print(str)
-
-    SVGStringFile = StringIO.StringIO('<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
-             '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"' +
-            ' xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve" height="' + height + '"' +
-             ' width="' + width + '">' + str.replace(result.group(0), '') +  '</svg>') #%(height, width, str.replace(result.group(0), '')) )
+    SVGStringFile = StringIO.StringIO('<?xml version="1.0" encoding="UTF-8" standalone="no"?>' \
+             '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"' \
+            ' xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve" height="%s"' \
+             ' width="%s">%s</svg>\n' %(height, width, str.replace(result.group(0), '').encode('utf-8')) )
     SVGStringFile.seek(0)
 
     return SVGStringFile
