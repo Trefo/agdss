@@ -14,15 +14,16 @@ def convertSVGtoPNG(file, filename):
         return
     try:
         with WandImage(file=file) as img:
-            #img.depth = 8
+            #img.depth = 1
             #img.colorspace = 'gray'
             img.background_color = WandColor('white')
+	    #img.alpha_channel = False
             img.alpha_channel = 'remove'
 
             #Convert to black and white
             img.negate()
             img.threshold(0)
-            #img.negate()
+            img.negate()
 
             img.format = 'png'
             img.save(filename=(settings.STATIC_ROOT +  'labels/' + filename + '.png'))
