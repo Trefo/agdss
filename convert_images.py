@@ -5,21 +5,23 @@ from webclient.models import Image, ImageLabel
 from django.conf import settings
 import re
 import wand.exceptions
+import os
 
-
-def convertSVGtoPNG(file, filename):
+def convertSVGtoPNG(img_file, foldername, filename):
     #Convert copy of image to new format
     if not file:
         #TODO: Some error checking
         return
+    #TODO: error checking on foldername and filename
     try:
-        with WandImage(file=file) as img:
+        with WandImage(file=img_file) as img:
             #img.depth = 1
             #img.colorspace = 'gray'
+
             #print(filename)
 	    #print(WandColor('white'))
-	    img.background_color = WandColor('white')
 
+            img.background_color = WandColor('white')
             img.alpha_channel = 'remove'
 
             #Convert to black and white
@@ -29,10 +31,12 @@ def convertSVGtoPNG(file, filename):
 
             img.format = 'png'
 
+
             if not os.path.exists(settings.STATIC_ROOT +  'labels/' + foldername + '/'):
                 os.makedirs(settings.STATIC_ROOT +  'labels/' + foldername + '/')
             img.save(filename=(settings.STATIC_ROOT +  'labels/' + foldername + '/' + filename + '.png'))
             print("converted Image " + filename)
+ 
 
     except wand.exceptions.CoderError as e:
         print('Failed to convert: ' + filename + ': '+ str(e))
@@ -69,7 +73,8 @@ def convertSVGs(LabelList):
     #convertSVGtoPNG(labelToSVGString(LabelList[3].labelShapes), 'name')
     #return
     for label in LabelList:
-        convertSVGtoPNG(labelToSVGString(label.labelShapes), 'P%iL%iI%s' %(label.parentImage.id, label.id,label.parentImage.name))
+        convertSVGtoPNG(img_file=labelToSVGString(label.labelShapes), foldername=label.categoryType.category_name,
+                        filename='P%iL%iC%sI%s' %(label.parentImage.id, label.id, label.categoryType.category_name, label.parentImage.name))
 
 
 def convertAll():
