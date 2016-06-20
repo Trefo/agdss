@@ -16,8 +16,10 @@ def convertSVGtoPNG(file, filename):
         with WandImage(file=file) as img:
             #img.depth = 1
             #img.colorspace = 'gray'
-            img.background_color = WandColor('white')
-	    #img.alpha_channel = False
+            #print(filename)
+	    #print(WandColor('white'))
+	    img.background_color = WandColor('white')
+
             img.alpha_channel = 'remove'
 
             #Convert to black and white
@@ -26,12 +28,18 @@ def convertSVGtoPNG(file, filename):
             img.negate()
 
             img.format = 'png'
-            img.save(filename=(settings.STATIC_ROOT +  'labels/' + filename + '.png'))
-            print("converted Image")
+
+            if not os.path.exists(settings.STATIC_ROOT +  'labels/' + foldername + '/'):
+                os.makedirs(settings.STATIC_ROOT +  'labels/' + foldername + '/')
+            img.save(filename=(settings.STATIC_ROOT +  'labels/' + foldername + '/' + filename + '.png'))
+            print("converted Image " + filename)
+
     except wand.exceptions.CoderError as e:
-        print('Failed to convert: ' + str(e))
+        print('Failed to convert: ' + filename + ': '+ str(e))
     except wand.exceptions.MissingDelegateError as e:
-        print('DE Failed to convert: ' + str(e))
+        print('DE Failed to convert: ' + filename + ': '+ str(e))
+    except wand.exceptions.WandError as e:
+	print('Failed to convert ' + filename + ': '+ str(e))
 
 def labelToSVGString(str):
     #Find width and height
