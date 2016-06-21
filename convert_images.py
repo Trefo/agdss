@@ -13,6 +13,11 @@ def convertSVGtoPNG(img_file, foldername, filename):
         #TODO: Some error checking
         return
     #TODO: error checking on foldername and filename
+    foldername_ = foldername
+    if foldername_[0] == '/' or foldername_[0] == '\\':
+        foldername_ = foldername_[1:]
+    if foldername_[-1] == '/' or foldername_[-1] == '\\':
+        foldername_ = foldername_[:-1]
     try:
         with WandImage(file=img_file) as img:
             #img.depth = 1
