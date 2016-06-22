@@ -18,11 +18,20 @@
         var labelsLayer = new paper.Layer();
         var isActive = false;
         var aboveExistingLabel = false;
+        var labelsDrawn = 0; //Whether a label has been drawn on this image
 
         $(document).ready(function() {
             $("#applyLabels").click(function() {
+
+                //Check if there are labels or if the no label checkbox is checked
+                if(labelsDrawn <= 0 && !$('#noLabels').prop('checked')) {
+                    alert('No labels drawn in image. If there are no labelable features in this image,' +
+                            ' check the "No Labels in image" checkbox');
+                    return false;
+                }
                 var updated_category = $("#categories").val();
                 //selectedImage = JSON.parse($('#imageCombo').val().toString());
+                console.log(window.labelsLayer.exportSVG({embedImages: false, asString: false}));
                 $.ajax({
                     url : "/webclient/applyLabels",
                     type : "POST",
@@ -55,6 +64,7 @@
                 isActive = true;
                 var center = (startPoint + event.point)/2
                 window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
+                labelsDrawn += 1;
             }
             else {
                 dragStartPoint = event.point;
@@ -85,6 +95,7 @@
                     isActive = false;
                     aboveExistingLabel = false;
                     this.remove();
+                    labelsDrawn -= 1
                 }
                 window.circlePath.remove();
                 window.circlePath = newPath;
@@ -269,10 +280,6 @@
         <div id="image_name_div"><h3 id="image_name"></h3></div>
         <!--<canvas id="canvas" resize></canvas> -->
         <canvas id="canvas" width="1920" height="1080"></canvas>
-
-        <div>
-            <p>Note: If there are no labelable features in the image, simply hit submit without labeling anything</p>
-        </div>
 
         <div id="image_info">
             <p id="image_info_name"></p>
