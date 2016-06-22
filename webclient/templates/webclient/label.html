@@ -48,6 +48,7 @@
                             window.labelsLayer.removeChildren();
                         }
                         //window.labelsLayer.importJSON(JSON.parse(data));
+                        $('#noLabels').prop('checked', false);
                         getNewImage();
                     },
                     error : function(xhr,errmsg,err) {
