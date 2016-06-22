@@ -86,5 +86,5 @@ def convertSVG(label, reconvert=False):
                     filename='P%iL%iC%sI%s' % (
                     label.parentImage.id, label.id, label.categoryType.category_name, label.parentImage.name),
                     reconvert=False)
-def convertAll():
+def convertAll(reconvert=False):
     convertSVGs(ImageLabel.objects.all())

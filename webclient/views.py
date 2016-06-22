@@ -314,5 +314,5 @@ def updateImage(request):
 @require_POST
 def convertAll(request):
     from convert_images import convertAll
-    convertAll()
+    convertAll(request.POST.get('reconvert', False))
     return HttpResponse('Ok')
