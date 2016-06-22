@@ -257,6 +257,28 @@
         }
 
 
+
+        $('document').ready(function(){
+
+
+            //Canvas Controls
+            $('#brightnessControl').on('change', function() {
+                console.log('test');
+                alert('test');
+            });
+            $('#brightnessControl').on('change', function() {
+                console.log('test');
+                alert('test');
+            });
+            $('#brightnessControl').on('change', function() {
+                console.log('test');
+                alert('test');
+            });
+
+        });
+
+
+
     </script>
 
 
@@ -303,6 +325,15 @@
 
         </div>
 
+    </div>
+
+    <div id="imageControl">
+        Brightness: <span id="brightness">1</span><br>
+        <input type="range"  min="1" max="10" id="brightnessControl"/><br>
+        Contrast: <span id="contrast">1</span><br>
+        <input type="range"  min="1" max="10" id="contrastControl"/><br>
+        Saturation: <span id="saturation">1</span> <br>
+        <input type="range"  min="1" max="10" id="saturationControl"/>
     </div>
     <!--<div id="submitImage">
         <button id="next">Submit</button>
