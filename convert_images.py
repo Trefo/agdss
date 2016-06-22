@@ -78,9 +78,11 @@ def convertSVGs(LabelList):
     #convertSVGtoPNG(labelToSVGString(LabelList[3].labelShapes), 'name')
     #return
     for label in LabelList:
-        convertSVGtoPNG(img_file=labelToSVGString(label.labelShapes), foldername=label.categoryType.category_name,
-                        filename='P%iL%iC%sI%s' %(label.parentImage.id, label.id, label.categoryType.category_name, label.parentImage.name))
+        convertSVG(label)
 
-
+def convertSVG(label):
+    convertSVGtoPNG(img_file=labelToSVGString(label.labelShapes), foldername=label.categoryType.category_name,
+                    filename='P%iL%iC%sI%s' % (
+                    label.parentImage.id, label.id, label.categoryType.category_name, label.parentImage.name))
 def convertAll():
     convertSVGs(ImageLabel.objects.all())

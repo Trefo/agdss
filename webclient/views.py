@@ -14,7 +14,6 @@ from django.views.decorators.http import require_POST, require_GET
 from django.conf import settings
 from .models import *
 
-
 def index(request):
     template = loader.get_template('webclient/index.html')
     context = {}
@@ -75,6 +74,9 @@ def applyLabels(request):
  #   else:
     labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,pub_date=datetime.now(),categoryType=categoryType)
     labelObject.save()
+
+    from convert_images import convertSVG
+    convertSVG(labelObject)
     return HttpResponse(label_list_)
 
 @require_GET
