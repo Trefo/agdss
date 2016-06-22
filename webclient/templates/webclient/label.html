@@ -61,10 +61,10 @@
         function onMouseDown(event) {
             if(!aboveExistingLabel){ //Create new label
                 startPoint = event.point;
-                isActive = true;
+                isActive = true; //Whether the path is currently being created
                 var center = (startPoint + event.point)/2
-                window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
-                labelsDrawn += 1;
+                //window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
+                dragged = false; //Whether the path has been created with a click and dragged to be larger than a simgle point
             }
             else {
                 dragStartPoint = event.point;
@@ -74,8 +74,13 @@
 
         function onMouseDrag(event) {
             if(isActive){
+                if(!dragged) {
+                    var center = (startPoint + event.point)/2
+                    window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
+                    dragged = true;
+                    labelsDrawn += 1;
+                }
                 var center = (startPoint + event.point)/2
-                //newPath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
                 newPath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
                 newPath.strokeColor = 'yellow';
                 newPath.strokeWidth = 3;
@@ -95,6 +100,7 @@
                     isActive = false;
                     aboveExistingLabel = false;
                     this.remove();
+                    console.log(window.labelsLayer.exportSVG({embedImages: false, asString: false}));
                     labelsDrawn -= 1
                 }
                 window.circlePath.remove();
@@ -106,12 +112,16 @@
 
         }
 
-
-
         function onMouseUp(event) {
-            window.circlePath.opacity = 0.3;
             isActive = false;
-            window.circlePath.fillColor = 'grey';
+            if (!dragged) {
+                aboveExistingLabel = false;
+            }
+            else {
+                window.circlePath.opacity = 0.3;
+                window.circlePath.fillColor = 'grey';
+            }
+
         }
 
 
