@@ -7,7 +7,7 @@ import re
 import wand.exceptions
 import os
 
-def convertSVGtoPNG(img_file, foldername, filename):
+def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
     #Convert copy of image to new format
     if not file:
         #TODO: Some error checking
@@ -18,6 +18,9 @@ def convertSVGtoPNG(img_file, foldername, filename):
         foldername_ = foldername_[1:]
     if foldername_[-1] == '/' or foldername_[-1] == '\\':
         foldername_ = foldername_[:-1]
+
+    if not reconvert and os.path.exists(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + '.png'):
+         return
     try:
         with WandImage(file=img_file) as img:
             #img.depth = 1
@@ -37,9 +40,9 @@ def convertSVGtoPNG(img_file, foldername, filename):
             img.format = 'png'
 
 
-            if not os.path.exists(settings.STATIC_ROOT +  'labels/' + foldername + '/'):
-                os.makedirs(settings.STATIC_ROOT +  'labels/' + foldername + '/')
-            img.save(filename=(settings.STATIC_ROOT +  'labels/' + foldername + '/' + filename + '.png'))
+            if not os.path.exists(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/'):
+                os.makedirs(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/')
+            img.save(filename=(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + '.png'))
             print("converted Image " + filename)
  
 
@@ -74,15 +77,14 @@ def labelToSVGString(str):
 
     return SVGStringFile
 
-def convertSVGs(LabelList):
-    #convertSVGtoPNG(labelToSVGString(LabelList[3].labelShapes), 'name')
-    #return
+def convertSVGs(LabelList, reconvert=False):
     for label in LabelList:
-        convertSVG(label)
+        convertSVG(label, reconvert)
 
-def convertSVG(label):
+def convertSVG(label, reconvert=False):
     convertSVGtoPNG(img_file=labelToSVGString(label.labelShapes), foldername=label.categoryType.category_name,
                     filename='P%iL%iC%sI%s' % (
-                    label.parentImage.id, label.id, label.categoryType.category_name, label.parentImage.name))
+                    label.parentImage.id, label.id, label.categoryType.category_name, label.parentImage.name),
+                    reconvert=False)
 def convertAll():
     convertSVGs(ImageLabel.objects.all())
