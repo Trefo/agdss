@@ -263,13 +263,22 @@
 
             //Canvas Controls
             $('#brightnessControl').on('input', function() {
-                $('span#brightness').html($('#brightnessControl').val());
+                var brightness = $('#brightnessControl').val();
+                $('span#brightness').html(brightness);
+                $('#canvas').css('-webkit-filter', 'brightness(' + brightness + ')');
+                $('#canvas').css('filter', 'brightness(' + brightness + ')');
             });
             $('#contrastControl').on('input', function() {
-                $('span#contrast').html($('#brightnessControl').val());
+                var contrast = $('#contrastControl').val();
+                $('span#contrast').html($('#contrastControl').val());
+                $('#canvas').css('-webkit-filter', 'contrast(' + contrast + ')');
+                $('#canvas').css('filter', 'contrast(' + contrast + ')');
             });
             $('#saturationControl').on('input', function() {
-                $('span#contrast').html($('#brightnessControl').val());
+                var saturation = $('#saturationControl').val();
+                $('span#saturation').html($('#saturationControl').val());
+                $('#canvas').css('-webkit-filter', 'saturation(' + saturation + ')');
+                $('#canvas').css('filter', 'saturation(' + saturation + ')');
             });
 
         });
@@ -326,11 +335,11 @@
 
     <div id="imageControl">
         <label id=brightnessLabel>Brightness:</label> <span id="brightness">1</span><br>
-        <input type="range"  min="1" max="10" id="brightnessControl"/><br>
+        <input type="range"  min="1" max="10" step="0.1" value="1" id="brightnessControl"/><br>
         <label id="contrastLabel">Contrast:</label> <span id="contrast">1</span><br>
-        <input type="range"  min="1" max="10" id="contrastControl"/><br>
+        <input type="range"  min="0" max="3" step="0.1" value="1" id="contrastControl"/><br>
         <label id="saturationLabel">Saturation:</label> <span id="saturation">1</span> <br>
-        <input type="range"  min="1" max="10" id="saturationControl"/>
+        <input type="range"  min="0" max="1" step="0.1" value="1" id="saturationControl"/>
     </div>
     <!--<div id="submitImage">
         <button id="next">Submit</button>
