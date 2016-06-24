@@ -32,6 +32,8 @@
                 var updated_category = $("#categories").val();
                 //selectedImage = JSON.parse($('#imageCombo').val().toString());
                 console.log(window.labelsLayer.exportSVG({embedImages: false, asString: false}));
+                $('#noLabels').prop('checked', false);
+                labelsDrawn = 0;
                 $.ajax({
                     url : "/webclient/applyLabels",
                     type : "POST",
@@ -48,7 +50,7 @@
                             window.labelsLayer.removeChildren();
                         }
                         //window.labelsLayer.importJSON(JSON.parse(data));
-                        $('#noLabels').prop('checked', false);
+                        //$('#noLabels').prop('checked', false);
                         getNewImage();
                     },
                     error : function(xhr,errmsg,err) {

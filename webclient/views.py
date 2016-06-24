@@ -52,8 +52,8 @@ def applyLabels(request):
     category_name = dict['category_name']
     sourceType = ''
     categoryType = ''
-    parentImage_ = Image.objects.all().filter(name=image_name, path=path);
-    categoryTypeList = CategoryType.objects.all().filter(category_name=category_name);
+    parentImage_ = Image.objects.all().filter(name=image_name, path=path)
+    categoryTypeList = CategoryType.objects.all().filter(category_name=category_name)
     if (categoryTypeList):
         categoryType = categoryTypeList[0]
     else:
@@ -316,3 +316,13 @@ def convertAll(request):
     from convert_images import convertAll
     convertAll(request.POST.get('reconvert', False))
     return HttpResponse('Ok')
+
+
+@csrf_exempt
+@require_GET
+def unlabeledImages(request):
+    print('test')
+    images = Image.objects.all().filter(imagelabel__isnull=True).distinct()
+    print(images)
+    print(len(images))
+    return HttpResponse(images)

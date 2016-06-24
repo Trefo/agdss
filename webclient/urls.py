@@ -19,4 +19,5 @@ urlpatterns = [
     url(r'^getInfo$', 'webclient.views.getInfo'),
     url(r'^getNewImage$', 'webclient.views.getNewImage'),
     url(r'^convertAll$', 'webclient.views.convertAll'),
+    url(r'^unlabeledImages$', 'webclient.views.unlabeledImages'),
     ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
