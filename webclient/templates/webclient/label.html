@@ -277,8 +277,8 @@
             $('#saturationControl').on('input', function() {
                 var saturation = $('#saturationControl').val();
                 $('span#saturation').html($('#saturationControl').val());
-                $('#canvas').css('-webkit-filter', 'saturation(' + saturation + ')');
-                $('#canvas').css('filter', 'saturation(' + saturation + ')');
+                $('#canvas').css('-webkit-filter', 'saturate(' + saturation + ')');
+                $('#canvas').css('filter', 'saturate(' + saturation + ')');
             });
 
         });
@@ -314,8 +314,8 @@
             <input type="checkbox" id="noLabels" /> No labels in image
         </form>
     </div>
-
-    <div id="canvasDiv">
+    <table id="displayTable"><tr>
+    <td><div id="canvasDiv">
         <div id="image_name_div"><h3 id="image_name"></h3></div>
         <!--<canvas id="canvas" resize></canvas> -->
         <canvas id="canvas" width="1920" height="1080"></canvas>
@@ -331,16 +331,22 @@
 
         </div>
 
-    </div>
+    </div></td>
 
-    <div id="imageControl">
-        <label id=brightnessLabel>Brightness:</label> <span id="brightness">1</span><br>
-        <input type="range"  min="1" max="10" step="0.1" value="1" id="brightnessControl"/><br>
-        <label id="contrastLabel">Contrast:</label> <span id="contrast">1</span><br>
-        <input type="range"  min="0" max="3" step="0.1" value="1" id="contrastControl"/><br>
-        <label id="saturationLabel">Saturation:</label> <span id="saturation">1</span> <br>
-        <input type="range"  min="0" max="1" step="0.1" value="1" id="saturationControl"/>
-    </div>
+
+    <td id="imageControlTd"><div id="imageControlContainer">
+        <div id="imageControl">
+            <label id=brightnessLabel>Brightness:</label> <span id="brightness">1</span><br>
+            <input type="range"  min="1" max="10" step="0.1" value="1" id="brightnessControl"/><br>
+            <label id="contrastLabel">Contrast:</label> <span id="contrast">1</span><br>
+            <input type="range"  min="0" max="3" step="0.1" value="1" id="contrastControl"/><br>
+            <label id="saturationLabel">Saturation:</label> <span id="saturation">1</span> <br>
+            <input type="range"  min="0" max="3" step="0.1" value="1" id="saturationControl"/>
+        </div>
+    </div></td>
+
+
+    </tr></table>
     <!--<div id="submitImage">
         <button id="next">Submit</button>
     </div> -->

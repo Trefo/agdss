@@ -19,10 +19,28 @@ button #next {
 }
 
 div #canvasDiv {
-
 }
 
 
 #canvas {
 
+}
+
+div #imageControlContainer {
+    padding-top: 75%;
+
+}
+
+div #imageControl {
+    padding: 2px;
+    border: 1px groove;
+}
+
+#imageControlTd {
+    vertical-align: top;
+}
+
+
+
+#displayTable td,tr{
 }
