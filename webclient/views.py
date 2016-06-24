@@ -323,6 +323,4 @@ def convertAll(request):
 def unlabeledImages(request):
     print('test')
     images = Image.objects.all().filter(imagelabel__isnull=True).distinct()
-    print(images)
-    print(len(images))
-    return HttpResponse(images)
+    return HttpResponse("Images: " + ','.join(map(str, images)) )
