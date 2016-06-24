@@ -168,6 +168,7 @@
 
         function getNewImage() {
             if (typeof spinner == 'undefined') {
+                //TODO: Remove Spinner
                 var opts = {
                   lines: 13, length: 28, width: 14, radius: 42, scale: 1,
                     corners: 1, color: '#000', opacity: 0.15, rotate: 0,
@@ -267,20 +268,23 @@
             $('#brightnessControl').on('input', function() {
                 var brightness = $('#brightnessControl').val();
                 $('span#brightness').html(brightness);
-                $('#canvas').css('-webkit-filter', 'brightness(' + brightness + ')');
-                $('#canvas').css('filter', 'brightness(' + brightness + ')');
+                cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' +  $('#saturationControl').val() + ')';
+                $('#canvas').css('-webkit-filter', cssText);
+                $('#canvas').css('filter', cssText);
             });
             $('#contrastControl').on('input', function() {
                 var contrast = $('#contrastControl').val();
+                cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' +  $('#saturationControl').val() + ')';
                 $('span#contrast').html($('#contrastControl').val());
-                $('#canvas').css('-webkit-filter', 'contrast(' + contrast + ')');
-                $('#canvas').css('filter', 'contrast(' + contrast + ')');
+                $('#canvas').css('-webkit-filter', cssText);
+                $('#canvas').css('filter', cssText);
             });
             $('#saturationControl').on('input', function() {
                 var saturation = $('#saturationControl').val();
+                cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' +  $('#saturationControl').val() + ')';
                 $('span#saturation').html($('#saturationControl').val());
-                $('#canvas').css('-webkit-filter', 'saturate(' + saturation + ')');
-                $('#canvas').css('filter', 'saturate(' + saturation + ')');
+                $('#canvas').css('-webkit-filter', cssText);
+                $('#canvas').css('filter', cssText);
             });
 
         });
