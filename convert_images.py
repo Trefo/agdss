@@ -35,7 +35,7 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
             #Convert to black and white
             img.negate()
             img.threshold(0)
-            img.negate()
+            #img.negate()
 
             img.format = 'png'
 
@@ -85,6 +85,6 @@ def convertSVG(label, reconvert=False):
     convertSVGtoPNG(img_file=labelToSVGString(label.labelShapes), foldername=label.categoryType.category_name,
                     filename='P%iL%iC%sI%s' % (
                     label.parentImage.id, label.id, label.categoryType.category_name, label.parentImage.name),
-                    reconvert=False)
+                    reconvert=reconvert)
 def convertAll(reconvert=False):
-    convertSVGs(ImageLabel.objects.all())
+    convertSVGs(ImageLabel.objects.all(), reconvert=reconvert)
