@@ -287,6 +287,12 @@
                 $('#canvas').css('filter', cssText);
             });
 
+            $('#resetImageControl').on('click', function() {
+                $('#brightnessControl').val("1").trigger('input');
+                $('#contrastControl').val("1").trigger('input');
+                $('#saturationControl').val("1").trigger('input');
+            });
+
         });
 
 
@@ -345,10 +351,10 @@
             <label id=brightnessLabel>Brightness:</label> <span id="brightness">1</span><br>
             <input type="range"  min="1" max="10" step="0.1" value="1" id="brightnessControl"/><br>
             <label id="contrastLabel">Contrast:</label> <span id="contrast">1</span><br>
-            <input type="range"  min="0" max="3" step="0.1" value="1" id="contrastControl"/><br>
+            <input type="range"  min="1" max="3" step="0.1" value="1" id="contrastControl"/><br>
             <label id="saturationLabel">Saturation:</label> <span id="saturation">1</span> <br>
-            <input type="range"  min="0" max="3" step="0.1" value="1" id="saturationControl"/><br>
-            <input type="button" id="resetImageControl">Reset</input>
+            <input type="range"  min="1" max="5" step="0.1" value="1" id="saturationControl"/><br>
+            <button type="button" id="resetImageControl" >Reset</button>
         </div>
     </div></td>
 
