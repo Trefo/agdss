@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
+from unicodedata import decimal
+
 from django.db import models
 
 
@@ -45,3 +47,9 @@ class ImageLabel(models.Model):
 
 
 
+
+
+class ImageFilter(models.Model):
+    brightness = models.DecimalField(max_digits=3, decimal_place=1)
+    contrast = models.DecimalField(max_digits=3, decimal_place=1)
+    saturation = models.DecimalField(max_digits=3, decimal_place=1)
