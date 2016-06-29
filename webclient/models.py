@@ -50,6 +50,6 @@ class ImageLabel(models.Model):
 
 
 class ImageFilter(models.Model):
-    brightness = models.DecimalField(max_digits=3, decimal_place=1)
-    contrast = models.DecimalField(max_digits=3, decimal_place=1)
-    saturation = models.DecimalField(max_digits=3, decimal_place=1)
+    brightness = models.DecimalField(max_digits=3, decimal_places=1)
+    contrast = models.DecimalField(max_digits=3, decimal_places=1)
+    saturation = models.DecimalField(max_digits=3, decimal_places=1)

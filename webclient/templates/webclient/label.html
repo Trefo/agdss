@@ -42,7 +42,12 @@
                         image_name: currentImage.image_name,
                         path: currentImage.path,
                         category_name: updated_category,
-                        label_list: window.labelsLayer.exportSVG({embedImages: false, asString: true})
+                        label_list: window.labelsLayer.exportSVG({embedImages: false, asString: true}),
+                        image_filters: {
+                            brightness: $('#brightnessControl').val(),
+                            contrast: $('#brightnessControl').val(),
+                            saturation: $('#brightnessControl').val()
+                        }
                     }),
                     success : function(data) {
                         //$('#debug').text(data);

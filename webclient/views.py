@@ -50,6 +50,15 @@ def applyLabels(request):
     image_name = dict['image_name']
     path = dict['path']
     category_name = dict['category_name']
+
+    image_filters = dict['image_filters']
+    image_filter_obj = ImageFilter(brightness=image_filters['brightness'],
+                                    contrast=image_filters['contrast'],
+                                    saturation=image_filters['saturation'])
+    image_filter_obj.save()
+    print(image_filters)
+
+
     sourceType = ''
     categoryType = ''
     parentImage_ = Image.objects.all().filter(name=image_name, path=path)
