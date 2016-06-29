@@ -19,6 +19,7 @@
         var isActive = false;
         var aboveExistingLabel = false;
         var labelsDrawn = 0; //Whether a label has been drawn on this image
+        var prevLabels = 0;
 
         $(document).ready(function() {
             $("#applyLabels").click(function() {
@@ -33,6 +34,7 @@
                 //selectedImage = JSON.parse($('#imageCombo').val().toString());
                 console.log(window.labelsLayer.exportSVG({embedImages: false, asString: false}));
                 $('#noLabels').prop('checked', false);
+                prevLabels = labelsDrawn;
                 labelsDrawn = 0;
                 $.ajax({
                     url : "/webclient/applyLabels",
@@ -60,6 +62,8 @@
                     },
                     error : function(xhr,errmsg,err) {
                         alert(xhr.status + ": " + xhr.responseText);
+                        labelsDrawn = prevLabels;
+
                     }
                 });
                 return false;
