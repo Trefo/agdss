@@ -41,6 +41,7 @@ class ImageLabel(models.Model):
     categoryType = models.ForeignKey(CategoryType, on_delete=models.CASCADE)
     labelShapes = models.TextField(max_length=10000)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
+    labeler = models.ForeignKey(Labeler, on_delete=models.CASCADE, default=None)
 
     def __unicode__(self):
         return 'Image: ' + self.parentImage.name + ' | Category: ' + self.categoryType.category_name
@@ -54,3 +55,8 @@ class ImageFilter(models.Model):
     contrast = models.DecimalField(max_digits=3, decimal_places=1)
     saturation = models.DecimalField(max_digits=3, decimal_places=1)
     imageLabel = models.ForeignKey(ImageLabel, on_delete=models.CASCADE, default=None)
+    labeler = models.ForeignKey(Labeler, on_delete=models.CASCADE, default=None)
+
+from django.contrib.auth.models import User
+class Labeler(models.Model):
+    user = models.OneToOneField(User)
