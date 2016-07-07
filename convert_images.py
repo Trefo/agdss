@@ -111,7 +111,7 @@ def combineImageLabels(image):
     for im in filepaths:
         img = Image.open(im)
         img.load()
-        imarr = numpy.array(img, dtype=numpy.float)
+        imarr = numpy.array(img, copy=True, dtype=numpy.float)
         img.show()
         arr = arr + imarr / N
     arr = numpy.array(numpy.round(arr), dtype=numpy.uint8)
