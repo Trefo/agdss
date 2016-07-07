@@ -6,6 +6,8 @@ from django.conf import settings
 import re
 import wand.exceptions
 import os
+from PIL import Image
+import numpy
 
 def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
     #Convert copy of image to new format
@@ -44,6 +46,7 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
                 os.makedirs(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/')
             img.save(filename=(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + '.png'))
             print("converted Image " + filename)
+            return settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + '.png'
  
 
     except wand.exceptions.CoderError as e:
@@ -78,13 +81,36 @@ def labelToSVGString(str):
     return SVGStringFile
 
 def convertSVGs(LabelList, reconvert=False):
-    for label in LabelList:
-        convertSVG(label, reconvert)
+    return [convertSVG(label, reconvert) for label in LabelList]
 
 def convertSVG(label, reconvert=False):
-    convertSVGtoPNG(img_file=labelToSVGString(label.labelShapes), foldername=label.categoryType.category_name,
-                    filename='P%iL%iC%sI%s' % (
-                    label.parentImage.id, label.id, label.categoryType.category_name, label.parentImage.name),
+    return convertSVGtoPNG(img_file=labelToSVGString(label.labelShapes), foldername=label.categoryType.category_name,
+                    filename=labelFilename(label),
                     reconvert=reconvert)
+
+def labelFilename(label):
+    return 'P%iL%iC%sI%s' % (
+            label.parentImage.id, label.id, label.categoryType.category_name, label.parentImage.name)
 def convertAll(reconvert=False):
     convertSVGs(ImageLabel.objects.all(), reconvert=reconvert)
+
+
+def combineImageLabels(image):
+    labels = ImageLabel.objects.all().filter(parentImage=image)
+    if not labels:
+        return
+
+    #Based on https://stackoverflow.com/questions/17291455/how-to-get-an-average-picture-from-100-pictures-using-pil
+    filepaths = convertSVGs(labels)
+    width, height = Image.open(labels[0]).size
+    N = len(filepaths)
+    arr =  numpy.zeros((height,width,3),numpy.float)
+    for im in filepaths:
+        imarr = numpy.array(Image.open(im), dtype=numpy.float)
+        arr = arr + imarr / N
+    arr = numpy.array(numpy.round(arr), dtype=numpy.uint8)
+    out = Image.fromarray(arr, mode="RGB")
+    out.save("C:/Users/Sandeep/Dropbox/Average.png")
+    out.show()
+
+

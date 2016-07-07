@@ -330,7 +330,7 @@ def convertAll(request):
 @require_GET
 def unlabeledImages(request):
     images = Image.objects.all().filter(imagelabel__isnull=True).distinct()
-    return HttpResponse("Images: " + ','.join(map(str, images)) )\
+    return HttpResponse("Images: " + ','.join(map(str, images)) )
 
 @csrf_exempt
 @require_GET
@@ -338,3 +338,8 @@ def numImageLabels(request):
     images = Image.objects.all().annotate(num=Count('imagelabel')).order_by('-num')
     print(images)
     return HttpResponse("Images: " + ','.join(map(str, images)) )
+@csrf_exempt
+@require_POST
+def combineAllImages(request):
+    from convert_images import combineImageLabels
+    combineImageLabels(Image.objects.all()[0])
