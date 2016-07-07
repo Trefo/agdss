@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^convertAll$', 'webclient.views.convertAll'),
     url(r'^unlabeledImages$', 'webclient.views.unlabeledImages'),
     url(r'^numImageLabels$', 'webclient.views.numImageLabels'),
+    url(r'^combineAllImages$', 'webclient.views.combineAllImages'),
     ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

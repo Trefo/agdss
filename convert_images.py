@@ -22,7 +22,7 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
         foldername_ = foldername_[:-1]
 
     if not reconvert and os.path.exists(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + '.png'):
-         return
+         return settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + '.png'
     try:
         with WandImage(file=img_file) as img:
             #img.depth = 1
@@ -81,7 +81,7 @@ def labelToSVGString(str):
     return SVGStringFile
 
 def convertSVGs(LabelList, reconvert=False):
-    return [convertSVG(label, reconvert) for label in LabelList]
+    return [convertSVG(label, reconvert) for label in LabelList if label is not None]
 
 def convertSVG(label, reconvert=False):
     return convertSVGtoPNG(img_file=labelToSVGString(label.labelShapes), foldername=label.categoryType.category_name,
@@ -102,14 +102,20 @@ def combineImageLabels(image):
 
     #Based on https://stackoverflow.com/questions/17291455/how-to-get-an-average-picture-from-100-pictures-using-pil
     filepaths = convertSVGs(labels)
-    width, height = Image.open(labels[0]).size
+    if not filepaths:
+        return
+    width, height = Image.open(filepaths[0]).size
     N = len(filepaths)
-    arr =  numpy.zeros((height,width,3),numpy.float)
+    print(filepaths)
+    arr = numpy.zeros((height,width),numpy.float)
     for im in filepaths:
-        imarr = numpy.array(Image.open(im), dtype=numpy.float)
+        img = Image.open(im)
+        img.load()
+        imarr = numpy.array(img, dtype=numpy.float)
+        img.show()
         arr = arr + imarr / N
     arr = numpy.array(numpy.round(arr), dtype=numpy.uint8)
-    out = Image.fromarray(arr, mode="RGB")
+    out = Image.fromarray(arr, mode="L")
     out.save("C:/Users/Sandeep/Dropbox/Average.png")
     out.show()
 

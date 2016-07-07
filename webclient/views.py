@@ -342,4 +342,5 @@ def numImageLabels(request):
 @require_POST
 def combineAllImages(request):
     from convert_images import combineImageLabels
-    combineImageLabels(Image.objects.all()[0])
+    combineImageLabels(Image.objects.all()[1])
+    return HttpResponse("OK")
