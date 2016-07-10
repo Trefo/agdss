@@ -25,6 +25,7 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
     if not reconvert and os.path.exists(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + '.png'):
          return settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + '.png'
     try:
+        svgs = separatePaths(img_file)
         with WandImage(file=img_file) as img:
             #img.depth = 1
             #img.colorspace = 'gray'
@@ -57,6 +58,11 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
     except wand.exceptions.WandError as e:
 	print('Failed to convert ' + filename + ': '+ str(e))
 
+
+#Returns array of SVGs each with 1 path
+def separatePaths(svg):
+    rePath = r'(<path[^/>]*/>)'
+    result = re.search(rePath, svg)
 def labelToSVGString(str):
     #Find width and height
     reWH = r'<image [^>]*(height="(?P<height>\d+)"[^>]* | width="(?P<width>\d+)"[^>]*){2}[^>]*/>'
