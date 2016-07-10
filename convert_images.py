@@ -79,6 +79,12 @@ def labelToSVGString(str):
         #TODO: Do some error stuff
         return
 
+    reFill = r'<path[^/>]*fill\s*=\s*"(?P<fill>[^"]*)"'
+    reStroke = r'<path[^/>]*stroke\s*=\s*"(?P<stroke>[^"]*)"'
+    pathFill = '#000001'
+    pathStroke = '#000001'
+
+    str.replace()
     SVGStringFile = StringIO.StringIO('<?xml version="1.0" encoding="UTF-8" standalone="no"?>' \
              '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"' \
             ' xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve" height="%s"' \
