@@ -6,11 +6,12 @@ from django.conf import settings
 import re
 import wand.exceptions
 import os
-from PIL import Image
+from PIL import Image as PILImage
 import numpy
 
 def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
     #Convert copy of image to new format
+    print(img_file.getvalue())
     if not file:
         #TODO: Some error checking
         return
@@ -95,7 +96,9 @@ def convertAll(reconvert=False):
     convertSVGs(ImageLabel.objects.all(), reconvert=reconvert)
 
 
-def combineImageLabels(image):
+def combineImageLabels(image, thresholdPercent=100):
+    threshold = int(thresholdPercent/100.0 * 255)
+    print(threshold)
     labels = ImageLabel.objects.all().filter(parentImage=image)
     if not labels:
         return
@@ -104,19 +107,23 @@ def combineImageLabels(image):
     filepaths = convertSVGs(labels)
     if not filepaths:
         return
-    width, height = Image.open(filepaths[0]).size
+    width, height = PILImage.open(filepaths[0]).size
     N = len(filepaths)
     print(filepaths)
     arr = numpy.zeros((height,width),numpy.float)
     for im in filepaths:
-        img = Image.open(im)
+        img = PILImage.open(im).convert('L')
         img.load()
         imarr = numpy.array(img, copy=True, dtype=numpy.float)
-        img.show()
+        #img.show()
         arr = arr + imarr / N
     arr = numpy.array(numpy.round(arr), dtype=numpy.uint8)
-    out = Image.fromarray(arr, mode="L")
-    out.save("C:/Users/Sandeep/Dropbox/Average.png")
+    #for i in arr:
+     #   print(i)
+    arr[arr <= threshold] = 0  # Black
+    arr[arr > threshold] = 255  # White
+    out = PILImage.fromarray(arr, mode="L")
+    out.save("C:/Users/Sandeep/Dropbox/kumar-prec-ag/temp/%sAverage.png" %image.name)
     out.show()
 
 
