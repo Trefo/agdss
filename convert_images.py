@@ -96,7 +96,7 @@ def convertAll(reconvert=False):
     convertSVGs(ImageLabel.objects.all(), reconvert=reconvert)
 
 
-def combineImageLabels(image, thresholdPercent=100):
+def combineImageLabels(image, thresholdPercent=50):
     threshold = int(thresholdPercent/100.0 * 255)
     print(threshold)
     labels = ImageLabel.objects.all().filter(parentImage=image)
