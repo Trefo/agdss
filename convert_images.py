@@ -65,7 +65,10 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
 #Returns array of SVGs each with 1 path
 def separatePaths(svg):
     #rePath = r'(<path[^/>]*/>)'
-    result = re.search(SVGRegex.rePath, svg)
+    paths = re.findall(SVGRegex.rePath, svg)
+    image, height, width = SVGDimensions(svg)
+
+    for path in paths:
 
 
 def SVGDimensions(str):
@@ -96,18 +99,16 @@ def SVGString(DBStr, height=None, width=None):
             ' xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve" height="%s"' \
              ' width="%s">%s</svg>\n' %(height, width, addedStr)
 
-def labelToSVGString(str):
-
+def labelToSVGStringFile(str):
     SVGStringFile = StringIO.StringIO(SVGString(str))
     SVGStringFile.seek(0)
-
     return SVGStringFile
 
 def convertSVGs(LabelList, reconvert=False):
     return [convertSVG(label, reconvert) for label in LabelList if label is not None]
 
 def convertSVG(label, reconvert=False):
-    return convertSVGtoPNG(img_file=labelToSVGString(label.labelShapes), foldername=label.categoryType.category_name,
+    return convertSVGtoPNG(img_file=labelToSVGStringFile(label.labelShapes), foldername=label.categoryType.category_name,
                     filename=labelFilename(label),
                     reconvert=reconvert)
 
