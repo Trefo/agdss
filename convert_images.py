@@ -8,6 +8,9 @@ import wand.exceptions
 import os
 from PIL import Image as PILImage
 import numpy
+import SVGRegex
+
+
 
 def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
     #Convert copy of image to new format
@@ -61,12 +64,13 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
 
 #Returns array of SVGs each with 1 path
 def separatePaths(svg):
-    rePath = r'(<path[^/>]*/>)'
-    result = re.search(rePath, svg)
+    #rePath = r'(<path[^/>]*/>)'
+    result = re.search(SVGRegex.rePath, svg)
+
 def labelToSVGString(str):
     #Find width and height
-    reWH = r'<image [^>]*(height="(?P<height>\d+)"[^>]* | width="(?P<width>\d+)"[^>]*){2}[^>]*/>'
-    result = re.search(reWH, str)
+    #reWH = r'<image [^>]*(height="(?P<height>\d+)"[^>]* | width="(?P<width>\d+)"[^>]*){2}[^>]*/>'
+    result = re.search(SVGRegex.reWH, str)
     if result == None:
         #TODO: Some errory stuff
         return
@@ -79,8 +83,8 @@ def labelToSVGString(str):
         #TODO: Do some error stuff
         return
 
-    reFill = r'<path[^/>]*fill\s*=\s*"(?P<fill>[^"]*)"'
-    reStroke = r'<path[^/>]*stroke\s*=\s*"(?P<stroke>[^"]*)"'
+    #reFill = r'<path[^/>]*fill\s*=\s*"(?P<fill>[^"]*)"'
+    #reStroke = r'<path[^/>]*stroke\s*=\s*"(?P<stroke>[^"]*)"'
     pathFill = '#000001'
     pathStroke = '#000001'
 
@@ -109,7 +113,7 @@ def convertAll(reconvert=False):
 
 
 def combineImageLabels(image, thresholdPercent=50):
-    threshold = int(thresholdPercent/100.0 * 255)
+    threshold = thresholdPercent/100.0 * 255
     print(threshold)
     labels = ImageLabel.objects.all().filter(parentImage=image)
     if not labels:
