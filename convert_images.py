@@ -67,32 +67,38 @@ def separatePaths(svg):
     #rePath = r'(<path[^/>]*/>)'
     result = re.search(SVGRegex.rePath, svg)
 
-def labelToSVGString(str):
-    #Find width and height
-    #reWH = r'<image [^>]*(height="(?P<height>\d+)"[^>]* | width="(?P<width>\d+)"[^>]*){2}[^>]*/>'
+
+def SVGDimensions(str):
     result = re.search(SVGRegex.reWH, str)
     if result == None:
-        #TODO: Some errory stuff
-        return
-
-    #Requires encoding as unicode format does not work
-    height = result.group('height').encode('utf-8')
-    width = result.group('width').encode('utf-8')
-
-    if height == None or width == None:
-        #TODO: Do some error stuff
-        return
+        return (None, None, None)
 
     #reFill = r'<path[^/>]*fill\s*=\s*"(?P<fill>[^"]*)"'
     #reStroke = r'<path[^/>]*stroke\s*=\s*"(?P<stroke>[^"]*)"'
     pathFill = '#000001'
     pathStroke = '#000001'
 
-    str.replace()
-    SVGStringFile = StringIO.StringIO('<?xml version="1.0" encoding="UTF-8" standalone="no"?>' \
+    image = result.group(0)
+    height = result.group('height').encode('utf-8')
+    width = result.group('width').encode('utf-8')
+    return (image, height, width)
+
+
+#If height and width are defined, image tag is not removed
+#Otherwise, height and width are extracted from it and it is removed
+def SVGString(DBStr, height=None, width=None):
+    if height == None or width == None:
+        image, height, width = SVGDimensions(DBStr)
+        addedStr = DBStr.replace(image, '').encode('utf-8')
+
+    return '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' \
              '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"' \
             ' xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve" height="%s"' \
-             ' width="%s">%s</svg>\n' %(height, width, str.replace(result.group(0), '').encode('utf-8')) )
+             ' width="%s">%s</svg>\n' %(height, width, addedStr)
+
+def labelToSVGString(str):
+
+    SVGStringFile = StringIO.StringIO(SVGString(str))
     SVGStringFile.seek(0)
 
     return SVGStringFile
