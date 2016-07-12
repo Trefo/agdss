@@ -90,7 +90,20 @@ def separatePaths(svg):
         images.append(SVGStringToImageBlob(SVGString(path, height, width)))
     return images
 
-
+def countableLabel(svgString):
+    convertedImages = separatePaths(svgString)
+    height, width = SVGDimensions(svgString)[1:]
+    image = numpy.zeros((int(height), int(width)), numpy.uint8)
+    for convertedImage in convertedImages:
+        img = PILImage.open(StringIO.StringIO(convertedImage)).convert("L")
+        imgArr = numpy.array(img, copy=True)
+        PILImage.fromarray(imgArr, mode='L').show()
+        image += imgArr
+        #img.show()
+    #for i in image * 100:
+     #   print i
+    #PILImage.fromarray(image * 100, mode='L').show()
+    return image
 def SVGDimensions(str):
     result = re.search(SVGRegex.reWH, str)
     if result == None:
@@ -110,10 +123,12 @@ def SVGDimensions(str):
 #If height and width are defined, image tag is not removed
 #Otherwise, height and width are extracted from it and it is removed
 def SVGString(DBStr, height=None, width=None):
+    addedStr = DBStr
     if height == None or width == None:
         image, height, width = SVGDimensions(DBStr)
-        addedStr = DBStr.replace(image, '').encode('utf-8')
-
+        if image:
+            addedStr = DBStr.replace(image, '')
+    addedStr = addedStr.encode('utf-8')
     return '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' \
              '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"' \
             ' xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve" height="%s"' \
@@ -143,9 +158,14 @@ def combineImageLabels(image, thresholdPercent=50):
     threshold = thresholdPercent/100.0 * 255
     print(threshold)
     labels = ImageLabel.objects.all().filter(parentImage=image)
+    for label in labels:
+        countableLabel(label.labelShapes)
+        return
+        for i in separatePaths(label.labelShapes):
+            print(i)
     if not labels:
         return
-
+    return
     #Based on https://stackoverflow.com/questions/17291455/how-to-get-an-average-picture-from-100-pictures-using-pil
     filepaths = convertSVGs(labels)
     if not filepaths:
