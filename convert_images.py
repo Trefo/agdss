@@ -90,20 +90,6 @@ def separatePaths(svg):
         images.append(SVGStringToImageBlob(SVGString(path, height, width)))
     return images
 
-def countableLabel(svgString):
-    convertedImages = separatePaths(svgString)
-    height, width = SVGDimensions(svgString)[1:]
-    image = numpy.zeros((int(height), int(width)), numpy.uint8)
-    for convertedImage in convertedImages:
-        img = PILImage.open(StringIO.StringIO(convertedImage)).convert("L")
-        imgArr = numpy.array(img, copy=True)
-        imgArr[imgArr == 255] = 1
-        image += imgArr
-        #img.show()
-    #for i in image * 100:
-     #   print i
-    PILImage.fromarray(image * 20, mode='L').show()
-    return image
 def SVGDimensions(str):
     result = re.search(SVGRegex.reWH, str)
     if result == None:
@@ -115,8 +101,8 @@ def SVGDimensions(str):
     pathStroke = '#000001'
 
     image = result.group(0)
-    height = result.group('height').encode('utf-8')
-    width = result.group('width').encode('utf-8')
+    height = int(result.group('height'))
+    width = int(result.group('width'))
     return (image, height, width)
 
 
@@ -154,35 +140,49 @@ def convertAll(reconvert=False):
     convertSVGs(ImageLabel.objects.all(), reconvert=reconvert)
 
 
+def countableLabel(svgString):
+    convertedImages = separatePaths(svgString)
+    height, width = SVGDimensions(svgString)[1:]
+    if not height or not width:
+        return None
+    image = numpy.zeros((height, width), numpy.uint8)
+    for convertedImage in convertedImages:
+        img = PILImage.open(StringIO.StringIO(convertedImage)).convert("L")
+        imgArr = numpy.array(img, copy=True)
+        imgArr[imgArr == 255] = 1
+        image += imgArr
+        #img.show()
+    #for i in image * 100:
+     #   print i
+    #PILImage.fromarray(image * 20, mode='L').show()
+    return image
+
+
 def combineImageLabels(image, thresholdPercent=50):
     print(image)
     threshold = thresholdPercent/100.0 * 255
     labels = ImageLabel.objects.all().filter(parentImage=image)
-    for label in labels:
-        countableLabel(label.labelShapes)
     if not labels:
         return
-    return
+    labelImages = [countableLabel(label.labelShapes) for label in labels]
+
     #Based on https://stackoverflow.com/questions/17291455/how-to-get-an-average-picture-from-100-pictures-using-pil
-    filepaths = convertSVGs(labels)
-    if not filepaths:
-        return
-    width, height = PILImage.open(filepaths[0]).size
-    N = len(filepaths)
-    print(filepaths)
+
+    height, width = SVGDimensions(labels[0].labelShapes)[1:]
     arr = numpy.zeros((height,width),numpy.float)
-    for im in filepaths:
-        img = PILImage.open(im).convert('L')
-        img.load()
-        imarr = numpy.array(img, copy=True, dtype=numpy.float)
+    N = len(labelImages)
+    for im in labelImages:
+        if im is None:
+            continue
+        imarr = im.astype(numpy.float)
         #img.show()
         arr = arr + imarr / N
     arr = numpy.array(numpy.round(arr), dtype=numpy.uint8)
     #for i in arr:
      #   print(i)
-    arr[arr <= threshold] = 0  # Black
-    arr[arr > threshold] = 255  # White
-    out = PILImage.fromarray(arr, mode="L")
+    #arr[arr <= threshold] = 0  # Black
+    #arr[arr > threshold] = 255  # White
+    out = PILImage.fromarray(arr * 20, mode="L")
     out.save("C:/Users/Sandeep/Dropbox/kumar-prec-ag/temp/%sAverage.png" %image.name)
     out.show()
 
