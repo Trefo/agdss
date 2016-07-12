@@ -102,7 +102,7 @@ def countableLabel(svgString):
         #img.show()
     #for i in image * 100:
      #   print i
-    PILImage.fromarray(image, mode='L').show()
+    PILImage.fromarray(image * 20, mode='L').show()
     return image
 def SVGDimensions(str):
     result = re.search(SVGRegex.reWH, str)
@@ -155,14 +155,11 @@ def convertAll(reconvert=False):
 
 
 def combineImageLabels(image, thresholdPercent=50):
+    print(image)
     threshold = thresholdPercent/100.0 * 255
-    print(threshold)
     labels = ImageLabel.objects.all().filter(parentImage=image)
     for label in labels:
         countableLabel(label.labelShapes)
-        return
-        for i in separatePaths(label.labelShapes):
-            print(i)
     if not labels:
         return
     return
