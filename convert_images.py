@@ -177,13 +177,14 @@ def combineImageLabels(image, thresholdPercent=50):
         imarr = im.astype(numpy.float)
         #img.show()
         arr = arr + imarr / N
-    arr = numpy.array(numpy.round(arr), dtype=numpy.uint8)
-    #for i in arr:
-     #   print(i)
-    #arr[arr <= threshold] = 0  # Black
-    #arr[arr > threshold] = 255  # White
-    out = PILImage.fromarray(arr * 20, mode="L")
+    Outarr = numpy.array(numpy.round(arr * 20), dtype=numpy.uint8)
+    out = PILImage.fromarray(Outarr, mode="L")
     out.save("C:/Users/Sandeep/Dropbox/kumar-prec-ag/temp/%sAverage.png" %image.name)
+    out.show()
+
+    Outarr = numpy.array(numpy.round(arr), dtype=numpy.uint8)
+    out = PILImage.fromarray(Outarr * 20, mode="L")
+    out.save("C:/Users/Sandeep/Dropbox/kumar-prec-ag/temp/%sThresholdAverage.png" %image.name)
     out.show()
 
 
