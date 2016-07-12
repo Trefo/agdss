@@ -14,8 +14,8 @@ import SVGRegex
 
 def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
     #Convert copy of image to new format
-    print(img_file.getvalue())
-    if not file:
+    #print(img_file.getvalue())
+    if not img_file:
         #TODO: Some error checking
         return
     #TODO: error checking on foldername and filename
@@ -28,7 +28,7 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
     if not reconvert and os.path.exists(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + '.png'):
          return settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + '.png'
     try:
-        svgs = separatePaths(img_file)
+        #svgs = separatePaths(img_file)
         with WandImage(file=img_file) as img:
             #img.depth = 1
             #img.colorspace = 'gray'
@@ -61,14 +61,34 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
     except wand.exceptions.WandError as e:
 	print('Failed to convert ' + filename + ': '+ str(e))
 
-
+def SVGStringToImageBlob(svg):
+    if not svg:
+        return
+    svgFile = StringIO.StringIO(svg)
+    try:
+        with WandImage(file=svgFile) as img:
+            img.background_color = WandColor('white')
+            img.alpha_channel = 'remove'
+            # Convert to black and white
+            img.negate()
+            img.threshold(0)
+            img.format = 'png'
+            return img.make_blob()
+    except wand.exceptions.CoderError as e:
+        print('Failed to convert: ' + svg + ': ' + str(e))
+    except wand.exceptions.MissingDelegateError as e:
+        print('DE Failed to convert: ' + svg + ': ' + str(e))
+    except wand.exceptions.WandError as e:
+        print('Failed to convert ' + svg + ': ' + str(e))
 #Returns array of SVGs each with 1 path
 def separatePaths(svg):
     #rePath = r'(<path[^/>]*/>)'
     paths = re.findall(SVGRegex.rePath, svg)
     image, height, width = SVGDimensions(svg)
-
+    images = []
     for path in paths:
+        images.append(SVGStringToImageBlob(SVGString(path, height, width)))
+    return images
 
 
 def SVGDimensions(str):
