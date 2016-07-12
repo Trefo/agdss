@@ -97,12 +97,12 @@ def countableLabel(svgString):
     for convertedImage in convertedImages:
         img = PILImage.open(StringIO.StringIO(convertedImage)).convert("L")
         imgArr = numpy.array(img, copy=True)
-        PILImage.fromarray(imgArr, mode='L').show()
+        imgArr[imgArr == 255] = 1
         image += imgArr
         #img.show()
     #for i in image * 100:
      #   print i
-    #PILImage.fromarray(image * 100, mode='L').show()
+    PILImage.fromarray(image, mode='L').show()
     return image
 def SVGDimensions(str):
     result = re.search(SVGRegex.reWH, str)
