@@ -158,10 +158,10 @@ def countableLabel(svgString):
     return image
 
 
-def combineImageLabels(image, thresholdPercent=50):
+def combineImageLabels(image, category, thresholdPercent=50):
     print(image)
     threshold = thresholdPercent/100.0 * 255
-    labels = ImageLabel.objects.all().filter(parentImage=image)
+    labels = ImageLabel.objects.all().filter(parentImage=image, categoryType=category)
     if not labels:
         return
     labelImages = [countableLabel(label.labelShapes) for label in labels]
@@ -177,14 +177,35 @@ def combineImageLabels(image, thresholdPercent=50):
         imarr = im.astype(numpy.float)
         #img.show()
         arr = arr + imarr / N
-    Outarr = numpy.array(numpy.round(arr * 20), dtype=numpy.uint8)
-    out = PILImage.fromarray(Outarr, mode="L")
-    out.save("C:/Users/Sandeep/Dropbox/kumar-prec-ag/temp/%sAverage.png" %image.name)
-    out.show()
+    # Outarr = numpy.array(numpy.round(arr * 20), dtype=numpy.uint8)
+    # out = PILImage.fromarray(Outarr, mode="L")
+    # out.save("C:/Users/Sandeep/Dropbox/kumar-prec-ag/temp/%sAverage.png" %image.name)
+    # out.show()
+    #
+    # Outarr = numpy.array(numpy.round(arr), dtype=numpy.uint8)
+    # out = PILImage.fromarray(Outarr * 20, mode="L")
+    # out.save("C:/Users/Sandeep/Dropbox/kumar-prec-ag/temp/%sThresholdAverage.png" %image.name)
+    # out.show()
+    return numpy.array(numpy.round(arr) * 20, dtype=numpy.uint8)
 
-    Outarr = numpy.array(numpy.round(arr), dtype=numpy.uint8)
-    out = PILImage.fromarray(Outarr * 20, mode="L")
-    out.save("C:/Users/Sandeep/Dropbox/kumar-prec-ag/temp/%sThresholdAverage.png" %image.name)
-    out.show()
 
+
+def saveCombinedImage(imageNPArr, image, category, threshold):
+    #Folder format: /averages/*category*/Threshold_*threshold*/
+    foldername = category.category_name + '/Threshold_' + str(threshold) + '/'
+    imagename = "P%iC%sI%s.png" %(image.id, category.category_name, image.name)
+
+    if not os.path.exists(settings.STATIC_ROOT + settings.LABEL_AVERAGE_FOLDER_NAME + foldername):
+        os.makedirs(settings.STATIC_ROOT + settings.LABEL_AVERAGE_FOLDER_NAME + foldername)
+    out = PILImage.fromarray(imageNPArr, mode='L')
+    out.show()
+    print(settings.STATIC_ROOT + settings.LABEL_AVERAGE_FOLDER_NAME + foldername)
+
+    out.save(settings.STATIC_ROOT + settings.LABEL_AVERAGE_FOLDER_NAME + foldername + imagename)
+
+def combineAllLabels(threshold):
+    for image in Image.objects.all():
+        for category in image.categoryType.all():
+            combinedImage = combineImageLabels(image, category, threshold)
+            saveCombinedImage(combinedImage, image, category, threshold)
 

@@ -342,7 +342,8 @@ def numImageLabels(request):
 @require_POST
 def combineAllImages(request):
     thresholdPercent = int(request.POST.get('thresholdPercent', 50))
-    from convert_images import combineImageLabels
-    for img in Image.objects.all():
-        combineImageLabels(img, thresholdPercent)
+    from convert_images import combineAllLabels
+    #for img in Image.objects.all():
+    #    combineImageLabels(img, thresholdPercent)
+    combineAllLabels(thresholdPercent)
     return HttpResponse("OK")
