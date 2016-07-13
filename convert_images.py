@@ -160,7 +160,7 @@ def countableLabel(svgString):
 
 def combineImageLabelsToArr(image, category, thresholdPercent=50):
     print(image)
-    threshold = thresholdPercent/100.0 * 255
+    threshold = thresholdPercent/100.0
     labels = ImageLabel.objects.all().filter(parentImage=image, categoryType=category)
     if not labels:
         return
@@ -186,7 +186,11 @@ def combineImageLabelsToArr(image, category, thresholdPercent=50):
     # out = PILImage.fromarray(Outarr * 20, mode="L")
     # out.save("C:/Users/Sandeep/Dropbox/kumar-prec-ag/temp/%sThresholdAverage.png" %image.name)
     # out.show()
-    return numpy.array(numpy.round(arr), dtype=numpy.uint8)
+    #return numpy.array(numpy.round(arr), dtype=numpy.uint8)
+    ui8 = arr.astype(numpy.uint8)
+    PILImage.fromarray((ui8 + (arr >= (ui8 + threshold)).astype(numpy.uint8)) * 40, mode="L").show()
+    return ui8 + (arr >= (ui8 + threshold)).astype(numpy.uint8)
+    #numpy.array(numpy.round(arr), dtype=numpy.uint8)
 
 
 
