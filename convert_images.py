@@ -207,5 +207,11 @@ def combineAllLabels(threshold):
     for image in Image.objects.all():
         for category in image.categoryType.all():
             combinedImage = combineImageLabels(image, category, threshold)
-            saveCombinedImage(combinedImage, image, category, threshold)
+            if combinedImage is not None and combinedImage.size:
+                saveCombinedImage(combinedImage, image, category, threshold)
 
+def recombineImageLabels(image, threshold):
+    for category in image.categoryType.all():
+        combinedImage = combineImageLabels(image, category, threshold)
+        if combinedImage is not None and combinedImage.size:
+            saveCombinedImage(combinedImage, image, category, threshold)
