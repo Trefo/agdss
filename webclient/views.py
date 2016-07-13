@@ -83,9 +83,9 @@ def applyLabels(request):
                                    imageLabel=labelObject)
     image_filter_obj.save()
 
-    from convert_images import convertSVG, recombineImageLabels
+    from convert_images import convertSVG, combineImageLabels
     convertSVG(labelObject)
-    recombineImageLabels(parentImage_, 50)
+    combineImageLabels(parentImage_[0], 50)
     return HttpResponse(label_list_)
 
 @require_GET

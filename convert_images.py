@@ -158,7 +158,7 @@ def countableLabel(svgString):
     return image
 
 
-def combineImageLabels(image, category, thresholdPercent=50):
+def combineImageLabelsToArr(image, category, thresholdPercent=50):
     print(image)
     threshold = thresholdPercent/100.0 * 255
     labels = ImageLabel.objects.all().filter(parentImage=image, categoryType=category)
@@ -186,7 +186,7 @@ def combineImageLabels(image, category, thresholdPercent=50):
     # out = PILImage.fromarray(Outarr * 20, mode="L")
     # out.save("C:/Users/Sandeep/Dropbox/kumar-prec-ag/temp/%sThresholdAverage.png" %image.name)
     # out.show()
-    return numpy.array(numpy.round(arr) * 20, dtype=numpy.uint8)
+    return numpy.array(numpy.round(arr), dtype=numpy.uint8)
 
 
 
@@ -198,20 +198,17 @@ def saveCombinedImage(imageNPArr, image, category, threshold):
     if not os.path.exists(settings.STATIC_ROOT + settings.LABEL_AVERAGE_FOLDER_NAME + foldername):
         os.makedirs(settings.STATIC_ROOT + settings.LABEL_AVERAGE_FOLDER_NAME + foldername)
     out = PILImage.fromarray(imageNPArr, mode='L')
-    out.show()
+    #out.show()
     print(settings.STATIC_ROOT + settings.LABEL_AVERAGE_FOLDER_NAME + foldername)
 
     out.save(settings.STATIC_ROOT + settings.LABEL_AVERAGE_FOLDER_NAME + foldername + imagename)
 
 def combineAllLabels(threshold):
     for image in Image.objects.all():
-        for category in image.categoryType.all():
-            combinedImage = combineImageLabels(image, category, threshold)
-            if combinedImage is not None and combinedImage.size:
-                saveCombinedImage(combinedImage, image, category, threshold)
+        combineImageLabels(image, threshold)
 
-def recombineImageLabels(image, threshold):
+def combineImageLabels(image, threshold):
     for category in image.categoryType.all():
-        combinedImage = combineImageLabels(image, category, threshold)
+        combinedImage = combineImageLabelsToArr(image, category, threshold)
         if combinedImage is not None and combinedImage.size:
             saveCombinedImage(combinedImage, image, category, threshold)
