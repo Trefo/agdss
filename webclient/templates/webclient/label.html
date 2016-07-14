@@ -37,7 +37,8 @@
                 var svg = window.labelsLayer.exportSVG({embedImages: false, asString: false, matchShapes: true});
                 svg.getElementsByTagName('image')[1].remove(); //Remove image added by cropping
                for (i = 0, circles = svg.getElementsByTagName('circle'); i < circles.length; i++) {
-                    circles[i].setAttribute('transform', 'translate(100, 100)');
+                   console.log(imageX);
+                    circles[i].setAttribute('transform', 'translate(' + imageX + ',' + imageY + ')');
                 }
                 svg.getElementsByTagName('image')[0].setAttribute('x', '0');
                 svg.getElementsByTagName('image')[0].setAttribute('y', '0');
@@ -150,8 +151,10 @@
 
 
     <script type="text/javascript">
+        imageX = 0;
+        imageY = 0;
         var currentImage = {};
-        function onImageFormChange() {
+        /*function onImageFormChange() {
             if (!window.labelsLayer) {
                 window.labelsLayer = new paper.Layer();
             }else{
@@ -181,7 +184,7 @@
             });
 
 
-        }
+        } */
 
         function getNewImage() {
             if (!window.labelsLayer) {
@@ -205,6 +208,9 @@
                     if (data) {
                         displayLabels(response.labels)
                     }
+                    imageX = response.x;
+                    imageY = response.y;
+                    console.log(imageX);
                     displayImage(response.image_name, response.path, response.categories,
                         new paper.Point(response.x,response.y), new paper.Size(response.length,response.width));
                     currentImage = response
@@ -224,7 +230,6 @@
 
             function setup_images() {
                 //paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
-                console.log(img.naturalHeight);
                 paper.view.setViewSize(size);
                 paper.view.getViewSize();
                 raster = new paper.Raster(img).getSubRaster(new paper.Rectangle(point, size));
