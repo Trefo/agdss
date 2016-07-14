@@ -31,10 +31,19 @@
                 }
                 var updated_category = $("#categories").val();
                 //selectedImage = JSON.parse($('#imageCombo').val().toString());
-                console.log(window.labelsLayer.exportSVG({embedImages: false, asString: false}));
                 $('#noLabels').prop('checked', false);
                 prevLabels = labelsDrawn;
                 labelsDrawn = 0;
+                var svg = window.labelsLayer.exportSVG({embedImages: false, asString: false, matchShapes: true});
+                svg.getElementsByTagName('image')[1].remove(); //Remove image added by cropping
+               for (i = 0, circles = svg.getElementsByTagName('circle'); i < circles.length; i++) {
+                    circles[i].setAttribute('transform', 'translate(100, 100)');
+                }
+                svg.getElementsByTagName('image')[0].setAttribute('x', '0');
+                svg.getElementsByTagName('image')[0].setAttribute('y', '0');
+                console.log(svg);
+                xmlSer = new XMLSerializer();
+                svg = xmlSer.serializeToString(svg);
                 $.ajax({
                     url : "/webclient/applyLabels",
                     type : "POST",
@@ -43,7 +52,7 @@
                         image_name: currentImage.image_name,
                         path: currentImage.path,
                         category_name: updated_category,
-                        label_list: window.labelsLayer.exportSVG({embedImages: false, asString: true}),
+                        label_list: svg,
                         image_filters: {
                             brightness: $('#brightnessControl').val(),
                             contrast: $('#brightnessControl').val(),
@@ -214,8 +223,10 @@
             img.src = image_path + image_name;
 
             function setup_images() {
-                paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
+                //paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
+                console.log(img.naturalHeight);
                 paper.view.setViewSize(size);
+                paper.view.getViewSize();
                 raster = new paper.Raster(img).getSubRaster(new paper.Rectangle(point, size));
                 raster.position = paper.view.center;
                 paper.view.update();

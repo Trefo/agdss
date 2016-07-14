@@ -189,9 +189,9 @@ def getNewImage(request):
         'path': img.path,
         'image_name': img.name,
         'categories': [c.category_name for c in img.categoryType.all()],
-        'x':150,
-        'y':120,
-        'length':100,
+        'x':100,
+        'y':100,
+        'length':150,
         'width': 100,
             }
     if label_list:
