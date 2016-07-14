@@ -197,7 +197,7 @@
                         displayLabels(response.labels)
                     }
                     displayImage(response.image_name, response.path, response.categories,
-                        new paper.Point(200,250), new paper.Size(100,100));
+                        new paper.Point(response.x,response.y), new paper.Size(response.length,response.width));
                     currentImage = response
                 },
 
@@ -225,7 +225,7 @@
             }else {
               img.addEventListener('load', setup_images);
               img.addEventListener('error', function() {
-                  alert('Error loading image')
+                  alert('Error loading image');
               })
             }
 

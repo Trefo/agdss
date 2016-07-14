@@ -188,7 +188,11 @@ def getNewImage(request):
     response = {
         'path': img.path,
         'image_name': img.name,
-        'categories': [c.category_name for c in img.categoryType.all()]
+        'categories': [c.category_name for c in img.categoryType.all()],
+        'x':150,
+        'y':120,
+        'length':100,
+        'width': 100,
             }
     if label_list:
         response['labels'   ] = label_list.labelShapes
