@@ -54,6 +54,12 @@
                         path: currentImage.path,
                         category_name: updated_category,
                         label_list: svg,
+                        subimage: {
+                            x: imageX,
+                            y: imageY,
+                            length: imageLength,
+                            width: imageWidth,
+                        },
                         image_filters: {
                             brightness: $('#brightnessControl').val(),
                             contrast: $('#brightnessControl').val(),
@@ -153,6 +159,8 @@
     <script type="text/javascript">
         imageX = 0;
         imageY = 0;
+        imageLength = 0;
+        imageWidth = 0;
         var currentImage = {};
         /*function onImageFormChange() {
             if (!window.labelsLayer) {
@@ -208,11 +216,13 @@
                     if (data) {
                         displayLabels(response.labels)
                     }
-                    imageX = response.x;
-                    imageY = response.y;
+                    imageX = response.subimage.x;
+                    imageY = response.subimage.y;
+                    imageLength = response.subimage.length;
+                    imageWidth = response.subimage.width;
                     console.log(imageX);
                     displayImage(response.image_name, response.path, response.categories,
-                        new paper.Point(response.x,response.y), new paper.Size(response.length,response.width));
+                        new paper.Point(response.subimage.x,response.subimage.y), new paper.Size(response.subimage.length,response.subimage.width));
                     currentImage = response
                 },
 
