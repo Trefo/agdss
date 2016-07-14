@@ -196,7 +196,8 @@
                     if (data) {
                         displayLabels(response.labels)
                     }
-                    displayImage(response.image_name, response.path, response.categories)
+                    displayImage(response.image_name, response.path, response.categories,
+                        new paper.Point(200,250), new paper.Size(100,100));
                     currentImage = response
                 },
 
@@ -206,7 +207,7 @@
             });
         }
         //TODO: Input validation and error checking
-        function displayImage(image_name, image_path, categories) {
+        function displayImage(image_name, image_path, categories, point, size) {
 
             //Add new image and resize canvas to fit image
             img = new Image();
@@ -214,7 +215,8 @@
 
             function setup_images() {
                 paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
-                raster = new paper.Raster(img);
+                paper.view.setViewSize(size);
+                raster = new paper.Raster(img).getSubRaster(new paper.Rectangle(point, size));
                 raster.position = paper.view.center;
                 paper.view.update();
             };

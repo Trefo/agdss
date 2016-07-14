@@ -188,7 +188,7 @@ def combineImageLabelsToArr(image, category, thresholdPercent=50):
     # out.show()
     #return numpy.array(numpy.round(arr), dtype=numpy.uint8)
     ui8 = arr.astype(numpy.uint8)
-    PILImage.fromarray((ui8 + (arr >= (ui8 + threshold)).astype(numpy.uint8)) * 40, mode="L").show()
+    #PILImage.fromarray((ui8 + (arr >= (ui8 + threshold)).astype(numpy.uint8)) * 40, mode="L").show()
     return ui8 + (arr >= (ui8 + threshold)).astype(numpy.uint8)
     #numpy.array(numpy.round(arr), dtype=numpy.uint8)
 
