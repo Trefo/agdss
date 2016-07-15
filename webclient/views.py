@@ -1,7 +1,7 @@
 import json
 import os.path
-from datetime import datetime
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db.models import Count
@@ -11,8 +11,8 @@ from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 
-from django.conf import settings
 from .models import *
+
 
 def index(request):
     template = loader.get_template('webclient/index.html')
@@ -83,7 +83,7 @@ def applyLabels(request):
                                    imageLabel=labelObject)
     image_filter_obj.save()
 
-    from convert_images import convertSVG, combineImageLabels
+    from image_ops.convert_images import convertSVG, combineImageLabels
     convertSVG(labelObject)
     combineImageLabels(parentImage_[0], 50)
     return HttpResponse(label_list_)
@@ -192,12 +192,12 @@ def getNewImage(request):
         'subimage': {
             'x':100,
             'y':100,
-            'length':150,
-            'width': 100,
+            'length':200,
+            'width': 200,
         },
             }
     if label_list:
-        response['labels'   ] = label_list.labelShapes
+        response['labels'] = label_list.labelShapes
     else:
         response['labels'] = ''
 
@@ -328,7 +328,7 @@ def updateImage(request):
 @csrf_exempt
 @require_POST
 def convertAll(request):
-    from convert_images import convertAll
+    from image_ops.convert_images import convertAll
     convertAll(request.POST.get('reconvert', False))
     return HttpResponse('Ok')
 
@@ -349,7 +349,7 @@ def numImageLabels(request):
 @require_POST
 def combineAllImages(request):
     thresholdPercent = int(request.POST.get('thresholdPercent', 50))
-    from convert_images import combineAllLabels
+    from image_ops.convert_images import combineAllLabels
     #for img in Image.objects.all():
     #    combineImageLabels(img, thresholdPercent)
     combineAllLabels(thresholdPercent)
