@@ -159,7 +159,6 @@ def countableLabel(svgString):
 
 
 def combineImageLabelsToArr(image, category, thresholdPercent=50):
-    print(image)
     threshold = thresholdPercent/100.0
     labels = ImageLabel.objects.all().filter(parentImage=image, categoryType=category)
     if not labels:
@@ -203,7 +202,6 @@ def saveCombinedImage(imageNPArr, image, category, threshold):
         os.makedirs(settings.STATIC_ROOT + settings.LABEL_AVERAGE_FOLDER_NAME + foldername)
     out = PILImage.fromarray(imageNPArr, mode='L')
     #out.show()
-    print(settings.STATIC_ROOT + settings.LABEL_AVERAGE_FOLDER_NAME + foldername)
 
     out.save(settings.STATIC_ROOT + settings.LABEL_AVERAGE_FOLDER_NAME + foldername + imagename)
 

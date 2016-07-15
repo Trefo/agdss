@@ -63,7 +63,7 @@ def applyLabels(request):
         categoryType = CategoryType(category_name=category_name, pub_date=datetime.now())
         categoryType.save()
 
-    sourceTypeList = ImageSourceType.objects.all().filter(description="human");
+    sourceTypeList = ImageSourceType.objects.all().filter(description="human")
     if (sourceTypeList):
         sourceType = sourceTypeList[0]
     else:
@@ -82,7 +82,6 @@ def applyLabels(request):
         ipaddress = x_forwarded_for.split(',')[-1].strip()
     else:
         ipaddress = request.META.get('REMOTE_ADDR')
-    print(ipaddress)
     labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,pub_date=datetime.now(),categoryType=categoryType, ip_address=ipaddress)
     labelObject.save()
     image_filter_obj = ImageFilter(brightness=image_filters['brightness'],
