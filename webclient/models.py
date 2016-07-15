@@ -46,6 +46,7 @@ class ImageLabel(models.Model):
     labelShapes = models.TextField(max_length=10000)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
     labeler = models.ForeignKey(Labeler, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
 
     def __unicode__(self):
         return 'Image: ' + self.parentImage.name + ' | Category: ' + self.categoryType.category_name
