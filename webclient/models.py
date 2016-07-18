@@ -52,8 +52,14 @@ class ImageWindow(models.Model):
     def __unicode__(self):
         return '(x,y)=(%d,%d), length: %d, width: %d' %(self.x,self.y,self.length, self.width)
 
-
-defaultImageWindow = ImageWindow(x=0, y=0, length=1920, width=1080)
+def getDefaultImageWindowId():
+    defaultImageWindowList = ImageWindow.objects.all().filter(x=0, y=0, length=1920, width=1080)
+    if defaultImageWindowList:
+        defaultImageWindow = defaultImageWindowList[0]
+    else:
+        defaultImageWindow = ImageWindow(x=0, y=0, length=1920, width=1080)
+        defaultImageWindow.save()
+    return defaultImageWindow.id
 
 class ImageLabel(models.Model):
     parentImage = models.ForeignKey(Image, on_delete=models.CASCADE)
@@ -61,7 +67,7 @@ class ImageLabel(models.Model):
     labelShapes = models.TextField(max_length=10000)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
     labeler = models.ForeignKey(Labeler, on_delete=models.CASCADE, null=True, blank=True, default=None)
-    ImageWindow = models.ForeignKey(ImageWindow, on_delete=models.CASCADE, default=defaultImageWindow)
+    ImageWindow = models.ForeignKey(ImageWindow, on_delete=models.CASCADE, default=getDefaultImageWindowId)
     ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
 
     def __unicode__(self):

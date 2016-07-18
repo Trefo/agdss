@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^unlabeledImages$', 'webclient.views.unlabeledImages'),
     url(r'^numImageLabels$', 'webclient.views.numImageLabels'),
     url(r'^combineAllImages$', 'webclient.views.combineAllImages'),
+    url(r'^calculateEntropyMap$', 'webclient.views.calculateEntropyMap'),
     ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

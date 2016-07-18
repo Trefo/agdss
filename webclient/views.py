@@ -361,3 +361,12 @@ def combineAllImages(request):
     #    combineImageLabels(img, thresholdPercent)
     combineAllLabels(thresholdPercent)
     return HttpResponse("OK")
+
+
+@csrf_exempt
+@require_POST
+def calculateEntropyMap(request):
+    import image_ops.crop_images
+    images = Image.objects.all()
+    image_ops.crop_images.calculate_entropy_map(images[0], images[0].categoryType.all()[0])
+    return HttpResponse('ok')
