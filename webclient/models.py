@@ -40,12 +40,28 @@ from django.contrib.auth.models import User
 class Labeler(models.Model):
     user = models.OneToOneField(User)
 
+class ImageWindow(models.Model):
+    x = models.PositiveSmallIntegerField()
+    y = models.PositiveSmallIntegerField()
+    length = models.PositiveSmallIntegerField()
+    width = models.PositiveSmallIntegerField()
+
+    class Meta:
+        unique_together = ('x', 'y', 'length', 'width')
+
+    def __unicode__(self):
+        return '(x,y)=(%d,%d), length: %d, width: %d' %(self.x,self.y,self.length, self.width)
+
+
+defaultImageWindow = ImageWindow(x=0, y=0, length=1920, width=1080)
+
 class ImageLabel(models.Model):
     parentImage = models.ForeignKey(Image, on_delete=models.CASCADE)
     categoryType = models.ForeignKey(CategoryType, on_delete=models.CASCADE)
     labelShapes = models.TextField(max_length=10000)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
     labeler = models.ForeignKey(Labeler, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    ImageWindow = models.ForeignKey(ImageWindow, on_delete=models.CASCADE, default=defaultImageWindow)
     ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
 
     def __unicode__(self):

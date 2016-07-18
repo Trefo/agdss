@@ -12,13 +12,19 @@ import SVGRegex
 
 IMAGE_FILE_EXTENSION = '.png'
 
-def getLabelImageFile(label):
-    return labelFilename(label) + IMAGE_FILE_EXTENSION
+def getLabelImagePILFile(label):
+    filename = labelFilename(label) + IMAGE_FILE_EXTENSION
+    if not os.path.exists(filename):
+        return None
+    return PILImage.open(filename)
 
-def getAverageLabelImageFile(image, category, threshold):
+def getAverageLabelImagePILFile(image, category, threshold):
     foldername = category.category_name + '/Threshold_' + str(threshold) + '/'
     imagename = "P%iC%sI%s.png" % (image.id, category.category_name, image.name)
-    return foldername + imagename
+    filename = foldername + imagename
+    if not os.path.exists(filename):
+        return None
+    return PILImage.open(filename)
 
 def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
     #Convert copy of image to new format
@@ -57,7 +63,7 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
 
             if not os.path.exists(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/'):
                 os.makedirs(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/')
-            img.save(filename=(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + IMAGE_FILE_EXTENSION'))
+            img.save(filename=(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + IMAGE_FILE_EXTENSION))
             print("converted Image " + filename)
             return settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + IMAGE_FILE_EXTENSION
  
@@ -67,7 +73,7 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
     except wand.exceptions.MissingDelegateError as e:
         print('DE Failed to convert: ' + filename + ': '+ str(e))
     except wand.exceptions.WandError as e:
-	print('Failed to convert ' + filename + ': '+ str(e))
+        print('Failed to convert ' + filename + ': '+ str(e))
 
 def SVGStringToImageBlob(svg):
     if not svg:
