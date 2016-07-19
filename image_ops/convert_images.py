@@ -13,11 +13,11 @@ import SVGRegex
 IMAGE_FILE_EXTENSION = '.png'
 
 def getLabelImagePILFile(label):
-    foldername = settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + '/' + label.categoryType.category_name + '/'
-    filename = labelFilename(label) + IMAGE_FILE_EXTENSION
-    if not os.path.exists(foldername + filename):
-        return None
-    return PILImage.open(foldername + filename).convert("L")
+    #foldername = settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + '/' + label.categoryType.category_name + '/'
+    #filename = labelFilename(label) + IMAGE_FILE_EXTENSION
+    #if not os.path.exists(foldername + filename):
+    #    return None
+    return PILImage.fromarray(countableLabel(label.labelShapes))#.convert("L")
 
 def getAverageLabelImagePILFile(image, category, threshold):
     foldername = category.category_name + '/Threshold_' + str(threshold) + '/'
