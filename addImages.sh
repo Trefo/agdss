@@ -2,6 +2,7 @@
 #This script adds all files in its current directory to the images stored on the AgDSS server.
 #It takes one argument, which is the category for all the files that will be added
 #
+#SERVER="162.243.97.220"
 SERVER="localhost:8000"
 URL="/webclient/addImage"
 echo "Category is $1"

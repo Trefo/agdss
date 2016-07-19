@@ -40,6 +40,8 @@ from django.contrib.auth.models import User
 class Labeler(models.Model):
     user = models.OneToOneField(User)
 
+    def __unicode__(self):
+        return 'labeler'
 class ImageWindow(models.Model):
     x = models.PositiveSmallIntegerField()
     y = models.PositiveSmallIntegerField()
@@ -67,7 +69,7 @@ class ImageLabel(models.Model):
     labelShapes = models.TextField(max_length=10000)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
     labeler = models.ForeignKey(Labeler, on_delete=models.CASCADE, null=True, blank=True, default=None)
-    ImageWindow = models.ForeignKey(ImageWindow, on_delete=models.CASCADE, default=getDefaultImageWindowId)
+    imageWindow = models.ForeignKey(ImageWindow, on_delete=models.CASCADE, default=getDefaultImageWindowId)
     ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
 
     def __unicode__(self):
@@ -78,15 +80,15 @@ class ImageLabel(models.Model):
 
 
 class ImageFilter(models.Model):
-    brightness = models.DecimalField(max_digits=3, decimal_places=1)
-    contrast = models.DecimalField(max_digits=3, decimal_places=1)
-    saturation = models.DecimalField(max_digits=3, decimal_places=1)
+    brightness = models.DecimalField(max_digits=3, decimal_places=1, default=1)
+    contrast = models.DecimalField(max_digits=3, decimal_places=1, default=1)
+    saturation = models.DecimalField(max_digits=3, decimal_places=1, default=1)
     imageLabel = models.ForeignKey(ImageLabel, on_delete=models.CASCADE, null=True, blank=True, default=None)
     labeler = models.ForeignKey(Labeler, on_delete=models.CASCADE, null=True, blank=True, default=None)
 
     def __unicode__(self):
-        return 'ImageFilter: brightness:' + self.brightness + ' contrast: ' + self.contrast\
-               + 'saturation: ' + self.saturation
+        return 'ImageFilter: brightness:' + str(self.brightness) + ' contrast: ' + str(self.contrast)\
+               + 'saturation: ' + str(self.saturation)
 
 
 

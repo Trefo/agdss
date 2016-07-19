@@ -51,7 +51,7 @@ def applyLabels(request):
     path = dict['path']
     category_name = dict['category_name']
     image_filters = dict['image_filters']
-
+    subimage = dict['subimage']
 
     sourceType = ''
     categoryType = ''
@@ -82,7 +82,19 @@ def applyLabels(request):
         ipaddress = x_forwarded_for.split(',')[-1].strip()
     else:
         ipaddress = request.META.get('REMOTE_ADDR')
-    labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,pub_date=datetime.now(),categoryType=categoryType, ip_address=ipaddress)
+
+    imageWindowList = ImageWindow.objects.all().filter(
+        x=subimage['x'], y=subimage['y'], length=subimage['length'], width=subimage['width'])
+    if imageWindowList:
+        imageWindow = imageWindowList[0]
+    else:
+        imageWindow = ImageWindow(x=subimage['x'], y=subimage['y'],
+                                  length=subimage['length'], width=subimage['width'])
+        imageWindow.save()
+
+    labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,
+                             pub_date=datetime.now(),categoryType=categoryType,
+                             ip_address=ipaddress, imageWindow=imageWindow)
     labelObject.save()
     image_filter_obj = ImageFilter(brightness=image_filters['brightness'],
                                    contrast=image_filters['contrast'],
@@ -199,8 +211,8 @@ def getNewImage(request):
         'subimage': {
             'x':100,
             'y':100,
-            'length':200,
-            'width': 200,
+            'length':100,
+            'width': 100,
         },
             }
     if label_list:
