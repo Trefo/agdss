@@ -17,6 +17,7 @@ def getLabelImagePILFile(label):
     #filename = labelFilename(label) + IMAGE_FILE_EXTENSION
     #if not os.path.exists(foldername + filename):
     #    return None
+    PILImage.fromarray(20 * countableLabel(label.labelShapes)).show()
     return PILImage.fromarray(countableLabel(label.labelShapes))#.convert("L")
 
 def getAverageLabelImagePILFile(image, category, threshold):

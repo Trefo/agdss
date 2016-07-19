@@ -12,7 +12,7 @@ def calculate_entropy_map(image, category):
 
         #if npImg is None or npImg.shape != aggregrate_array[:,:,i].shape:
         #    continue
-
+        print numpy.array(convert_images.getLabelImagePILFile(label))
         imgList = numpy.asarray(convert_images.getLabelImagePILFile(label)).tolist()
         if not imgList and not imgList[0]:
             return
@@ -28,7 +28,9 @@ def calculate_entropy_map(image, category):
                 #print '%d %d' %(x, y)
                 aggregrate_array[x][y].append(imgList[x][y])
 
-    calculateEntropy(numpy.array(aggregrate_array))
+    calculateEntropy(aggregrate_array)
 
-def calculateEntropy(npArr):
+def calculateEntropy(arr):
+    binArr = [[numpy.bincount(numpy.array(y)) for y in x] for x in arr]
+    print probArr
     return
