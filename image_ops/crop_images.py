@@ -2,6 +2,7 @@ from PIL import Image as PILImage
 from webclient.models import *
 import convert_images
 import numpy
+import scipy
 
 def calculate_entropy_map(image, category):
     images = ImageLabel.objects.all().filter(categoryType=category)
@@ -12,7 +13,7 @@ def calculate_entropy_map(image, category):
 
         #if npImg is None or npImg.shape != aggregrate_array[:,:,i].shape:
         #    continue
-        print numpy.array(convert_images.getLabelImagePILFile(label))
+        #print numpy.array(convert_images.getLabelImagePILFile(label))
         imgList = numpy.asarray(convert_images.getLabelImagePILFile(label)).tolist()
         if not imgList and not imgList[0]:
             return
@@ -31,6 +32,6 @@ def calculate_entropy_map(image, category):
     calculateEntropy(aggregrate_array)
 
 def calculateEntropy(arr):
-    binArr = [[numpy.bincount(numpy.array(y)) for y in x] for x in arr]
-    print probArr
-    return
+    binArr = [[numpy.bincount(numpy.array(y, dtype=numpy.uint8)) for y in x] for x in arr]
+    probArr = [[y.astype(float)/numpy.sum(y) for y in x] for x in binArr]
+    return [[scipy.stats.entropy(y) for y in x] for x in probArr]

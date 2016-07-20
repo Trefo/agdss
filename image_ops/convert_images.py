@@ -17,7 +17,6 @@ def getLabelImagePILFile(label):
     #filename = labelFilename(label) + IMAGE_FILE_EXTENSION
     #if not os.path.exists(foldername + filename):
     #    return None
-    PILImage.fromarray(20 * countableLabel(label.labelShapes)).show()
     return PILImage.fromarray(countableLabel(label.labelShapes))#.convert("L")
 
 def getAverageLabelImagePILFile(image, category, threshold):
@@ -99,7 +98,7 @@ def SVGStringToImageBlob(svg):
 #Returns array of SVGs each with 1 path
 def separatePaths(svg):
     #rePath = r'(<path[^/>]*/>)'
-    paths = re.findall(SVGRegex.rePath, svg)
+    paths = re.findall(SVGRegex.rePath, svg) + re.findall(SVGRegex.reCircle, svg)
     image, height, width = SVGDimensions(svg)
     images = []
     for path in paths:
@@ -167,7 +166,7 @@ def countableLabel(svgString):
         imgArr = numpy.array(img, copy=True)
         imgArr[imgArr == 255] = 1
         image += imgArr
-        #img.show()
+        #PILImage.open(StringIO.StringIO(convertedImage)).show()
     #for i in image * 100:
      #   print i
     #PILImage.fromarray(image * 20, mode='L').show()
