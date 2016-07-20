@@ -5,10 +5,11 @@
 
 ##Setup
 1. Required software:
-  * Python2 (Python3 untested)
+  * Python2 (Python3 untested) with packages NumPy, Pillow, and Wand
   * Django
   * Postgres (or other database, though using another database requires changing code). Set port to 5432 (or change code to reflect chosen port). (Setup information: [here](https://help.ubuntu.com/community/PostgreSQL))
   * psycopg2 (required for Postgres)
+  * ImageMagick
 2. Clone this repo (and navigate to it).
 3. Create a (Postgres) database called `agdss` which has a user `aguser` with a password `aguser` (with all permissions). To change these configurations, see `DATABASE` in aguser/settings.py. The easiest way to do this is through a GUI manager like pgadmin3. However, it can be done via the Unix terminal.
   * If on Windows, one may be required to create a Firewall inbound rule allowing traffic on port 5432 as it is closed by default. This may not be necessary, but attempt if there is a problem. 
