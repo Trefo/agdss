@@ -29,7 +29,7 @@ def calculate_entropy_map(image, category):
                 #print '%d %d' %(x, y)
                 aggregrate_array[x][y].append(imgList[x][y])
 
-    calculateEntropy(aggregrate_array)
+    print calculateEntropy(aggregrate_array)
 
 def calculateEntropy(arr):
     binArr = [[numpy.bincount(numpy.array(y, dtype=numpy.uint8)) for y in x] for x in arr]
