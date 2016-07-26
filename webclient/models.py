@@ -28,6 +28,8 @@ class Image(models.Model):
     description = models.CharField(max_length=500)
     source = models.ForeignKey(ImageSourceType, on_delete=models.CASCADE)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
+    width = models.PositiveSmallIntegerField(default=1920)
+    height = models.PositiveSmallIntegerField(default=1080)
     #TODO: Cascade if last entry is deleted
     categoryType = models.ManyToManyField(CategoryType)
     class Meta:
@@ -40,12 +42,36 @@ from django.contrib.auth.models import User
 class Labeler(models.Model):
     user = models.OneToOneField(User)
 
+    def __unicode__(self):
+        return 'labeler'
+class ImageWindow(models.Model):
+    x = models.PositiveSmallIntegerField()
+    y = models.PositiveSmallIntegerField()
+    width = models.PositiveSmallIntegerField()
+    height = models.PositiveSmallIntegerField()
+
+    class Meta:
+        unique_together = ('x', 'y', 'width', 'height')
+
+    def __unicode__(self):
+        return '(x,y)=(%d,%d), length: %d, width: %d' %(self.x,self.y,self.length, self.width)
+
+def getDefaultImageWindowId():
+    defaultImageWindowList = ImageWindow.objects.all().filter(x=0, y=0, length=1920, width=1080)
+    if defaultImageWindowList:
+        defaultImageWindow = defaultImageWindowList[0]
+    else:
+        defaultImageWindow = ImageWindow(x=0, y=0, length=1920, width=1080)
+        defaultImageWindow.save()
+    return defaultImageWindow.id
+
 class ImageLabel(models.Model):
     parentImage = models.ForeignKey(Image, on_delete=models.CASCADE)
     categoryType = models.ForeignKey(CategoryType, on_delete=models.CASCADE)
     labelShapes = models.TextField(max_length=10000)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
     labeler = models.ForeignKey(Labeler, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    imageWindow = models.ForeignKey(ImageWindow, on_delete=models.CASCADE, default=getDefaultImageWindowId)
     ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
 
     def __unicode__(self):
@@ -56,15 +82,15 @@ class ImageLabel(models.Model):
 
 
 class ImageFilter(models.Model):
-    brightness = models.DecimalField(max_digits=3, decimal_places=1)
-    contrast = models.DecimalField(max_digits=3, decimal_places=1)
-    saturation = models.DecimalField(max_digits=3, decimal_places=1)
+    brightness = models.DecimalField(max_digits=3, decimal_places=1, default=1)
+    contrast = models.DecimalField(max_digits=3, decimal_places=1, default=1)
+    saturation = models.DecimalField(max_digits=3, decimal_places=1, default=1)
     imageLabel = models.ForeignKey(ImageLabel, on_delete=models.CASCADE, null=True, blank=True, default=None)
     labeler = models.ForeignKey(Labeler, on_delete=models.CASCADE, null=True, blank=True, default=None)
 
     def __unicode__(self):
-        return 'ImageFilter: brightness:' + self.brightness + ' contrast: ' + self.contrast\
-               + 'saturation: ' + self.saturation
+        return 'ImageFilter: brightness:' + str(self.brightness) + ' contrast: ' + str(self.contrast)\
+               + 'saturation: ' + str(self.saturation)
 
 
 
