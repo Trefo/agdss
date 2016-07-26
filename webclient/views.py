@@ -270,7 +270,6 @@ def addImage(request):
     except ValidationError, e:
         #Validate image and get width, length
         try:
-            PILImage.open(path + request.POST['image_name']).show()
             width, height = PILImage.open(path + request.POST['image_name']).size
         except IOError:
             return HttpResponseBadRequest("Image file %s cannot be found or the image cannot be opened and identified" %(path+request.POST['image_name']))
