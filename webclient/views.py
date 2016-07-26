@@ -10,6 +10,8 @@ from django.http import JsonResponse
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
+import urllib
+from cStringIO import StringIO
 
 from .models import *
 from PIL import Image as PILImage
@@ -251,17 +253,28 @@ Request: POST
 @require_POST
 def addImage(request):
     #Validate input
-    if not ('image_name' in request.POST and  'path' in request.POST and 'category' in request.POST):
+    if not ('image_name' in request.POST and 'path' in request.POST and 'category' in request.POST):
         return HttpResponseBadRequest("Missing required input")
     if request.POST['category'] == '':
         return HttpResponseBadRequest("Missing category")
 
     #Determine wheter 'path' is URL or file path
     path = request.POST['path']
+    if path[-1] != '/':
+        path += '/'
     url_check = URLValidator()
+    width, height = None, None
     try:
-        url_check(request.POST['path'])
+        url_check(path)
+        width, height = PILImage.open(StringIO(urllib.urlopen(path + request.POST['image_name']).read())).size
     except ValidationError, e:
+        #Validate image and get width, length
+        try:
+            PILImage.open(path + request.POST['image_name']).show()
+            width, height = PILImage.open(path + request.POST['image_name']).size
+        except IOError:
+            return HttpResponseBadRequest("Image file %s cannot be found or the image cannot be opened and identified" %(path+request.POST['image_name']))
+
         #Convert Filepath to webpath if necessary
         ##Check if path is in STATIC_ROOT (https://stackoverflow.com/questions/3812849/how-to-check-whether-a-directory-is-a-sub-directory-of-another-directory)
         root = os.path.join(os.path.realpath(settings.STATIC_ROOT), '')
@@ -273,8 +286,6 @@ def addImage(request):
         path = os.path.relpath(path_dir, root)
         path = '/webclient' + settings.STATIC_URL + path
 
-    if path[-1] != '/':
-        path += '/'
 
     #Get or create ImageSourceType
     desc = request.POST.get('source_description', default="human")
@@ -298,10 +309,6 @@ def addImage(request):
     if imageList:
         img = imageList[0]
     else:
-        try:
-            width, height = PILImage.open(path + request.POST['image_name']).size
-        except IOError:
-            return HttpResponseBadRequest("Image file cannot be found or the image cannot be opened and identified")
         img = Image(name=request.POST['image_name'], path=path, description=request.POST.get('description', default=''), source=sourceType, width=width, height=height)
         img.save()
     img.categoryType.add(categoryType)
