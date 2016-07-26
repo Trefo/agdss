@@ -20,13 +20,13 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('x', models.PositiveSmallIntegerField()),
                 ('y', models.PositiveSmallIntegerField()),
-                ('length', models.PositiveSmallIntegerField()),
                 ('width', models.PositiveSmallIntegerField()),
+                ('height', models.PositiveSmallIntegerField()),
             ],
         ),
         migrations.AlterUniqueTogether(
             name='imagewindow',
-            unique_together=set([('x', 'y', 'length', 'width')]),
+            unique_together=set([('x', 'y', 'width', 'height')]),
         ),
         migrations.AddField(
             model_name='imagelabel',

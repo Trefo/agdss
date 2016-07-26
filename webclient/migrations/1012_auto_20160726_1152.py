@@ -14,12 +14,12 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='image',
-            name='length',
+            name='width',
             field=models.PositiveSmallIntegerField(default=1920),
         ),
         migrations.AddField(
             model_name='image',
-            name='width',
+            name='height',
             field=models.PositiveSmallIntegerField(default=1080),
         ),
     ]
