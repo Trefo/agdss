@@ -10,9 +10,10 @@ from django.http import JsonResponse
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
-from django.core.urlresolvers import get_script_prefix
 import urllib
 from cStringIO import StringIO
+
+import helper_ops
 
 from .models import *
 from PIL import Image as PILImage
@@ -88,12 +89,12 @@ def applyLabels(request):
         ipaddress = request.META.get('REMOTE_ADDR')
 
     imageWindowList = ImageWindow.objects.all().filter(
-        x=subimage['x'], y=subimage['y'], length=subimage['length'], width=subimage['width'])
+        x=subimage['x'], y=subimage['y'], width=subimage['width'], height=subimage['height'])
     if imageWindowList:
         imageWindow = imageWindowList[0]
     else:
         imageWindow = ImageWindow(x=subimage['x'], y=subimage['y'],
-                                  length=subimage['length'], width=subimage['width'])
+                                  width=subimage['width'], height=subimage['height'])
         imageWindow.save()
 
     labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,
@@ -215,8 +216,8 @@ def getNewImage(request):
         'subimage': {
             'x':100,
             'y':100,
-            'length':100,
-            'width': 100,
+            'width':200,
+            'height': 100,
         },
             }
     if label_list:
@@ -269,7 +270,7 @@ def addImage(request):
         url_check(path)
         width, height = PILImage.open(StringIO(urllib.urlopen(path + request.POST['image_name']).read())).size
     except ValidationError, e:
-        #Validate image and get width, length
+        #Validate image and get width, height
         try:
             width, height = PILImage.open(path + request.POST['image_name']).size
         except IOError:
@@ -316,37 +317,14 @@ def addImage(request):
     #imgLabel.save()
     return HttpResponse("Added image " + request.POST['image_name'] + '\n')
 
-@csrf_exempt
-@require_POST
-def fixAllImagePaths(request):
-    for image in Image.objects.all():
-        if image.path[-1] != '/':
-            image.path += '/'
-            image.save()
-    return HttpResponse("Fixed all image paths and added a '/' if necessary")
-
-
 
 @csrf_exempt
 @require_POST
-def updateAllImageSizes(request):
-    url_check = URLValidator()
-    url = str(request.scheme + '://' + request.get_host())
+def cleanUpAndFixImages(request):
+    helper_ops.fixAllImagePaths()
+    helper_ops.updateAllImageSizes(request.scheme, request.get_host())
+    return HttpResponse("All images rows cleaned up and fixed.")
 
-    # if url[-1] == '/':
-    #     url = url[:-1]
-    # url = url.rsplit('/', 1)[0]
-    im_url = ''
-    for image in Image.objects.all():
-        try:
-            url_check(image.path)
-            im_url = image.path + image.name
-        except ValidationError, e:
-            im_url = url + image.path + '/' + image.name
-        print url + image.path + image.name
-        image.width, image.height = PILImage.open(StringIO(urllib.urlopen(im_url).read())).size
-        image.save()
-    return HttpResponse("Checked and updated all image sizes")
 
 '''
 Request: POST

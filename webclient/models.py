@@ -47,11 +47,11 @@ class Labeler(models.Model):
 class ImageWindow(models.Model):
     x = models.PositiveSmallIntegerField()
     y = models.PositiveSmallIntegerField()
-    length = models.PositiveSmallIntegerField()
     width = models.PositiveSmallIntegerField()
+    height = models.PositiveSmallIntegerField()
 
     class Meta:
-        unique_together = ('x', 'y', 'length', 'width')
+        unique_together = ('x', 'y', 'width', 'height')
 
     def __unicode__(self):
         return '(x,y)=(%d,%d), length: %d, width: %d' %(self.x,self.y,self.length, self.width)

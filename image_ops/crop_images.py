@@ -3,6 +3,7 @@ from webclient.models import *
 import convert_images
 import numpy
 import scipy
+import random
 
 def calculate_entropy_map(image, category):
     images = ImageLabel.objects.all().filter(categoryType=category)
@@ -38,5 +39,6 @@ def calculateEntropy(arr):
 
 
 def getImageWindow(image):
-    
-    retDict = {}
+    retDict = {'length':200, 'width': 200}
+    retDict['x'] = random.randrange(0, image.width - retDict['length'])
+    retDict['y'] = random.randrange(0, image.height - retDict['width'])

@@ -37,12 +37,10 @@
                 var svg = window.labelsLayer.exportSVG({embedImages: false, asString: false, matchShapes: true});
                 svg.getElementsByTagName('image')[1].remove(); //Remove image added by cropping
                for (i = 0, circles = svg.getElementsByTagName('circle'); i < circles.length; i++) {
-                   console.log(imageX);
                     circles[i].setAttribute('transform', 'translate(' + imageX + ',' + imageY + ')');
                 }
                 svg.getElementsByTagName('image')[0].setAttribute('x', '0');
                 svg.getElementsByTagName('image')[0].setAttribute('y', '0');
-                console.log(svg);
                 xmlSer = new XMLSerializer();
                 svg = xmlSer.serializeToString(svg);
                 $.ajax({
@@ -57,8 +55,8 @@
                         subimage: {
                             x: imageX,
                             y: imageY,
-                            length: imageLength,
                             width: imageWidth,
+                            height: imageHeight,
                         },
                         image_filters: {
                             brightness: $('#brightnessControl').val(),
@@ -128,7 +126,7 @@
                     isActive = false;
                     aboveExistingLabel = false;
                     this.remove();
-                    console.log(window.labelsLayer.exportSVG({embedImages: false, asString: false}));
+                    //console.log(window.labelsLayer.exportSVG({embedImages: false, asString: false}));
                     labelsDrawn -= 1
                 }
                 window.circlePath.remove();
@@ -160,8 +158,8 @@
     <script type="text/javascript">
         imageX = 0;
         imageY = 0;
-        imageLength = 0;
         imageWidth = 0;
+        imageHeight = 0;
         var currentImage = {};
         /*function onImageFormChange() {
             if (!window.labelsLayer) {
@@ -219,11 +217,10 @@
                     }
                     imageX = response.subimage.x;
                     imageY = response.subimage.y;
-                    imageLength = response.subimage.length;
                     imageWidth = response.subimage.width;
-                    console.log(imageX);
+                    imageHeight = response.subimage.height;
                     displayImage(response.image_name, response.path, response.categories,
-                        new paper.Point(response.subimage.x,response.subimage.y), new paper.Size(response.subimage.length,response.subimage.width));
+                        new paper.Point(response.subimage.x,response.subimage.y), new paper.Size(imageWidth,imageHeight));
                     currentImage = response
                 },
 
@@ -237,7 +234,13 @@
 
             //Add new image and resize canvas to fit image
             img = new Image();
-            img.src = image_path + image_name;
+            img.crossOrigin = "Anonymous";
+            try{
+                img.src = image_path + image_name;
+            }
+            catch(err) {
+                alert("Currently external URLs cannot be used. Error: " + err.message)
+            }
 
             function setup_images() {
                 //paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
