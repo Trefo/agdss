@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 
 from .models import *
-
+from PIL import Image as PILImage
 
 def index(request):
     template = loader.get_template('webclient/index.html')
@@ -43,6 +43,7 @@ def results(request):
     template = loader.get_template('webclient/results.html')
     context = {}
     return HttpResponse(template.render(context, request))
+
 @csrf_exempt
 def applyLabels(request):
     dict = json.load(request)
@@ -256,6 +257,7 @@ def addImage(request):
         return HttpResponseBadRequest("Missing category")
 
     #Determine wheter 'path' is URL or file path
+    path = request.POST['path']
     url_check = URLValidator()
     try:
         url_check(request.POST['path'])
@@ -296,7 +298,8 @@ def addImage(request):
     if imageList:
         img = imageList[0]
     else:
-        img = Image(name=request.POST['image_name'], path=path, description=request.POST.get('description', default=''), source=sourceType)
+        width, height = PILImage.open(path + request.POST['image_name']).size
+        img = Image(name=request.POST['image_name'], path=path, description=request.POST.get('description', default=''), source=sourceType, width=width, height=height)
         img.save()
     img.categoryType.add(categoryType)
     #imgLabel = ImageLabel(parentImage=img, categoryType=categoryType, pub_date=datetime.now())
@@ -330,6 +333,7 @@ def updateImage(request):
         image.description = request.POST['source-description']
     if 'add_category' in request.POST:
         cats = CategoryType.objects.all().filter(category_name=request.POST['add_category'])
+        cat = None
         if not cats or not image.filter(categoryType=cats[0]):
             if cats:
                 cat = cats[0]

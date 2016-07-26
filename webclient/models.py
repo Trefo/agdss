@@ -28,6 +28,8 @@ class Image(models.Model):
     description = models.CharField(max_length=500)
     source = models.ForeignKey(ImageSourceType, on_delete=models.CASCADE)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
+    length = models.PositiveSmallIntegerField(default=1920)
+    width = models.PositiveSmallIntegerField(default=1080)
     #TODO: Cascade if last entry is deleted
     categoryType = models.ManyToManyField(CategoryType)
     class Meta:

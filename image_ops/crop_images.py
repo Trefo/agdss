@@ -35,3 +35,8 @@ def calculateEntropy(arr):
     binArr = [[numpy.bincount(numpy.array(y, dtype=numpy.uint8)) for y in x] for x in arr]
     probArr = [[y.astype(float)/numpy.sum(y) for y in x] for x in binArr]
     return [[scipy.stats.entropy(y) for y in x] for x in probArr]
+
+
+def getImageWindow(image):
+    
+    retDict = {}
