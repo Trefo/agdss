@@ -14,7 +14,7 @@ import urllib
 from cStringIO import StringIO
 
 import helper_ops
-
+from image_ops import crop_images
 from .models import *
 from PIL import Image as PILImage
 
@@ -213,12 +213,7 @@ def getNewImage(request):
         'path': img.path,
         'image_name': img.name,
         'categories': [c.category_name for c in img.categoryType.all()],
-        'subimage': {
-            'x':100,
-            'y':100,
-            'width':200,
-            'height': 100,
-        },
+        'subimage': crop_images.getImageWindow(img),
             }
     if label_list:
         response['labels'] = label_list.labelShapes

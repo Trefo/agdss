@@ -2,7 +2,7 @@ from PIL import Image as PILImage
 from webclient.models import *
 import convert_images
 import numpy
-import scipy
+#import scipy
 import random
 
 def calculate_entropy_map(image, category):
@@ -35,10 +35,11 @@ def calculate_entropy_map(image, category):
 def calculateEntropy(arr):
     binArr = [[numpy.bincount(numpy.array(y, dtype=numpy.uint8)) for y in x] for x in arr]
     probArr = [[y.astype(float)/numpy.sum(y) for y in x] for x in binArr]
-    return [[scipy.stats.entropy(y) for y in x] for x in probArr]
+    return #[[scipy.stats.entropy(y) for y in x] for x in probArr]
 
 
 def getImageWindow(image):
     retDict = {'length':200, 'width': 200}
     retDict['x'] = random.randrange(0, image.width - retDict['length'])
     retDict['y'] = random.randrange(0, image.height - retDict['width'])
+    return retDict
