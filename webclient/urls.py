@@ -15,6 +15,8 @@ urlpatterns = [
     url(r'^loadLabels$', 'webclient.views.loadLabels'),
     url(r'^purge$', 'webclient.views.purge'),
     url(r'^addImage$', 'webclient.views.addImage'),
+    url(r'^updateAllImageSizes$', 'webclient.views.updateAllImageSizes'),
+    url(r'^fixAllImagePaths$', 'webclient.views.fixAllImagePaths'),
     url(r'^updateImage$', 'webclient.views.updateImage'),
     url(r'^getInfo$', 'webclient.views.getInfo'),
     url(r'^getNewImage$', 'webclient.views.getNewImage'),

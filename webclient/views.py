@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
+from django.core.urlresolvers import get_script_prefix
 import urllib
 from cStringIO import StringIO
 
@@ -315,7 +316,37 @@ def addImage(request):
     #imgLabel.save()
     return HttpResponse("Added image " + request.POST['image_name'] + '\n')
 
+@csrf_exempt
+@require_POST
+def fixAllImagePaths(request):
+    for image in Image.objects.all():
+        if image.path[-1] != '/':
+            image.path += '/'
+            image.save()
+    return HttpResponse("Fixed all image paths and added a '/' if necessary")
 
+
+
+@csrf_exempt
+@require_POST
+def updateAllImageSizes(request):
+    url_check = URLValidator()
+    url = str(request.scheme + '://' + request.get_host())
+
+    # if url[-1] == '/':
+    #     url = url[:-1]
+    # url = url.rsplit('/', 1)[0]
+    im_url = ''
+    for image in Image.objects.all():
+        try:
+            url_check(image.path)
+            im_url = image.path + image.name
+        except ValidationError, e:
+            im_url = url + image.path + '/' + image.name
+        print url + image.path + image.name
+        image.width, image.height = PILImage.open(StringIO(urllib.urlopen(im_url).read())).size
+        image.save()
+    return HttpResponse("Checked and updated all image sizes")
 
 '''
 Request: POST
