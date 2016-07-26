@@ -54,14 +54,14 @@ class ImageWindow(models.Model):
         unique_together = ('x', 'y', 'width', 'height')
 
     def __unicode__(self):
-        return '(x,y)=(%d,%d), length: %d, width: %d' %(self.x,self.y,self.length, self.width)
+        return '(x,y)=(%d,%d), width: %d, height: %d' %(self.x,self.y,self.width, self.height)
 
 def getDefaultImageWindowId():
-    defaultImageWindowList = ImageWindow.objects.all().filter(x=0, y=0, length=1920, width=1080)
+    defaultImageWindowList = ImageWindow.objects.all().filter(x=0, y=0, width=1920, height=1080)
     if defaultImageWindowList:
         defaultImageWindow = defaultImageWindowList[0]
     else:
-        defaultImageWindow = ImageWindow(x=0, y=0, length=1920, width=1080)
+        defaultImageWindow = ImageWindow(x=0, y=0, width=1920, height=1080)
         defaultImageWindow.save()
     return defaultImageWindow.id
 
