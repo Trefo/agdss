@@ -298,7 +298,10 @@ def addImage(request):
     if imageList:
         img = imageList[0]
     else:
-        width, height = PILImage.open(path + request.POST['image_name']).size
+        try:
+            width, height = PILImage.open(path + request.POST['image_name']).size
+        except IOError:
+            return HttpResponseBadRequest("Image file cannot be found or the image cannot be opened and identified")
         img = Image(name=request.POST['image_name'], path=path, description=request.POST.get('description', default=''), source=sourceType, width=width, height=height)
         img.save()
     img.categoryType.add(categoryType)
