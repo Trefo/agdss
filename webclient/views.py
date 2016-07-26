@@ -87,7 +87,7 @@ def applyLabels(request):
         ipaddress = x_forwarded_for.split(',')[-1].strip()
     else:
         ipaddress = request.META.get('REMOTE_ADDR')
-
+    print subimage
     imageWindowList = ImageWindow.objects.all().filter(
         x=subimage['x'], y=subimage['y'], width=subimage['width'], height=subimage['height'])
     if imageWindowList:
