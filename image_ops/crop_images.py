@@ -51,8 +51,8 @@ def getRandomImageWindow(image):
 def getGeometricImageWindow(image):
     windowDict = {'width': image.width/4, 'height': image.height/4}
     topLeftArr = []
-    for x in range(0, image.width, image.width / 4):
-        for y in range(0, image.height, image.height / 4):
+    for x in range(0, image.width, image.width / 8):
+        for y in range(0, image.height, image.height / 8):
             topLeftArr.append((x,y))
     numLabels = len(ImageLabel.objects.all().filter(parentImage=image))
     topLeft = topLeftArr[numLabels % len(topLeftArr)]
