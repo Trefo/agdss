@@ -39,6 +39,9 @@ def calculateEntropy(arr):
 
 
 def getImageWindow(image):
+    return getRandomImageWindow(image)
+
+def getRandomImageWindow(image):
     retDict = {'width':300, 'height': 300}
     retDict['x'] = random.randrange(0, image.width - retDict['width'])
     retDict['y'] = random.randrange(0, image.height - retDict['height'])
