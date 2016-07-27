@@ -39,10 +39,22 @@ def calculateEntropy(arr):
 
 
 def getImageWindow(image):
-    return getRandomImageWindow(image)
+    return getGeometricImageWindow(image)
 
 def getRandomImageWindow(image):
     retDict = {'width':300, 'height': 300}
     retDict['x'] = random.randrange(0, image.width - retDict['width'])
     retDict['y'] = random.randrange(0, image.height - retDict['height'])
     return retDict
+
+
+def getGeometricImageWindow(image):
+    windowDict = {'width': image.width/4, 'height': image.height/4}
+    topLeftArr = []
+    for x in range(0, image.width, image.width / 4):
+        for y in range(0, image.height, image.height / 4):
+            topLeftArr.append((x,y))
+    numLabels = len(ImageLabel.objects.all().filter(parentImage=image))
+    topLeft = topLeftArr[numLabels % len(topLeftArr)]
+    windowDict['x'], windowDict['y'] = topLeft
+    return windowDict

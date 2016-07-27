@@ -257,7 +257,7 @@ def addImage(request):
 
     #Determine wheter 'path' is URL or file path
     path = request.POST['path']
-    if path[-1] != '/':
+    if path[-1] != '/' and path[-1] != '\\':
         path += '/'
     url_check = URLValidator()
     width, height = None, None
@@ -281,7 +281,8 @@ def addImage(request):
                 "Image in unreachable location. Make sure that it is in a subdirectory of " + settings.STATIC_ROOT +".\n")
         path = os.path.relpath(path_dir, root)
         path = '/webclient' + settings.STATIC_URL + path
-
+        if path[-1] != '/' and path[-1] != '\\':
+            path += '/'
 
     #Get or create ImageSourceType
     desc = request.POST.get('source_description', default="human")
