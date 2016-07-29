@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" /> 
     <meta charset="UTF-8">
     <title>AgDSS Web</title>
     <!--<link rel="stylesheet" href="/static/scripts/paperjs/examples/css/style.css"> -->
@@ -11,10 +12,9 @@
     <script type='text/javascript' src='/static/scripts/jQuery/jquery-3.0.0.min.js'></script>
     <!--<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"> -->
 
-
     <script type="text/paperscript" canvas="canvas">
        var startPoint;
-        var raster;
+        var raster; 
         var labelsLayer = new paper.Layer();
         var isActive = false;
         var aboveExistingLabel = false;
@@ -36,7 +36,7 @@
                 $('#noLabels').prop('checked', false);
                 prevLabels = labelsDrawn;
                 labelsDrawn = 0;
-                $.ajax({
+                $.ajax({ 
                     url : "/webclient/applyLabels",
                     type : "POST",
                     dataType: 'text',
@@ -133,13 +133,9 @@
                 window.circlePath.opacity = 0.3;
                 window.circlePath.fillColor = 'grey';
             }
-
         }
 
-
-
     </script>
-
 
     <script type="text/javascript">
         var currentImage = {};
@@ -171,8 +167,6 @@
                     alert(xhr.status + ": " + xhr.responseText);
                 }
             });
-
-
         }
 
         function getNewImage() {
@@ -225,6 +219,7 @@
             });
             spinner.stop()
         }
+
         //TODO: Input validation and error checking
         function displayImage(image_name, image_path, categories) {
 
@@ -238,6 +233,7 @@
                 raster.position = paper.view.center;
                 paper.view.update();
             };
+
             if(img.complete) {
                 setup_images();
             }else {
@@ -300,8 +296,7 @@
                 $('#brightnessControl').val("1").trigger('input');
                 $('#contrastControl').val("1").trigger('input');
                 $('#saturationControl').val("1").trigger('input');
-            });
-
+            });      
         });
 
 
@@ -311,13 +306,14 @@
 
 </head>
 <body onload="getNewImage()">
+    
 <div id="main>">
     <!--<div id="toolbars">
         <select id="imageCombo"  onchange="onImageFormChange()">
             {#% for image in latest_image_list %#}
                 {#% ifequal image selected_image %#}
                     <option value='{"image_name": "{#  #}{image.name}}", "path": "{#  #}{ image.path }}"}' selected="selected">{#  #}{image.name}}</option>
-                {#% else %#}
+                {#% else %#} 
                     <option value='{"image_name": "{#  #}{image.name}}", "path": "{#  #}{ image.path }}"}'>{#  #}{image.name}}</option>
                 {#% endifequal %#}
             {#% endfor %#}
@@ -327,6 +323,7 @@
     <div id="controls">
         <form method="post" name="applyLabelsForm" >
             {% csrf_token %}
+            
             <!--<input name="categoryName" id="categoryName" type="text"> -->
                 <span id="categoryWord">Category: </span>
                 <select id="categories"></select>
@@ -335,25 +332,30 @@
             <input type="checkbox" id="noLabels" /> No labels in image
         </form>
     </div>
-    <table id="displayTable"><tr>
     <td><div id="canvasDiv">
+        
         <div id="image_name_div"><h3 id="image_name"></h3></div>
         <!--<canvas id="canvas" resize></canvas> -->
         <canvas id="canvas" width="1920" height="1080"></canvas>
+                       <table id="displayTable"><tr>     
 
+         <div>
+            <!--<p>View label info <a href="/webclient/view_label">here</a>.</p>-->
+             <!--<p>To report a bug, go to the github page <a href="https://github.com/dcunhas/agdss/issues">here</a> and open a new issue</p>-->
+            <a href="/webclient/view_label">
+                <button>View Label Info</button>
+            </a>
+            <p id=" "></p>
+            <a href="https://github.com/dcunhas/agdss/issues">
+                <button>Report a Bug</button>
+            </a>
+        </div>
         <div id="image_info">
             <p id="image_info_name"></p>
             <p id="image_info_path"></p>
         </div>
 
-         <div>
-            <p>View label info <a href="/webclient/view_label">here</a>.</p>
-             <p>To report a bug, go to the github page <a href="https://github.com/dcunhas/agdss/issues">here</a> and open a new issue</p>
-
-        </div>
-
     </div></td>
-
 
     <td id="imageControlTd"><div id="imageControlContainer">
         <div id="imageControl">
@@ -363,7 +365,7 @@
             <input type="range"  min="1" max="3" step="0.1" value="1" id="contrastControl"/><br>
             <label id="saturationLabel">Saturation:</label> <span id="saturation">1</span> <br>
             <input type="range"  min="1" max="5" step="0.1" value="1" id="saturationControl"/><br>
-            <button type="button" id="resetImageControl" >Reset</button>
+            <button type="button" id="reset`" >Reset</button>
         </div>
     </div></td>
 

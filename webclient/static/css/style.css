@@ -27,20 +27,20 @@ div #canvasDiv {
 }
 
 div #imageControlContainer {
-    padding-top: 75%;
-
+    
 }
 
 div #imageControl {
     padding: 2px;
-    border: 1px groove;
+    border: 5px groove;
 }
 
 #imageControlTd {
-    vertical-align: top;
+    vertical-align: : top;
 }
 
 
 
 #displayTable td,tr{
+    position:relative;left:100px;top:2px;">
 }
