@@ -11,7 +11,6 @@
    <!-- <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script> -->
     <script type='text/javascript' src='/static/scripts/jQuery/jquery-3.0.0.min.js'></script>
     <!--<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"> -->
-
     <script type="text/paperscript" canvas="canvas">
        var startPoint;
         var raster; 
@@ -59,7 +58,7 @@
                         //window.labelsLayer.importJSON(JSON.parse(data));
                         //$('#noLabels').prop('checked', false);
                         getNewImage();
-                    },
+                    }, 
                     error : function(xhr,errmsg,err) {
                         alert(xhr.status + ": " + xhr.responseText);
                         labelsDrawn = prevLabels;
