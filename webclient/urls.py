@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^loadLabels$', 'webclient.views.loadLabels'),
     url(r'^purge$', 'webclient.views.purge'),
     url(r'^addImage$', 'webclient.views.addImage'),
+    url(r'^cleanUpAndFixImages$', 'webclient.views.cleanUpAndFixImages'),
     url(r'^updateImage$', 'webclient.views.updateImage'),
     url(r'^getInfo$', 'webclient.views.getInfo'),
     url(r'^getNewImage$', 'webclient.views.getNewImage'),
@@ -22,4 +23,5 @@ urlpatterns = [
     url(r'^unlabeledImages$', 'webclient.views.unlabeledImages'),
     url(r'^numImageLabels$', 'webclient.views.numImageLabels'),
     url(r'^combineAllImages$', 'webclient.views.combineAllImages'),
+    url(r'^calculateEntropyMap$', 'webclient.views.calculateEntropyMap'),
     ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

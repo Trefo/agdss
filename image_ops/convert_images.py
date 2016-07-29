@@ -10,7 +10,22 @@ from PIL import Image as PILImage
 import numpy
 import SVGRegex
 
+IMAGE_FILE_EXTENSION = '.png'
 
+def getLabelImagePILFile(label):
+    #foldername = settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + '/' + label.categoryType.category_name + '/'
+    #filename = labelFilename(label) + IMAGE_FILE_EXTENSION
+    #if not os.path.exists(foldername + filename):
+    #    return None
+    return PILImage.fromarray(countableLabel(label.labelShapes))#.convert("L")
+
+def getAverageLabelImagePILFile(image, category, threshold):
+    foldername = category.category_name + '/Threshold_' + str(threshold) + '/'
+    imagename = "P%iC%sI%s.png" % (image.id, category.category_name, image.name)
+    filename = foldername + imagename
+    if not os.path.exists(filename):
+        return None
+    return PILImage.open(filename)
 
 def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
     #Convert copy of image to new format
@@ -26,7 +41,7 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
         foldername_ = foldername_[:-1]
 
     if not reconvert and os.path.exists(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + '.png'):
-         return settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + '.png'
+         return settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + IMAGE_FILE_EXTENSION
     try:
         #svgs = separatePaths(img_file)
         with WandImage(file=img_file) as img:
@@ -49,9 +64,9 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
 
             if not os.path.exists(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/'):
                 os.makedirs(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/')
-            img.save(filename=(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + '.png'))
+            img.save(filename=(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + IMAGE_FILE_EXTENSION))
             print("converted Image " + filename)
-            return settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + '.png'
+            return settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + IMAGE_FILE_EXTENSION
  
 
     except wand.exceptions.CoderError as e:
@@ -59,7 +74,7 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
     except wand.exceptions.MissingDelegateError as e:
         print('DE Failed to convert: ' + filename + ': '+ str(e))
     except wand.exceptions.WandError as e:
-	print('Failed to convert ' + filename + ': '+ str(e))
+        print('Failed to convert ' + filename + ': '+ str(e))
 
 def SVGStringToImageBlob(svg):
     if not svg:
@@ -83,7 +98,7 @@ def SVGStringToImageBlob(svg):
 #Returns array of SVGs each with 1 path
 def separatePaths(svg):
     #rePath = r'(<path[^/>]*/>)'
-    paths = re.findall(SVGRegex.rePath, svg)
+    paths = re.findall(SVGRegex.rePath, svg) + re.findall(SVGRegex.reCircle, svg)
     image, height, width = SVGDimensions(svg)
     images = []
     for path in paths:
@@ -151,7 +166,7 @@ def countableLabel(svgString):
         imgArr = numpy.array(img, copy=True)
         imgArr[imgArr == 255] = 1
         image += imgArr
-        #img.show()
+        #PILImage.open(StringIO.StringIO(convertedImage)).show()
     #for i in image * 100:
      #   print i
     #PILImage.fromarray(image * 20, mode='L').show()
@@ -190,7 +205,6 @@ def combineImageLabelsToArr(image, category, thresholdPercent=50):
     #PILImage.fromarray((ui8 + (arr >= (ui8 + threshold)).astype(numpy.uint8)) * 40, mode="L").show()
     return ui8 + (arr >= (ui8 + threshold)).astype(numpy.uint8)
     #numpy.array(numpy.round(arr), dtype=numpy.uint8)
-
 
 
 def saveCombinedImage(imageNPArr, image, category, threshold):
