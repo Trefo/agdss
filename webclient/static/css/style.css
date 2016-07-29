@@ -23,7 +23,7 @@ div #canvasDiv {
 
 
 #canvas {
-
+    border: 3px solid black;
 }
 
 div #imageControlContainer {

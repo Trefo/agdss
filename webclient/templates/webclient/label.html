@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="UTF-8">
     <title>AgDSS Web</title>
     <!--<link rel="stylesheet" href="/static/scripts/paperjs/examples/css/style.css"> -->
     <link rel="stylesheet" href="/static/css/style.css">
     <script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.min.js"></script>
-    <script type="text/javascript" src="/static/scripts/spinjs/spin.min.js"></script>
    <!-- <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script> -->
     <script type='text/javascript' src='/static/scripts/jQuery/jquery-3.0.0.min.js'></script>
     <!--<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"> -->
     <script type="text/paperscript" canvas="canvas">
        var startPoint;
-        var raster; 
+        var raster;
         var labelsLayer = new paper.Layer();
         var isActive = false;
         var aboveExistingLabel = false;
@@ -31,11 +30,19 @@
                 }
                 var updated_category = $("#categories").val();
                 //selectedImage = JSON.parse($('#imageCombo').val().toString());
-                console.log(window.labelsLayer.exportSVG({embedImages: false, asString: false}));
                 $('#noLabels').prop('checked', false);
                 prevLabels = labelsDrawn;
                 labelsDrawn = 0;
-                $.ajax({ 
+                var svg = window.labelsLayer.exportSVG({embedImages: false, asString: false, matchShapes: true});
+                svg.getElementsByTagName('image')[1].remove(); //Remove image added by cropping
+               for (i = 0, circles = svg.getElementsByTagName('circle'); i < circles.length; i++) {
+                    circles[i].setAttribute('transform', 'translate(' + imageX + ',' + imageY + ')');
+                }
+                svg.getElementsByTagName('image')[0].setAttribute('x', '0');
+                svg.getElementsByTagName('image')[0].setAttribute('y', '0');
+                xmlSer = new XMLSerializer();
+                svg = xmlSer.serializeToString(svg);
+                $.ajax({
                     url : "/webclient/applyLabels",
                     type : "POST",
                     dataType: 'text',
@@ -43,7 +50,13 @@
                         image_name: currentImage.image_name,
                         path: currentImage.path,
                         category_name: updated_category,
-                        label_list: window.labelsLayer.exportSVG({embedImages: false, asString: true}),
+                        label_list: svg,
+                        subimage: {
+                            x: imageX,
+                            y: imageY,
+                            width: imageWidth,
+                            height: imageHeight,
+                        },
                         image_filters: {
                             brightness: $('#brightnessControl').val(),
                             contrast: $('#brightnessControl').val(),
@@ -55,6 +68,7 @@
                         if(window.labelsLayer.hasChildren()){
                             window.labelsLayer.removeChildren();
                         }
+                        aboveExistingLabel = false;
                         //window.labelsLayer.importJSON(JSON.parse(data));
                         //$('#noLabels').prop('checked', false);
                         getNewImage();
@@ -111,7 +125,7 @@
                     isActive = false;
                     aboveExistingLabel = false;
                     this.remove();
-                    console.log(window.labelsLayer.exportSVG({embedImages: false, asString: false}));
+                    //console.log(window.labelsLayer.exportSVG({embedImages: false, asString: false}));
                     labelsDrawn -= 1
                 }
                 window.circlePath.remove();
@@ -134,11 +148,17 @@
             }
         }
 
+
+
     </script>
 
     <script type="text/javascript">
+        imageX = 0;
+        imageY = 0;
+        imageWidth = 0;
+        imageHeight = 0;
         var currentImage = {};
-        function onImageFormChange() {
+        /*function onImageFormChange() {
             if (!window.labelsLayer) {
                 window.labelsLayer = new paper.Layer();
             }else{
@@ -168,25 +188,10 @@
             });
         }
 
+
+        } */
+
         function getNewImage() {
-            if (typeof spinner == 'undefined') {
-                //TODO: Remove Spinner
-                var opts = {
-                  lines: 13, length: 28, width: 14, radius: 42, scale: 1,
-                    corners: 1, color: '#000', opacity: 0.15, rotate: 0,
-                    direction: 1, speed: 1, trail: 31, fps: 20, zIndex: 2e9,
-                    className: 'spinner', top: '50%', left: '50%', shadow: true,
-                    hwaccel: false, position: 'absolute'
-                };
-                // var spinLocation = document.getElementById('canvasDiv');
-                 var spinLocation = document.body;
-                spinner =  new Spinner(opts);
-                spinner.spin(spinLocation);
-            }
-            else {
-                //spinner.spin(document.getElementById("canvasDiv"));
-                spinner.spin(document.body);
-            }
             if (!window.labelsLayer) {
                 window.labelsLayer = new paper.Layer();
             }else{
@@ -208,7 +213,12 @@
                     if (data) {
                         displayLabels(response.labels)
                     }
-                    displayImage(response.image_name, response.path, response.categories)
+                    imageX = response.subimage.x;
+                    imageY = response.subimage.y;
+                    imageWidth = response.subimage.width;
+                    imageHeight = response.subimage.height;
+                    displayImage(response.image_name, response.path, response.categories,
+                        new paper.Point(response.subimage.x,response.subimage.y), new paper.Size(imageWidth,imageHeight));
                     currentImage = response
                 },
 
@@ -216,19 +226,26 @@
                     alert(xhr.status + ": " + xhr.responseText);
                 }
             });
-            spinner.stop()
         }
 
         //TODO: Input validation and error checking
-        function displayImage(image_name, image_path, categories) {
+        function displayImage(image_name, image_path, categories, point, size) {
 
             //Add new image and resize canvas to fit image
             img = new Image();
-            img.src = image_path + image_name;
+            img.crossOrigin = "Anonymous";
+            try{
+                img.src = image_path + image_name;
+            }
+            catch(err) {
+                alert("Currently external URLs cannot be used. Error: " + err.message)
+            }
 
             function setup_images() {
-                paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
-                raster = new paper.Raster(img);
+                //paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
+                paper.view.setViewSize(size);
+                paper.view.getViewSize();
+                raster = new paper.Raster(img).getSubRaster(new paper.Rectangle(point, size));
                 raster.position = paper.view.center;
                 paper.view.update();
             };
@@ -238,7 +255,7 @@
             }else {
               img.addEventListener('load', setup_images);
               img.addEventListener('error', function() {
-                  alert('Error loading image')
+                  alert('Error loading image');
               })
             }
 
@@ -295,7 +312,7 @@
                 $('#brightnessControl').val("1").trigger('input');
                 $('#contrastControl').val("1").trigger('input');
                 $('#saturationControl').val("1").trigger('input');
-            });      
+            });
         });
 
 
@@ -305,14 +322,14 @@
 
 </head>
 <body onload="getNewImage()">
-    
+
 <div id="main>">
     <!--<div id="toolbars">
         <select id="imageCombo"  onchange="onImageFormChange()">
             {#% for image in latest_image_list %#}
                 {#% ifequal image selected_image %#}
                     <option value='{"image_name": "{#  #}{image.name}}", "path": "{#  #}{ image.path }}"}' selected="selected">{#  #}{image.name}}</option>
-                {#% else %#} 
+                {#% else %#}
                     <option value='{"image_name": "{#  #}{image.name}}", "path": "{#  #}{ image.path }}"}'>{#  #}{image.name}}</option>
                 {#% endifequal %#}
             {#% endfor %#}
@@ -322,7 +339,6 @@
     <div id="controls">
         <form method="post" name="applyLabelsForm" >
             {% csrf_token %}
-            
             <!--<input name="categoryName" id="categoryName" type="text"> -->
                 <span id="categoryWord">Category: </span>
                 <select id="categories"></select>
@@ -332,11 +348,11 @@
         </form>
     </div>
     <td><div id="canvasDiv">
-        
+
         <div id="image_name_div"><h3 id="image_name"></h3></div>
         <!--<canvas id="canvas" resize></canvas> -->
         <canvas id="canvas" width="1920" height="1080"></canvas>
-                       <table id="displayTable"><tr>     
+                       <table id="displayTable"><tr>
 
          <div>
             <!--<p>View label info <a href="/webclient/view_label">here</a>.</p>-->

@@ -1,7 +1,7 @@
 import json
 import os.path
-from datetime import datetime
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db.models import Count
@@ -10,9 +10,13 @@ from django.http import JsonResponse
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
+import urllib
+from cStringIO import StringIO
 
-from django.conf import settings
+import helper_ops
+from image_ops import crop_images
 from .models import *
+from PIL import Image as PILImage
 
 def index(request):
     template = loader.get_template('webclient/index.html')
@@ -43,6 +47,7 @@ def results(request):
     template = loader.get_template('webclient/results.html')
     context = {}
     return HttpResponse(template.render(context, request))
+
 @csrf_exempt
 def applyLabels(request):
     dict = json.load(request)
@@ -51,7 +56,7 @@ def applyLabels(request):
     path = dict['path']
     category_name = dict['category_name']
     image_filters = dict['image_filters']
-
+    subimage = dict['subimage']
 
     sourceType = ''
     categoryType = ''
@@ -82,7 +87,19 @@ def applyLabels(request):
         ipaddress = x_forwarded_for.split(',')[-1].strip()
     else:
         ipaddress = request.META.get('REMOTE_ADDR')
-    labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,pub_date=datetime.now(),categoryType=categoryType, ip_address=ipaddress)
+    print subimage
+    imageWindowList = ImageWindow.objects.all().filter(
+        x=subimage['x'], y=subimage['y'], width=subimage['width'], height=subimage['height'])
+    if imageWindowList:
+        imageWindow = imageWindowList[0]
+    else:
+        imageWindow = ImageWindow(x=subimage['x'], y=subimage['y'],
+                                  width=subimage['width'], height=subimage['height'])
+        imageWindow.save()
+
+    labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,
+                             pub_date=datetime.now(),categoryType=categoryType,
+                             ip_address=ipaddress, imageWindow=imageWindow)
     labelObject.save()
     image_filter_obj = ImageFilter(brightness=image_filters['brightness'],
                                    contrast=image_filters['contrast'],
@@ -90,7 +107,7 @@ def applyLabels(request):
                                    imageLabel=labelObject)
     image_filter_obj.save()
 
-    from convert_images import convertSVG, combineImageLabels
+    from image_ops.convert_images import convertSVG, combineImageLabels
     convertSVG(labelObject)
     combineImageLabels(parentImage_[0], 50)
     return HttpResponse(label_list_)
@@ -195,10 +212,11 @@ def getNewImage(request):
     response = {
         'path': img.path,
         'image_name': img.name,
-        'categories': [c.category_name for c in img.categoryType.all()]
+        'categories': [c.category_name for c in img.categoryType.all()],
+        'subimage': crop_images.getImageWindow(img),
             }
     if label_list:
-        response['labels'   ] = label_list.labelShapes
+        response['labels'] = label_list.labelShapes
     else:
         response['labels'] = ''
 
@@ -232,16 +250,27 @@ Request: POST
 @require_POST
 def addImage(request):
     #Validate input
-    if not ('image_name' in request.POST and  'path' in request.POST and 'category' in request.POST):
+    if not ('image_name' in request.POST and 'path' in request.POST and 'category' in request.POST):
         return HttpResponseBadRequest("Missing required input")
     if request.POST['category'] == '':
         return HttpResponseBadRequest("Missing category")
 
     #Determine wheter 'path' is URL or file path
+    path = request.POST['path']
+    if path[-1] != '/' and path[-1] != '\\':
+        path += '/'
     url_check = URLValidator()
+    width, height = None, None
     try:
-        url_check(request.POST['path'])
+        url_check(path)
+        width, height = PILImage.open(StringIO(urllib.urlopen(path + request.POST['image_name']).read())).size
     except ValidationError, e:
+        #Validate image and get width, height
+        try:
+            width, height = PILImage.open(path + request.POST['image_name']).size
+        except IOError:
+            return HttpResponseBadRequest("Image file %s cannot be found or the image cannot be opened and identified" %(path+request.POST['image_name']))
+
         #Convert Filepath to webpath if necessary
         ##Check if path is in STATIC_ROOT (https://stackoverflow.com/questions/3812849/how-to-check-whether-a-directory-is-a-sub-directory-of-another-directory)
         root = os.path.join(os.path.realpath(settings.STATIC_ROOT), '')
@@ -252,9 +281,8 @@ def addImage(request):
                 "Image in unreachable location. Make sure that it is in a subdirectory of " + settings.STATIC_ROOT +".\n")
         path = os.path.relpath(path_dir, root)
         path = '/webclient' + settings.STATIC_URL + path
-
-    if path[-1] != '/':
-        path += '/'
+        if path[-1] != '/' and path[-1] != '\\':
+            path += '/'
 
     #Get or create ImageSourceType
     desc = request.POST.get('source_description', default="human")
@@ -278,13 +306,20 @@ def addImage(request):
     if imageList:
         img = imageList[0]
     else:
-        img = Image(name=request.POST['image_name'], path=path, description=request.POST.get('description', default=''), source=sourceType)
+        img = Image(name=request.POST['image_name'], path=path, description=request.POST.get('description', default=''), source=sourceType, width=width, height=height)
         img.save()
     img.categoryType.add(categoryType)
     #imgLabel = ImageLabel(parentImage=img, categoryType=categoryType, pub_date=datetime.now())
     #imgLabel.save()
     return HttpResponse("Added image " + request.POST['image_name'] + '\n')
 
+
+@csrf_exempt
+@require_POST
+def cleanUpAndFixImages(request):
+    helper_ops.fixAllImagePaths()
+    helper_ops.updateAllImageSizes(request.scheme, request.get_host())
+    return HttpResponse("All images rows cleaned up and fixed.")
 
 
 '''
@@ -312,6 +347,7 @@ def updateImage(request):
         image.description = request.POST['source-description']
     if 'add_category' in request.POST:
         cats = CategoryType.objects.all().filter(category_name=request.POST['add_category'])
+        cat = None
         if not cats or not image.filter(categoryType=cats[0]):
             if cats:
                 cat = cats[0]
@@ -329,7 +365,7 @@ def updateImage(request):
 @csrf_exempt
 @require_POST
 def convertAll(request):
-    from convert_images import convertAll
+    from image_ops.convert_images import convertAll
     convertAll(request.POST.get('reconvert', False))
     return HttpResponse('Ok')
 
@@ -350,8 +386,17 @@ def numImageLabels(request):
 @require_POST
 def combineAllImages(request):
     thresholdPercent = int(request.POST.get('thresholdPercent', 50))
-    from convert_images import combineAllLabels
+    from image_ops.convert_images import combineAllLabels
     #for img in Image.objects.all():
     #    combineImageLabels(img, thresholdPercent)
     combineAllLabels(thresholdPercent)
     return HttpResponse("OK")
+
+
+@csrf_exempt
+@require_POST
+def calculateEntropyMap(request):
+    import image_ops.crop_images
+    images = Image.objects.all()
+    image_ops.crop_images.calculate_entropy_map(images[0], images[0].categoryType.all()[0])
+    return HttpResponse('ok')
