@@ -219,8 +219,13 @@
                     imageY = response.subimage.y;
                     imageWidth = response.subimage.width;
                     imageHeight = response.subimage.height;
+                    imagePadding = response.subimage.padding;
+                    if(typeof padding == 'undefined') {
+                        padding = 0;
+                    }
                     displayImage(response.image_name, response.path, response.categories,
-                        new paper.Point(response.subimage.x,response.subimage.y), new paper.Size(imageWidth,imageHeight));
+                        new paper.Point(response.subimage.x,response.subimage.y),
+                        imageWidth, imageHeight, imagePadding);
                     currentImage = response
                 },
 
@@ -230,8 +235,9 @@
             });
         }
         //TODO: Input validation and error checking
-        function displayImage(image_name, image_path, categories, point, size) {
+        function displayImage(image_name, image_path, categories, point, width, height, padding) {
 
+            size = new paper.Size(width + 2*padding, height + 2*padding);
             //Add new image and resize canvas to fit image
             img = new Image();
             img.crossOrigin = "Anonymous";
@@ -246,7 +252,7 @@
                 //paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
                 paper.view.setViewSize(size);
                 paper.view.getViewSize();
-                raster = new paper.Raster(img).getSubRaster(new paper.Rectangle(point, size));
+                raster = new paper.Raster(img).getSubRaster(new paper.Rectangle(point - padding, size));
                 raster.position = paper.view.center;
                 paper.view.update();
             };

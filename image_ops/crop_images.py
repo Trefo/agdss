@@ -39,7 +39,7 @@ def calculateEntropy(arr):
 
 
 def getImageWindow(image):
-    return getGeometricImageWindow(image)
+    return getPaddedWindow(image)
 
 def getRandomImageWindow(image):
     retDict = {'width':300, 'height': 300}
@@ -58,3 +58,9 @@ def getGeometricImageWindow(image):
     topLeft = topLeftArr[numLabels % len(topLeftArr)]
     windowDict['x'], windowDict['y'] = topLeft
     return windowDict
+
+
+def getPaddedWindow(image):
+    r = getGeometricImageWindow(image)
+    r['padding'] = 20
+    return r
