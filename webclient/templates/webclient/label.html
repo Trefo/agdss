@@ -252,9 +252,11 @@
                 //paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
                 paper.view.setViewSize(size);
                 paper.view.getViewSize();
-                raster = new paper.Raster(img).getSubRaster(new paper.Rectangle(point - padding, size));
+                point = new paper.Point(point.x - padding, point.y - padding);
+                raster = new paper.Raster(img).getSubRaster(new paper.Rectangle(point, size));
                 raster.position = paper.view.center;
                 paper.view.update();
+
             };
             if(img.complete) {
                 setup_images();
