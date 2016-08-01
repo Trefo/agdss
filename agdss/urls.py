@@ -18,16 +18,19 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic.edit import CreateView
 from django.contrib.auth.forms import UserCreationForm
+from django.conf import settings
 
 urlpatterns = [
     url(r'^grappelli/', include('grappelli.urls')),  # grappelli URLS
     url(r'^webclient/', include('webclient.urls')),
     url(r'^admin/', admin.site.urls),
 
+    url('^', include('django.contrib.auth.urls')),
+
     url('^register/', CreateView.as_view(
-        template_name='register.html',
+        template_name='registration/register.html',
         form_class=UserCreationForm,
-        success_url='/'
+        success_url= '/login'
     )),
     url('^accounts/', include('django.contrib.auth.urls')),
 ]

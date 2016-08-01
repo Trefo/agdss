@@ -123,6 +123,11 @@ USE_L10N = True
 USE_TZ = False
 
 
+#Login
+LOGIN_REDIRECT_URL = '/webclient'
+
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = '/static/'

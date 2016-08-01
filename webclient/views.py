@@ -204,7 +204,10 @@ def getNewImage(request):
     img = Image.objects.all()
     if hasPrior and len(Image.objects.all()) > 1:
         img = img.exclude(name=request.GET['image_name'], path=request.GET['path'])
-    img = img.annotate(count=Count('imagelabel')).order_by('count')[0]
+    labelsPerImage = crop_images.NUM_WINDOW_COLS * \
+                     crop_images.NUM_WINDOW_ROWS * crop_images.NUM_LABELS_PER_WINDOW
+    img = img.annotate(count=Count('imagelabel')) \
+        .filter(count__lt=labelsPerImage).order_by('count').reverse()[0]
 
 
 
