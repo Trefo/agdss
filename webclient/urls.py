@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     #Page URLs
-    url(r'^$', views.index, name='index'),
+    url(r'^$', views.index, name='label_index'),
     url(r'^label$', views.label, name='label'),
     url(r'^results$', views.results, name='results'),
     url(r'^view_label$', views.view_label, name='view_label'),

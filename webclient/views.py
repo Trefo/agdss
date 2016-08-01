@@ -112,7 +112,6 @@ def applyLabels(request):
     #     #ipaddress = x_forwarded_for.split(',')[-1].strip()
     # else:
     #     #ipaddress = request.META.get('REMOTE_ADDR')
-    print subimage
     imageWindowList = ImageWindow.objects.all().filter(
         x=subimage['x'], y=subimage['y'], width=subimage['width'], height=subimage['height'])
     if imageWindowList:
@@ -251,14 +250,14 @@ def getNewImage(request):
     return JsonResponse(response)
 
 
-#TODO: Remove csrf_exempt
-@csrf_exempt
-def purge(request):
-    Image.objects.all().delete()
-    ImageLabel.objects.all().delete()
-    ImageSourceType.objects.all().delete()
-    CategoryType.objects.all().delete()
-    return HttpResponse("PURGED TABLES!")
+# #TODO: Remove csrf_exempt
+# @csrf_exempt
+# def purge(request):
+#     Image.objects.all().delete()
+#     ImageLabel.objects.all().delete()
+#     ImageSourceType.objects.all().delete()
+#     CategoryType.objects.all().delete()
+#     return HttpResponse("PURGED TABLES!")
 
 
 
