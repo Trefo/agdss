@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
+from django.contrib.auth.decorators import login_required
 import urllib
 from cStringIO import StringIO
 
@@ -18,17 +19,25 @@ from image_ops import crop_images
 from .models import *
 from PIL import Image as PILImage
 
+
+######
+#PAGES
+######
+
+@login_required
 def index(request):
     template = loader.get_template('webclient/index.html')
     context = {}
     return HttpResponse(template.render(context, request))
 
+
+@login_required
 def view_label(request):
     template = loader.get_template('webclient/view_label.html')
     context = {}
     return HttpResponse(template.render(context, request))
 
-
+@login_required
 def label(request):
     #latest_image_list = os.listdir('C:/Users/Sandeep/Dropbox/kumar-prec-ag/tag_images') # '/Users/jdas/Dropbox/Research/agriculture/agdss/image-store/')
     latest_image_list = Image.objects.all()
@@ -42,11 +51,16 @@ def label(request):
         context = {}
     return HttpResponse(template.render(context, request))
 
-
+@login_required
 def results(request):
     template = loader.get_template('webclient/results.html')
     context = {}
     return HttpResponse(template.render(context, request))
+
+
+##################
+#POST/GET REQUESTS
+##################
 
 @csrf_exempt
 def applyLabels(request):
