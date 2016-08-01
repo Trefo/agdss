@@ -43,7 +43,7 @@ class Labeler(models.Model):
     user = models.OneToOneField(User)
 
     def __unicode__(self):
-        return 'labeler'
+        return str(self.user)
 class ImageWindow(models.Model):
     x = models.PositiveSmallIntegerField()
     y = models.PositiveSmallIntegerField()
@@ -72,7 +72,7 @@ class ImageLabel(models.Model):
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
     labeler = models.ForeignKey(Labeler, on_delete=models.CASCADE, null=True, blank=True, default=None)
     imageWindow = models.ForeignKey(ImageWindow, on_delete=models.CASCADE, default=getDefaultImageWindowId)
-    ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
+    #ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
 
     def __unicode__(self):
         return 'Image: ' + self.parentImage.name + ' | Category: ' + self.categoryType.category_name

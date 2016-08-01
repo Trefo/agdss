@@ -169,7 +169,7 @@ def countableLabel(svgString):
         #PILImage.open(StringIO.StringIO(convertedImage)).show()
     #for i in image * 100:
      #   print i
-    PILImage.fromarray(image * 20, mode='L').show()
+    #PILImage.fromarray(image * 20, mode='L').show()
     return image
 
 

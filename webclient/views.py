@@ -2,7 +2,7 @@ import json
 import os.path
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, MultipleObjectsReturned
 from django.core.validators import URLValidator
 from django.db.models import Count
 from django.http import *
@@ -13,6 +13,7 @@ from django.views.decorators.http import require_POST, require_GET
 from django.contrib.auth.decorators import login_required
 import urllib
 from cStringIO import StringIO
+import sys
 
 import helper_ops
 from image_ops import crop_images
@@ -71,7 +72,17 @@ def applyLabels(request):
     category_name = dict['category_name']
     image_filters = dict['image_filters']
     subimage = dict['subimage']
-
+    user = request.user
+    if not user.is_authenticated():
+        return HttpResponseBadRequest("Requires logged in user")
+    try:
+        labeler = Labeler.objects.get(user=user)
+    except Labeler.DoesNotExist:
+        labeler = Labeler(user=user)
+        labeler.save()
+    except MultipleObjectsReturned:
+        print >> sys.stderr, "Multiple labelers for user object"
+        return
     sourceType = ''
     categoryType = ''
     parentImage_ = Image.objects.all().filter(name=image_name, path=path)
@@ -97,10 +108,10 @@ def applyLabels(request):
 
 
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ipaddress = x_forwarded_for.split(',')[-1].strip()
-    else:
-        ipaddress = request.META.get('REMOTE_ADDR')
+    # if x_forwarded_for:
+    #     #ipaddress = x_forwarded_for.split(',')[-1].strip()
+    # else:
+    #     #ipaddress = request.META.get('REMOTE_ADDR')
     print subimage
     imageWindowList = ImageWindow.objects.all().filter(
         x=subimage['x'], y=subimage['y'], width=subimage['width'], height=subimage['height'])
@@ -113,7 +124,7 @@ def applyLabels(request):
 
     labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,
                              pub_date=datetime.now(),categoryType=categoryType,
-                             ip_address=ipaddress, imageWindow=imageWindow)
+                             labeler=labeler, imageWindow=imageWindow)
     labelObject.save()
     image_filter_obj = ImageFilter(brightness=image_filters['brightness'],
                                    contrast=image_filters['contrast'],
