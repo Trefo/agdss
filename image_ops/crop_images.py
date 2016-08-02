@@ -44,8 +44,8 @@ def calculateEntropy(arr):
     return #[[scipy.stats.entropy(y) for y in x] for x in probArr]
 
 
-def getImageWindow(image):
-    return getPaddedWindow(image)
+def getImageWindow(image, user):
+    return getPaddedWindow(image, user)
 
 def getRandomImageWindow(image):
     retDict = {'width':300, 'height': 300}
@@ -66,7 +66,7 @@ def getGeometricImageWindow(image):
     return windowDict
 
 
-def getPaddedWindow(image):
+def getPaddedWindow(image, user):
     #Crop out sidemost pixels
     windowWidth = (image.width - 2* WINDOW_PADDING)/NUM_WINDOW_COLS
     windowHeight = (image.height - 2* WINDOW_PADDING)/NUM_WINDOW_ROWS
@@ -77,7 +77,7 @@ def getPaddedWindow(image):
         for y in range(WINDOW_PADDING, image.height - WINDOW_PADDING, windowWidth):
             labels = image.imagelabel_set.all().filter(imageWindow__x=x, imageWindow__y=y)
             print labels
-            if len(labels) < NUM_LABELS_PER_WINDOW:
+            if len(labels) < NUM_LABELS_PER_WINDOW and all(label.user != user for label in labels):
                 windowDict['x'], windowDict['y'] = (x,y)
                 print windowDict
                 return windowDict

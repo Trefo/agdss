@@ -204,11 +204,11 @@ def getInfo(request):
 
 @require_GET
 def getNewImage(request):
-    if not 'image_name' in request.GET or not 'path' in request.GET:
-        hasPrior = False
-    else:
-        hasPrior = True
-        #return HttpResponseBadRequest("Missing image name or path")
+    # if not 'image_name' in request.GET or not 'path' in request.GET:
+    #     hasPrior = False
+    # else:
+    #     hasPrior = True
+    #     #return HttpResponseBadRequest("Missing image name or path")
 
     if len(Image.objects.all()) == 0:
         return HttpResponseBadRequest("No images in database")
@@ -226,21 +226,27 @@ def getNewImage(request):
 
     #Least number of labels which was not just seen
     img = Image.objects.all()
-    if hasPrior and len(Image.objects.all()) > 1:
-        img = img.exclude(name=request.GET['image_name'], path=request.GET['path'])
+    # if hasPrior and len(Image.objects.all()) > 1:
+    #     img = img.exclude(name=request.GET['image_name'], path=request.GET['path'])
+
     labelsPerImage = crop_images.NUM_WINDOW_COLS * \
                      crop_images.NUM_WINDOW_ROWS * crop_images.NUM_LABELS_PER_WINDOW
-    img = img.annotate(count=Count('imagelabel')) \
-        .filter(count__lt=labelsPerImage).order_by('count').reverse()[0]
+    images = img.annotate(count=Count('imagelabel')) \
+        .filter(count__lt=labelsPerImage).order_by('count').reverse()
 
-
+    subimage = None
+    for i in images:
+        subimage = crop_images.getImageWindow(i, request.user)
+        if subimage is not None:
+            img = i
+            break
 
     label_list = ImageLabel.objects.all().filter(parentImage=img).order_by('pub_date').last()
     response = {
         'path': img.path,
         'image_name': img.name,
         'categories': [c.category_name for c in img.categoryType.all()],
-        'subimage': crop_images.getImageWindow(img),
+        'subimage': subimage,
             }
     if label_list:
         response['labels'] = label_list.labelShapes
