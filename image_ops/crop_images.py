@@ -77,7 +77,7 @@ def getPaddedWindow(image, user):
         for y in range(WINDOW_PADDING, image.height - WINDOW_PADDING, windowWidth):
             labels = image.imagelabel_set.all().filter(imageWindow__x=x, imageWindow__y=y)
             print labels
-            if len(labels) < NUM_LABELS_PER_WINDOW and all(label.user != user for label in labels):
+            if len(labels) < NUM_LABELS_PER_WINDOW and all(label.labeler.user != user for label in labels):
                 windowDict['x'], windowDict['y'] = (x,y)
                 print windowDict
                 return windowDict

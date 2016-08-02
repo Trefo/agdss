@@ -251,7 +251,9 @@
             function setup_images() {
                 //paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
                 paper.view.setViewSize(size);
-                paper.view.getViewSize();
+                //paper.view.getViewSize();
+                $('#canvasWrapper').css('width', size.width).css('height', size.height)
+                //$('#canvas').css('box-shadow', " -20 -20 20px" +  imagePadding + "px rgba(255,0,0,0.5)");
                 point = new paper.Point(point.x - padding, point.y - padding);
                 raster = new paper.Raster(img).getSubRaster(new paper.Rectangle(point, size));
                 raster.position = paper.view.center;
@@ -359,8 +361,9 @@
     <td><div id="canvasDiv">
         <div id="image_name_div"><h3 id="image_name"></h3></div>
         <!--<canvas id="canvas" resize></canvas> -->
-        <canvas id="canvas" width="1920" height="1080"></canvas>
-
+       <div id="canvasWrapper">
+           <canvas id="canvas" width="1920" height="1080"></canvas>
+        </div>
         <div id="image_info">
             <p id="image_info_name"></p>
             <p id="image_info_path"></p>
