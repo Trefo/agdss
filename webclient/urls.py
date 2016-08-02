@@ -13,7 +13,7 @@ urlpatterns = [
     #GET/POST URLs
     url(r'^applyLabels$', 'webclient.views.applyLabels'),
     url(r'^loadLabels$', 'webclient.views.loadLabels'),
-    url(r'^purge$', 'webclient.views.purge'),
+    #url(r'^purge$', 'webclient.views.purge'),
     url(r'^addImage$', 'webclient.views.addImage'),
     url(r'^cleanUpAndFixImages$', 'webclient.views.cleanUpAndFixImages'),
     url(r'^updateImage$', 'webclient.views.updateImage'),
