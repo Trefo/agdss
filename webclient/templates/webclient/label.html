@@ -219,8 +219,13 @@
                     imageY = response.subimage.y;
                     imageWidth = response.subimage.width;
                     imageHeight = response.subimage.height;
+                    imagePadding = response.subimage.padding;
+                    if(typeof padding == 'undefined') {
+                        padding = 0;
+                    }
                     displayImage(response.image_name, response.path, response.categories,
-                        new paper.Point(response.subimage.x,response.subimage.y), new paper.Size(imageWidth,imageHeight));
+                        new paper.Point(response.subimage.x,response.subimage.y),
+                        imageWidth, imageHeight, imagePadding);
                     currentImage = response
                 },
 
@@ -230,8 +235,9 @@
             });
         }
         //TODO: Input validation and error checking
-        function displayImage(image_name, image_path, categories, point, size) {
+        function displayImage(image_name, image_path, categories, point, width, height, padding) {
 
+            size = new paper.Size(width + 2*padding, height + 2*padding);
             //Add new image and resize canvas to fit image
             img = new Image();
             img.crossOrigin = "Anonymous";
@@ -245,11 +251,15 @@
             function setup_images() {
                 //paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
                 paper.view.setViewSize(size);
-                paper.view.getViewSize();
+                //paper.view.getViewSize();
+                $('#canvasWrapper').css('width', size.width).css('height', size.height)
+                //$('#canvas').css('box-shadow', " -20 -20 20px" +  imagePadding + "px rgba(255,0,0,0.5)");
+                point = new paper.Point(point.x - padding, point.y - padding);
                 raster = new paper.Raster(img).getSubRaster(new paper.Rectangle(point, size));
                 raster.position = paper.view.center;
                 paper.view.update();
-            };
+
+            }
             if(img.complete) {
                 setup_images();
             }else {
@@ -346,13 +356,15 @@
             <input id="applyLabels" type="button" value="submit"> <br>
             <input type="checkbox" id="noLabels" /> No labels in image
         </form>
+        <a href="/logout">logout</a>
     </div>
     <table id="displayTable"><tr>
     <td><div id="canvasDiv">
         <div id="image_name_div"><h3 id="image_name"></h3></div>
         <!--<canvas id="canvas" resize></canvas> -->
-        <canvas id="canvas" width="1920" height="1080"></canvas>
-
+       <div id="canvasWrapper">
+           <canvas id="canvas" width="1920" height="1080"></canvas>
+        </div>
         <div id="image_info">
             <p id="image_info_name"></p>
             <p id="image_info_path"></p>

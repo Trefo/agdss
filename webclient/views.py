@@ -2,7 +2,7 @@ import json
 import os.path
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, MultipleObjectsReturned
 from django.core.validators import URLValidator
 from django.db.models import Count
 from django.http import *
@@ -10,25 +10,35 @@ from django.http import JsonResponse
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
+from django.contrib.auth.decorators import login_required
 import urllib
 from cStringIO import StringIO
+import sys
 
 import helper_ops
 from image_ops import crop_images
 from .models import *
 from PIL import Image as PILImage
 
+
+######
+#PAGES
+######
+
+@login_required
 def index(request):
     template = loader.get_template('webclient/index.html')
     context = {}
     return HttpResponse(template.render(context, request))
 
+
+@login_required
 def view_label(request):
     template = loader.get_template('webclient/view_label.html')
     context = {}
     return HttpResponse(template.render(context, request))
 
-
+@login_required
 def label(request):
     #latest_image_list = os.listdir('C:/Users/Sandeep/Dropbox/kumar-prec-ag/tag_images') # '/Users/jdas/Dropbox/Research/agriculture/agdss/image-store/')
     latest_image_list = Image.objects.all()
@@ -42,11 +52,16 @@ def label(request):
         context = {}
     return HttpResponse(template.render(context, request))
 
-
+@login_required
 def results(request):
     template = loader.get_template('webclient/results.html')
     context = {}
     return HttpResponse(template.render(context, request))
+
+
+##################
+#POST/GET REQUESTS
+##################
 
 @csrf_exempt
 def applyLabels(request):
@@ -57,7 +72,17 @@ def applyLabels(request):
     category_name = dict['category_name']
     image_filters = dict['image_filters']
     subimage = dict['subimage']
-
+    user = request.user
+    if not user.is_authenticated():
+        return HttpResponseBadRequest("Requires logged in user")
+    try:
+        labeler = Labeler.objects.get(user=user)
+    except Labeler.DoesNotExist:
+        labeler = Labeler(user=user)
+        labeler.save()
+    except MultipleObjectsReturned:
+        print >> sys.stderr, "Multiple labelers for user object"
+        return
     sourceType = ''
     categoryType = ''
     parentImage_ = Image.objects.all().filter(name=image_name, path=path)
@@ -83,11 +108,10 @@ def applyLabels(request):
 
 
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ipaddress = x_forwarded_for.split(',')[-1].strip()
-    else:
-        ipaddress = request.META.get('REMOTE_ADDR')
-    print subimage
+    # if x_forwarded_for:
+    #     #ipaddress = x_forwarded_for.split(',')[-1].strip()
+    # else:
+    #     #ipaddress = request.META.get('REMOTE_ADDR')
     imageWindowList = ImageWindow.objects.all().filter(
         x=subimage['x'], y=subimage['y'], width=subimage['width'], height=subimage['height'])
     if imageWindowList:
@@ -99,7 +123,7 @@ def applyLabels(request):
 
     labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,
                              pub_date=datetime.now(),categoryType=categoryType,
-                             ip_address=ipaddress, imageWindow=imageWindow)
+                             labeler=labeler, imageWindow=imageWindow)
     labelObject.save()
     image_filter_obj = ImageFilter(brightness=image_filters['brightness'],
                                    contrast=image_filters['contrast'],
@@ -180,11 +204,11 @@ def getInfo(request):
 
 @require_GET
 def getNewImage(request):
-    if not 'image_name' in request.GET or not 'path' in request.GET:
-        hasPrior = False
-    else:
-        hasPrior = True
-        #return HttpResponseBadRequest("Missing image name or path")
+    # if not 'image_name' in request.GET or not 'path' in request.GET:
+    #     hasPrior = False
+    # else:
+    #     hasPrior = True
+    #     #return HttpResponseBadRequest("Missing image name or path")
 
     if len(Image.objects.all()) == 0:
         return HttpResponseBadRequest("No images in database")
@@ -202,18 +226,27 @@ def getNewImage(request):
 
     #Least number of labels which was not just seen
     img = Image.objects.all()
-    if hasPrior and len(Image.objects.all()) > 1:
-        img = img.exclude(name=request.GET['image_name'], path=request.GET['path'])
-    img = img.annotate(count=Count('imagelabel')).order_by('count')[0]
+    # if hasPrior and len(Image.objects.all()) > 1:
+    #     img = img.exclude(name=request.GET['image_name'], path=request.GET['path'])
 
+    labelsPerImage = crop_images.NUM_WINDOW_COLS * \
+                     crop_images.NUM_WINDOW_ROWS * crop_images.NUM_LABELS_PER_WINDOW
+    images = img.annotate(count=Count('imagelabel')) \
+        .filter(count__lt=labelsPerImage).order_by('count').reverse()
 
+    subimage = None
+    for i in images:
+        subimage = crop_images.getImageWindow(i, request.user)
+        if subimage is not None:
+            img = i
+            break
 
     label_list = ImageLabel.objects.all().filter(parentImage=img).order_by('pub_date').last()
     response = {
         'path': img.path,
         'image_name': img.name,
         'categories': [c.category_name for c in img.categoryType.all()],
-        'subimage': crop_images.getImageWindow(img),
+        'subimage': subimage,
             }
     if label_list:
         response['labels'] = label_list.labelShapes
@@ -223,14 +256,14 @@ def getNewImage(request):
     return JsonResponse(response)
 
 
-#TODO: Remove csrf_exempt
-@csrf_exempt
-def purge(request):
-    Image.objects.all().delete()
-    ImageLabel.objects.all().delete()
-    ImageSourceType.objects.all().delete()
-    CategoryType.objects.all().delete()
-    return HttpResponse("PURGED TABLES!")
+# #TODO: Remove csrf_exempt
+# @csrf_exempt
+# def purge(request):
+#     Image.objects.all().delete()
+#     ImageLabel.objects.all().delete()
+#     ImageSourceType.objects.all().delete()
+#     CategoryType.objects.all().delete()
+#     return HttpResponse("PURGED TABLES!")
 
 
 

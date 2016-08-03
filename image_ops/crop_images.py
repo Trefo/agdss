@@ -5,6 +5,12 @@ import numpy
 #import scipy
 import random
 
+
+NUM_WINDOW_ROWS = 4
+NUM_WINDOW_COLS = 4
+WINDOW_PADDING = 20
+NUM_LABELS_PER_WINDOW = 3
+
 def calculate_entropy_map(image, category):
     images = ImageLabel.objects.all().filter(categoryType=category)
     #aggregrate_array = numpy.full((241,386, len(images)), 255, dtype=numpy.uint8)
@@ -38,8 +44,8 @@ def calculateEntropy(arr):
     return #[[scipy.stats.entropy(y) for y in x] for x in probArr]
 
 
-def getImageWindow(image):
-    return getGeometricImageWindow(image)
+def getImageWindow(image, user):
+    return getPaddedWindow(image, user)
 
 def getRandomImageWindow(image):
     retDict = {'width':300, 'height': 300}
@@ -58,3 +64,21 @@ def getGeometricImageWindow(image):
     topLeft = topLeftArr[numLabels % len(topLeftArr)]
     windowDict['x'], windowDict['y'] = topLeft
     return windowDict
+
+
+def getPaddedWindow(image, user):
+    #Crop out sidemost pixels
+    windowWidth = (image.width - 2* WINDOW_PADDING)/NUM_WINDOW_COLS
+    windowHeight = (image.height - 2* WINDOW_PADDING)/NUM_WINDOW_ROWS
+    windowDict = {'width': windowWidth, 'height': windowHeight,
+                  'padding': WINDOW_PADDING}
+
+    for x in range(WINDOW_PADDING, image.width - WINDOW_PADDING,  windowWidth):
+        for y in range(WINDOW_PADDING, image.height - WINDOW_PADDING, windowWidth):
+            labels = image.imagelabel_set.all().filter(imageWindow__x=x, imageWindow__y=y)
+            print labels
+            if len(labels) < NUM_LABELS_PER_WINDOW and all(label.labeler.user != user for label in labels):
+                windowDict['x'], windowDict['y'] = (x,y)
+                print windowDict
+                return windowDict
+    return None

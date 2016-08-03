@@ -57,7 +57,7 @@ ROOT_URLCONF = 'agdss.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR + '/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -123,9 +123,15 @@ USE_L10N = True
 USE_TZ = False
 
 
+#Login
+LOGIN_REDIRECT_URL = '/webclient'
+
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = '/static/'
 #STATIC_ROOT = "C:/Users/Sandeep/Dropbox/kumar-prec-ag"
 #STATIC_ROOT = "/home/sdcunha/Dropbox/kumar-prec-ag"
+
 
