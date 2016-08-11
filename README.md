@@ -6,7 +6,7 @@
 ##Setup
 1. Required software:
   * Python2 (Python3 untested) with packages NumPy, Pillow, and Wand
-  * Django < 1.10 (django 1.10 no longer allows you to specify urls as string, http://stackoverflow.com/questions/38744285/django-urls-error-view-must-be-a-callable-or-a-list-tuple-in-the-case-of-includ) 
+  * Django* < 1.10 (django 1.10 no longer allows you to specify urls as string, http://stackoverflow.com/questions/38744285/django-urls-error-view-must-be-a-callable-or-a-list-tuple-in-the-case-of-includ) 
   * * use pip install django==1.9
   * Postgres (or other database, though using another database requires changing code). Set port to 5432 (or change code to reflect chosen port). (Setup information: [here](https://help.ubuntu.com/community/PostgreSQL))
   * psycopg2 (required for Postgres)
