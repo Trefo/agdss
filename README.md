@@ -7,7 +7,7 @@
 1. Required software:
   * Python2 (Python3 untested) with packages NumPy, Pillow, and Wand
   * Django* < 1.10 (django 1.10 no longer allows you to specify urls as string, http://stackoverflow.com/questions/38744285/django-urls-error-view-must-be-a-callable-or-a-list-tuple-in-the-case-of-includ) 
-  * * use pip install django==1.9
+  * * pip install django==1.9
   * Postgres (or other database, though using another database requires changing code). Set port to 5432 (or change code to reflect chosen port). (Setup information: [here](https://help.ubuntu.com/community/PostgreSQL))
   * psycopg2 (required for Postgres)
   * ImageMagick (`ImageMagick 6.7.7-10 Q16` and `ImageMagick-6.9.4 Q16` are known to be working and compatible versions)
