@@ -283,6 +283,7 @@ Request: POST
 @require_POST
 def addImage(request):
     #Validate input
+    print request.POST
     if not ('image_name' in request.POST and 'path' in request.POST and 'category' in request.POST):
         return HttpResponseBadRequest("Missing required input")
     if request.POST['category'] == '':

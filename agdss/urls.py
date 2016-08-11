@@ -14,15 +14,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 
-from django.conf.urls import include, url
+from django.conf.urls import url, include
+import django.views
+
 from django.contrib import admin
 from django.views.generic.edit import CreateView
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import RedirectView
-from django.conf import settings
+
 
 urlpatterns = [
-    url(r'^grappelli/', include('grappelli.urls')),  # grappelli URLS
     url(r'^webclient/', include('webclient.urls')),
     url(r'^admin/', admin.site.urls),
 
