@@ -133,7 +133,7 @@ def applyLabels(request):
 
     from image_ops.convert_images import convertSVG, combineImageLabels
     convertSVG(labelObject)
-    combineImageLabels(parentImage_[0], 50)
+    #combineImageLabels(parentImage_[0], 50)
     return HttpResponse(label_list_)
 
 @require_GET
