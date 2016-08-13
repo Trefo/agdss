@@ -43,7 +43,8 @@
                 svg.getElementsByTagName('image')[0].setAttribute('y', '0');
                 xmlSer = new XMLSerializer();
                 svg = xmlSer.serializeToString(svg);
-                $.ajax({
+                $('#debug').text('loading next image...');
+		$.ajax({
                     url : "/webclient/applyLabels",
                     type : "POST",
                     dataType: 'text',
@@ -65,7 +66,7 @@
                         }
                     }),
                     success : function(data) {
-                        //$('#debug').text(data);
+                        $('#debug').text('');
                         if(window.labelsLayer.hasChildren()){
                             window.labelsLayer.removeChildren();
                         }
@@ -109,7 +110,7 @@
                 var center = (startPoint + event.point)/2
                 newPath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
                 newPath.strokeColor = 'yellow';
-                newPath.strokeWidth = 3;
+                newPath.strokeWidth = 2;
                 newPath.opacity = 0.5;
                 newPath.onMouseEnter= function(event){
                     if(!isActive) {
@@ -120,7 +121,7 @@
                 }
                 newPath.onMouseLeave= function(event){
                     aboveExistingLabel = false;
-                    this.fillColor = 'grey';
+                    this.fillColor = 'aqua';
                 }
                 newPath.onDoubleClick = function(event) {
                     isActive = false;
@@ -145,7 +146,7 @@
             }
             else {
                 window.circlePath.opacity = 0.3;
-                window.circlePath.fillColor = 'grey';
+                window.circlePath.fillColor = 'aqua';
             }
 
         }
@@ -345,6 +346,9 @@
             {#% endfor %#}
         </select>
     </div> -->
+ <div id="debug">
+
+    </div>
 
     <div id="controls">
         <form method="post" name="applyLabelsForm" >
@@ -352,12 +356,15 @@
             <!--<input name="categoryName" id="categoryName" type="text"> -->
                 <span id="categoryWord">Category: </span>
                 <select id="categories"></select>
-                <span name="categoryName" id="categoryName"></span>
-            <input id="applyLabels" type="button" value="submit"> <br>
+                <span name="categoryName" id="categoryName" style="font-size: 30px;"></span>
+            <input id="applyLabels" type="button" value="submit" style="font-size : 20px; height:50px; width:130px"> <br>
             <input type="checkbox" id="noLabels" /> No labels in image
         </form>
         <a href="/logout">logout</a>
-    </div>
+        <br/>
+	<i>encircle occluded fruits entirely, <br/>use your best guess!</i>
+	<br/>
+</div>
     <table id="displayTable"><tr>
     <td><div id="canvasDiv">
         <div id="image_name_div"><h3 id="image_name"></h3></div>
@@ -397,9 +404,6 @@
         <button id="next">Submit</button>
     </div> -->
 
-    <div id="debug">
-
-    </div>
 </div>
 </body>
 </html>

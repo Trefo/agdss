@@ -3,10 +3,13 @@ html, body {
     overflow: hidden;
     height: 100%; */
 
+
 }
 div #toolbars {
     visibility: hidden;
     display:none;
+font-size:13pt;
+font-family:arial;
 }
 /* Scale canvas with resize attribute to full size
 canvas[resize] {
@@ -19,6 +22,8 @@ button #next {
 }
 
 div #canvasDiv {
+font-size:13pt;
+font-family:arial;
 }
 
 div #canvasWrapper {
@@ -39,19 +44,40 @@ div #canvasWrapper {
 
 div #imageControlContainer {
     padding-top: 75%;
-
 }
 
 div #imageControl {
     padding: 2px;
     border: 1px groove;
+font-size:13pt;
+font-family:arial;
 }
 
 #imageControlTd {
     vertical-align: top;
 }
 
-
+#debug{
+font-size:15pt;
+font-family:arial;
+font-weight:bold;
+font-style:italic;
+color:#800000;
+}
+#controls{
+font-size:13pt;
+font-family:arial;
+}
 
 #displayTable td,tr{
+}
+
+
+#info{
+    font-size:15pt;
+font-family:"Helvetica Neue";
+    color:white;
+    background-color: black;
+    opacity:0.7;
+
 }
