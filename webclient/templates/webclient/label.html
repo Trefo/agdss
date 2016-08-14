@@ -362,12 +362,18 @@
         </form>
         <a href="/logout">logout</a>
         <br/>
-	<i>encircle occluded fruits entirely, <br/>use your best guess!</i>
+<p width="50%">
+            <ol>
+                <ul>Encircle occluded fruits <i>entirely</i>, use your best guess!</ul>
+                <ul>Click and drag to select region.</ul> 
+		<ul>Labels can be moved by clicking and dragging.</ul> 
+		<ul>Double click to delete an area.</ul>
+            </ol>
+        </p>
 	<br/>
 </div>
     <table id="displayTable"><tr>
     <td><div id="canvasDiv">
-        <div id="image_name_div"><h3 id="image_name"></h3></div>
         <!--<canvas id="canvas" resize></canvas> -->
        <div id="canvasWrapper">
            <canvas id="canvas" width="1920" height="1080"></canvas>
@@ -378,7 +384,6 @@
         </div>
 
          <div>
-            <p>View label info <a href="/webclient/view_label">here</a>.</p>
              <p>To report a bug, go to the github page <a href="https://github.com/dcunhas/agdss/issues">here</a> and open a new issue</p>
 
         </div>
