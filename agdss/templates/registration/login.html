@@ -8,8 +8,19 @@
     <body background="http://openuav.ddns.net:8000/static/images/labelag-splash.jpeg" style="width:50%;">
         {#% extends 'base.html' %#}
 
-        <div id="login" style="width:50%;font-size:15pt;font-family:Helvetica;color:white;background-color: black;opacity:0.7;>
+ <div id="login" style="width:300px;height:200px;font-size:15pt;font-family:Helvetica;color:white;background-color: black;opacity:0.7;
+ position: absolute;text-align: left;
+    padding-left: 10px;
+    padding-top: 10px;
+
+    top: 10%;
+    bottom: 50%;
+    left: 0;
+    right: 0;
+   margin: auto;>
+
 {% block content %}
+
   <h2 style="font-size:15pt;font-family:Helvetica;color:white;">Login</h2>
   <form method="post">
     {% csrf_token %}
