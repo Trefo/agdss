@@ -50,8 +50,9 @@ div #imageControlContainer {
 div #imageControl {
     padding: 2px;
     border: 1px groove;
-font-size:13pt;
+font-size:14pt;
 font-family:arial;
+
 }
 
 #imageControlTd {
@@ -71,15 +72,21 @@ font-family:arial;
 }
 
 #displayTable td,tr{
+    width: 100px;
 }
 
 
 #info{
     font-size:15pt;
-font-family:"Helvetica Neue";
+    font-family:"Helvetica Neue";
     color:white;
     background-color: black;
     opacity:0.7;
     background-position:center;
 
+}
+
+#tips{
+    padding-left: 0px;
+    text-align: left;
 }
