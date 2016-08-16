@@ -90,7 +90,7 @@ class ImageFilter(models.Model):
 
     def __unicode__(self):
         return 'ImageFilter: brightness:' + str(self.brightness) + ' contrast: ' + str(self.contrast)\
-               + 'saturation: ' + str(self.saturation)
+               + ' saturation: ' + str(self.saturation) + ' labeler: ' + str(self.labeler)
 
 
 
