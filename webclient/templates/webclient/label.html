@@ -244,21 +244,23 @@
             size = new paper.Size(width + 2*padding, height + 2*padding);
             //Add new image and resize canvas to fit image
             img = new Image();
+            img.onload = function() {
+                if(!img.complete || img.naturalWidth == 0) {
+                    alert("Could not load image");
+                    console.log(img);
+                    return;
+                    }
+                if(point.x + width + padding > img.naturalWidth || point.y + height + padding > img.naturalHeight) {
+                    alert("Window out of bounds of image.");
+                    return;
+                }
+            };
             img.crossOrigin = "Anonymous";
             try{
                 img.src = image_path + image_name;
             }
             catch(err) {
                 alert("Image cannot be opened. Note that currently external URLs cannot be used. Error: " + err.message)
-            }
-            if(!img.complete || img.naturalWidth == 0) {
-                alert("Could not load image");
-                console.log(img);
-                return
-            }
-            if(point.x + width + padding > img.naturalWidth || point.y + height + padding > img.naturalHeight) {
-                alert("Window out of bounds of image.");
-                return
             }
 
             function setup_images() {
