@@ -237,7 +237,10 @@
         }
         //TODO: Input validation and error checking
         function displayImage(image_name, image_path, categories, point, width, height, padding) {
-
+            if(width <= 0 || height <= 0 || padding < 0) {
+                alert("Problem with width, height, or padding value");
+                return;
+            }
             size = new paper.Size(width + 2*padding, height + 2*padding);
             //Add new image and resize canvas to fit image
             img = new Image();
@@ -246,14 +249,23 @@
                 img.src = image_path + image_name;
             }
             catch(err) {
-                alert("Currently external URLs cannot be used. Error: " + err.message)
+                alert("Image cannot be opened. Note that currently external URLs cannot be used. Error: " + err.message)
+            }
+            if(!img.complete || img.naturalWidth == 0) {
+                alert("Could not load image");
+                console.log(img);
+                return
+            }
+            if(point.x + width + padding > img.naturalWidth || point.y + height + padding > img.naturalHeight) {
+                alert("Window out of bounds of image.");
+                return
             }
 
             function setup_images() {
                 //paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
                 paper.view.setViewSize(size);
                 //paper.view.getViewSize();
-                $('#canvasWrapper').css('width', size.width).css('height', size.height)
+                $('#canvasWrapper').css('width', size.width).css('height', size.height);
                 //$('#canvas').css('box-shadow', " -20 -20 20px" +  imagePadding + "px rgba(255,0,0,0.5)");
                 point = new paper.Point(point.x - padding, point.y - padding);
                 raster = new paper.Raster(img).getSubRaster(new paper.Rectangle(point, size));

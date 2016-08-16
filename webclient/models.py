@@ -75,7 +75,7 @@ class ImageLabel(models.Model):
     #ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
 
     def __unicode__(self):
-        return 'Image: ' + self.parentImage.name + ' | Category: ' + self.categoryType.category_name  + ' | Labeler: ' + self.labeler.__unicode__()
+        return 'Image: ' + self.parentImage.name + ' | Category: ' + self.categoryType.category_name  + ' | Labeler: ' + str(self.labeler)
 
 
 
