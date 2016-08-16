@@ -128,7 +128,8 @@ def applyLabels(request):
     image_filter_obj = ImageFilter(brightness=image_filters['brightness'],
                                    contrast=image_filters['contrast'],
                                    saturation=image_filters['saturation'],
-                                   imageLabel=labelObject)
+                                   imageLabel=labelObject,
+                                   labeler=labeler)
     image_filter_obj.save()
 
     from image_ops.convert_images import convertSVG, combineImageLabels
