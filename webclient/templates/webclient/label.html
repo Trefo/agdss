@@ -22,6 +22,8 @@
 
         $(document).ready(function() {
             $("#applyLabels").click(function() {
+                endTime = Date.now();
+                timeTaken = endTime - startTime;
 
                 //Check if there are labels or if the no label checkbox is checked
                 if(labelsDrawn <= 0 && !$('#noLabels').prop('checked')) {
@@ -63,7 +65,8 @@
                             brightness: $('#brightnessControl').val(),
                             contrast: $('#brightnessControl').val(),
                             saturation: $('#brightnessControl').val()
-                        }
+                        },
+                        timeTaken: timeTaken,
                     }),
                     success : function(data) {
                         $('#debug').text('');
@@ -195,6 +198,7 @@
         } */
 
         function getNewImage() {
+            startTime = Date.now();
             if (!window.labelsLayer) {
                 window.labelsLayer = new paper.Layer();
             }else{
@@ -315,22 +319,19 @@
                 var brightness = $('#brightnessControl').val();
                 $('span#brightness').html(brightness);
                 cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' +  $('#saturationControl').val() + ')';
-                $('#canvas').css('-webkit-filter', cssText);
-                $('#canvas').css('filter', cssText);
+                $('#canvas').css('-webkit-filter', cssText).css('filter', cssText);
             });
             $('#contrastControl').on('input', function() {
                 var contrast = $('#contrastControl').val();
                 cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' +  $('#saturationControl').val() + ')';
                 $('span#contrast').html($('#contrastControl').val());
-                $('#canvas').css('-webkit-filter', cssText);
-                $('#canvas').css('filter', cssText);
+                $('#canvas').css('-webkit-filter', cssText).css('filter', cssText);
             });
             $('#saturationControl').on('input', function() {
                 var saturation = $('#saturationControl').val();
                 cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' +  $('#saturationControl').val() + ')';
                 $('span#saturation').html($('#saturationControl').val());
-                $('#canvas').css('-webkit-filter', cssText);
-                $('#canvas').css('filter', cssText);
+                $('#canvas').css('-webkit-filter', cssText).css('filter', cssText);
             });
 
             $('#resetImageControl').on('click', function() {

@@ -1,6 +1,8 @@
 from webclient.models import *
 
 from django.contrib import admin
+from django.db.models import Count
+
 
 
 admin.site.register(Image)
@@ -18,6 +20,7 @@ class ImageLabelInline(admin.TabularInline):
     show_change_link = True
     can_delete = False
     ordering = ['pub_date']
+
 class LabelerAdmin(admin.ModelAdmin):
     fieldsets = [
         ('User', {'fields': ['user']}),

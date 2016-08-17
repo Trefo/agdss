@@ -72,6 +72,7 @@ class ImageLabel(models.Model):
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
     labeler = models.ForeignKey(Labeler, on_delete=models.CASCADE, null=True, blank=True, default=None)
     imageWindow = models.ForeignKey(ImageWindow, on_delete=models.CASCADE, default=getDefaultImageWindowId)
+    timeTaken = models.PositiveIntegerField(null=True, default=None)
     #ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
 
     def __unicode__(self):

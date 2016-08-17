@@ -72,6 +72,7 @@ def applyLabels(request):
     category_name = dict['category_name']
     image_filters = dict['image_filters']
     subimage = dict['subimage']
+    timeTaken = dict['timeTaken']
     user = request.user
     if not user.is_authenticated():
         return HttpResponseBadRequest("Requires logged in user")
@@ -123,7 +124,8 @@ def applyLabels(request):
 
     labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,
                              pub_date=datetime.now(),categoryType=categoryType,
-                             labeler=labeler, imageWindow=imageWindow)
+                             labeler=labeler, imageWindow=imageWindow,
+                             timeTaken=timeTaken)
     labelObject.save()
     image_filter_obj = ImageFilter(brightness=image_filters['brightness'],
                                    contrast=image_filters['contrast'],
