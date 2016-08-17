@@ -17,15 +17,23 @@ Including another URLconf
 from django.conf.urls import url, include
 import django.views
 
-from django.contrib import admin
 from django.views.generic.edit import CreateView
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import RedirectView
+from django.contrib import admin
+from adminplus.sites import AdminSitePlus
+
+
+#Set up admin site and import all admin.py files
+admin.site = AdminSitePlus()
+admin.autodiscover()
+import agdss.admin #Necessary
 
 
 urlpatterns = [
     url(r'^webclient/', include('webclient.urls')),
     url(r'^admin/', admin.site.urls),
+
 
     url('^', include('django.contrib.auth.urls')),
 

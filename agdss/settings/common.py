@@ -32,7 +32,9 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'webclient.apps.WebclientConfig',
-    'django.contrib.admin',
+    #'django.contrib.admin',
+    'django.contrib.admin.apps.SimpleAdminConfig',
+    'adminplus',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',

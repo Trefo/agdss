@@ -1,10 +1,14 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 urlpatterns = [
-    #Page URLs
+
+
+
+                  #Page URLs
     url(r'^$', views.index, name='label_index'),
     url(r'^label$', views.label, name='label'),
     url(r'^results$', views.results, name='results'),
