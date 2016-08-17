@@ -75,7 +75,7 @@ class ImageLabel(models.Model):
     #ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
 
     def __unicode__(self):
-        return 'Image: ' + self.parentImage.name + ' | Category: ' + self.categoryType.category_name
+        return 'Image: ' + self.parentImage.name + ' | Category: ' + self.categoryType.category_name  + ' | Labeler: ' + str(self.labeler)
 
 
 
@@ -90,7 +90,7 @@ class ImageFilter(models.Model):
 
     def __unicode__(self):
         return 'ImageFilter: brightness:' + str(self.brightness) + ' contrast: ' + str(self.contrast)\
-               + 'saturation: ' + str(self.saturation)
+               + ' saturation: ' + str(self.saturation) + ' labeler: ' + str(self.labeler)
 
 
 

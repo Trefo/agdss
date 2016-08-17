@@ -128,12 +128,13 @@ def applyLabels(request):
     image_filter_obj = ImageFilter(brightness=image_filters['brightness'],
                                    contrast=image_filters['contrast'],
                                    saturation=image_filters['saturation'],
-                                   imageLabel=labelObject)
+                                   imageLabel=labelObject,
+                                   labeler=labeler)
     image_filter_obj.save()
 
     from image_ops.convert_images import convertSVG, combineImageLabels
     convertSVG(labelObject)
-    combineImageLabels(parentImage_[0], 50)
+    #combineImageLabels(parentImage_[0], 50)
     return HttpResponse(label_list_)
 
 @require_GET
@@ -283,6 +284,7 @@ Request: POST
 @require_POST
 def addImage(request):
     #Validate input
+    print request.POST
     if not ('image_name' in request.POST and 'path' in request.POST and 'category' in request.POST):
         return HttpResponseBadRequest("Missing required input")
     if request.POST['category'] == '':

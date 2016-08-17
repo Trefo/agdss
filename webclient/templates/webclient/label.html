@@ -43,7 +43,8 @@
                 svg.getElementsByTagName('image')[0].setAttribute('y', '0');
                 xmlSer = new XMLSerializer();
                 svg = xmlSer.serializeToString(svg);
-                $.ajax({
+                $('#debug').text('loading next image...');
+		$.ajax({
                     url : "/webclient/applyLabels",
                     type : "POST",
                     dataType: 'text',
@@ -65,7 +66,7 @@
                         }
                     }),
                     success : function(data) {
-                        //$('#debug').text(data);
+                        $('#debug').text('');
                         if(window.labelsLayer.hasChildren()){
                             window.labelsLayer.removeChildren();
                         }
@@ -109,7 +110,7 @@
                 var center = (startPoint + event.point)/2
                 newPath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
                 newPath.strokeColor = 'yellow';
-                newPath.strokeWidth = 3;
+                newPath.strokeWidth = 2;
                 newPath.opacity = 0.5;
                 newPath.onMouseEnter= function(event){
                     if(!isActive) {
@@ -120,7 +121,7 @@
                 }
                 newPath.onMouseLeave= function(event){
                     aboveExistingLabel = false;
-                    this.fillColor = 'grey';
+                    this.fillColor = 'aqua';
                 }
                 newPath.onDoubleClick = function(event) {
                     isActive = false;
@@ -145,7 +146,7 @@
             }
             else {
                 window.circlePath.opacity = 0.3;
-                window.circlePath.fillColor = 'grey';
+                window.circlePath.fillColor = 'aqua';
             }
 
         }
@@ -213,7 +214,7 @@
                 success: function (response) {
                     data = response.labels;
                     if (data) {
-                        displayLabels(response.labels)
+                        displayLabels(response.labels);
                     }
                     imageX = response.subimage.x;
                     imageY = response.subimage.y;
@@ -236,23 +237,37 @@
         }
         //TODO: Input validation and error checking
         function displayImage(image_name, image_path, categories, point, width, height, padding) {
-
+            if(width <= 0 || height <= 0 || padding < 0) {
+                alert("Problem with width, height, or padding value");
+                return;
+            }
             size = new paper.Size(width + 2*padding, height + 2*padding);
             //Add new image and resize canvas to fit image
             img = new Image();
+            img.onload = function() {
+                if(!img.complete || img.naturalWidth == 0) {
+                    alert("Could not load image");
+                    console.log(img);
+                    return;
+                    }
+                if(point.x + width + padding > img.naturalWidth || point.y + height + padding > img.naturalHeight) {
+                    alert("Window out of bounds of image.");
+                    return;
+                }
+            };
             img.crossOrigin = "Anonymous";
             try{
                 img.src = image_path + image_name;
             }
             catch(err) {
-                alert("Currently external URLs cannot be used. Error: " + err.message)
+                alert("Image cannot be opened. Note that currently external URLs cannot be used. Error: " + err.message)
             }
 
             function setup_images() {
                 //paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
                 paper.view.setViewSize(size);
                 //paper.view.getViewSize();
-                $('#canvasWrapper').css('width', size.width).css('height', size.height)
+                $('#canvasWrapper').css('width', size.width).css('height', size.height);
                 //$('#canvas').css('box-shadow', " -20 -20 20px" +  imagePadding + "px rgba(255,0,0,0.5)");
                 point = new paper.Point(point.x - padding, point.y - padding);
                 raster = new paper.Raster(img).getSubRaster(new paper.Rectangle(point, size));
@@ -332,7 +347,7 @@
 
 
 </head>
-<body onload="getNewImage()">
+<body onload="getNewImage()" bgcolor="#c0c0c0">
 <div id="main>">
     <!--<div id="toolbars">
         <select id="imageCombo"  onchange="onImageFormChange()">
@@ -345,6 +360,9 @@
             {#% endfor %#}
         </select>
     </div> -->
+ <div id="debug">
+
+    </div>
 
     <div id="controls">
         <form method="post" name="applyLabelsForm" >
@@ -352,15 +370,26 @@
             <!--<input name="categoryName" id="categoryName" type="text"> -->
                 <span id="categoryWord">Category: </span>
                 <select id="categories"></select>
-                <span name="categoryName" id="categoryName"></span>
-            <input id="applyLabels" type="button" value="submit"> <br>
+                <span name="categoryName" id="categoryName" style="font-size: 30px;"></span>
+            <input id="applyLabels" type="button" value="submit" style="font-size : 20px; height:50px; width:130px"> <br>
             <input type="checkbox" id="noLabels" /> No labels in image
         </form>
         <a href="/logout">logout</a>
-    </div>
+        <br/>
+<div id="tips">
+    <p>
+        <ol style="text-align: left;padding-left: 0px;">
+        <ul>Encircle occluded fruits <i>entirely</i>, use your best guess!</ul>
+        <ul>Click and drag to select region.</ul>
+		<ul>Labels can be moved by clicking and dragging.</ul> 
+		<ul>Double click to delete an area.</ul>
+        </ol>
+    </p>
+</div>
+
+</div>
     <table id="displayTable"><tr>
     <td><div id="canvasDiv">
-        <div id="image_name_div"><h3 id="image_name"></h3></div>
         <!--<canvas id="canvas" resize></canvas> -->
        <div id="canvasWrapper">
            <canvas id="canvas" width="1920" height="1080"></canvas>
@@ -371,8 +400,7 @@
         </div>
 
          <div>
-            <p>View label info <a href="/webclient/view_label">here</a>.</p>
-             <p>To report a bug, go to the github page <a href="https://github.com/dcunhas/agdss/issues">here</a> and open a new issue</p>
+             <p>To report a bug, go to the github page <a href="https://github.com/dcunhas/agdss/issues" target="_blank">here</a> and open a new issue</p>
 
         </div>
 
@@ -397,9 +425,6 @@
         <button id="next">Submit</button>
     </div> -->
 
-    <div id="debug">
-
-    </div>
 </div>
 </body>
 </html>

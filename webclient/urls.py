@@ -11,8 +11,7 @@ urlpatterns = [
     url(r'^view_label$', views.view_label, name='view_label'),
 
     #GET/POST URLs
-    url(r'^applyLabels$', 'webclient.views.applyLabels'),
-    url(r'^loadLabels$', 'webclient.views.loadLabels'),
+
     #url(r'^purge$', 'webclient.views.purge'),
     url(r'^addImage$', 'webclient.views.addImage'),
     url(r'^cleanUpAndFixImages$', 'webclient.views.cleanUpAndFixImages'),
@@ -24,4 +23,6 @@ urlpatterns = [
     url(r'^numImageLabels$', 'webclient.views.numImageLabels'),
     url(r'^combineAllImages$', 'webclient.views.combineAllImages'),
     url(r'^calculateEntropyMap$', 'webclient.views.calculateEntropyMap'),
+    url(r'^applyLabels$', 'webclient.views.applyLabels'),
+    url(r'^loadLabels$', 'webclient.views.loadLabels'),
     ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -3,7 +3,7 @@
 #It takes one argument, which is the category for all the files that will be added
 #
 #SERVER="162.243.97.220"
-SERVER="localhost:8000"
+SERVER="localhost:80"
 URL="/webclient/addImage"
 echo "Category is $1"
 if [ "$#" -lt 1 ]

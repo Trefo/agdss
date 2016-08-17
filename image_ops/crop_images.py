@@ -68,13 +68,13 @@ def getGeometricImageWindow(image):
 
 def getPaddedWindow(image, user):
     #Crop out sidemost pixels
-    windowWidth = (image.width - 2* WINDOW_PADDING)/NUM_WINDOW_COLS
-    windowHeight = (image.height - 2* WINDOW_PADDING)/NUM_WINDOW_ROWS
+    windowWidth = (image.width - (2* WINDOW_PADDING))/NUM_WINDOW_COLS
+    windowHeight = (image.height - (2* WINDOW_PADDING))/NUM_WINDOW_ROWS
     windowDict = {'width': windowWidth, 'height': windowHeight,
                   'padding': WINDOW_PADDING}
 
     for x in range(WINDOW_PADDING, image.width - WINDOW_PADDING,  windowWidth):
-        for y in range(WINDOW_PADDING, image.height - WINDOW_PADDING, windowWidth):
+        for y in range(WINDOW_PADDING, image.height - WINDOW_PADDING, windowHeight):
             labels = image.imagelabel_set.all().filter(imageWindow__x=x, imageWindow__y=y)
             print labels
             if len(labels) < NUM_LABELS_PER_WINDOW and all(label.labeler.user != user for label in labels):

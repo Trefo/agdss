@@ -15,6 +15,14 @@
 3. Create a (Postgres) database called `agdss` which has a user `aguser` with a password `aguser` (with all permissions). To change these configurations, see `DATABASE` in aguser/settings.py. The easiest way to do this is through a GUI manager like pgadmin3. However, it can be done via the Unix terminal.
   * If on Windows, one may be required to create a Firewall inbound rule allowing traffic on port 5432 as it is closed by default. This may not be necessary, but attempt if there is a problem. 
   * To do this in the terminal, follow the setup information [here](https://help.ubuntu.com/community/PostgreSQL). Afterwords, to create the user, run `sudo -u postgres psql` to enter the postgres prompt. There, run `CREATE USER aguser WITH PASSWORD 'aguser';` followed by `GRANT ALL PRIVILEGES ON DATABASE "agdss" to aguser;`.
+  * DB setup on MacOSX:
+    psql postgres
+    CREATE DATABASE agdss;
+    CREATE USER aguser WITH PASSWORD 'aguser';
+    GRANT ALL PRIVILEGES ON DATABASE "agdss" to aguser;
+
+
+
 5. Run `python manage.py migrate` to create the tables in the database.
 6. To create admin credentials (required to access /admin), run `python manage.py createsuperuser` and enter the requested information.
 7. TEMPORARY: Set `STATIC_ROOT` to parent directory of images (in agdss/settings.py).
