@@ -95,6 +95,21 @@ def SVGStringToImageBlob(svg):
         print('DE Failed to convert: ' + svg + ': ' + str(e))
     except wand.exceptions.WandError as e:
         print('Failed to convert ' + svg + ': ' + str(e))
+
+def RenderSVGString(svg):
+    if not svg:
+        return
+    svgFile = StringIO.StringIO(svg)
+    try:
+        with WandImage(file=svgFile) as img:
+            img.format = 'png'
+            return img.make_blob()
+    except wand.exceptions.CoderError as e:
+        print('Failed to convert: ' + svg + ': ' + str(e))
+    except wand.exceptions.MissingDelegateError as e:
+        print('DE Failed to convert: ' + svg + ': ' + str(e))
+    except wand.exceptions.WandError as e:
+        print('Failed to convert ' + svg + ': ' + str(e))
 #Returns array of SVGs each with 1 path
 def separatePaths(svg):
     #rePath = r'(<path[^/>]*/>)'
@@ -123,11 +138,11 @@ def SVGDimensions(str):
 
 #If height and width are defined, image tag is not removed
 #Otherwise, height and width are extracted from it and it is removed
-def SVGString(DBStr, height=None, width=None):
+def SVGString(DBStr, height=None, width=None, keepImage=False):
     addedStr = DBStr
     if height == None or width == None:
         image, height, width = SVGDimensions(DBStr)
-        if image:
+        if not keepImage and image:
             addedStr = DBStr.replace(image, '')
     addedStr = addedStr.encode('utf-8')
     return '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' \
