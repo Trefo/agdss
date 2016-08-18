@@ -26,8 +26,9 @@ from adminplus.sites import AdminSitePlus
 
 #Set up admin site and import all admin.py files
 admin.site = AdminSitePlus()
+admin.sites.site = admin.site
 admin.autodiscover()
-import agdss.admin #Necessary
+
 
 
 urlpatterns = [
