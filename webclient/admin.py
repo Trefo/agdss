@@ -48,13 +48,8 @@ class ImageLabelAdmin(admin.ModelAdmin):
     readonly_fields = ('overlayed_image', )
 
     def overlayed_image(self, obj):
-        from PIL import Image as PILImage
-        from StringIO import StringIO
-        #return StringIO(SVGStringToImageBlob(SVGString(obj.labelShapes)))
-        blob = RenderSVGString(SVGString(obj.labelShapes))
+        print SVGString(obj.labelShapes, keepImage=True)
+        blob = RenderSVGString(SVGString(obj.labelShapes, keepImage=True))
         b64 = base64.b64encode(blob)
-        #print '<img src="data:image/png;utf8,%r"/>' % SVGStringToImageBlob(SVGString(obj.labelShapes))
-        print "<img src='data:image/png;base64,%s'/>" % blob
-        #return mark_safe('<img src="data:image/png;base64,%r"/>' % b64)
         return format_html('<img src="data:image/png;base64,{}" alt="Rendered Image Label"></>',
                            b64)
