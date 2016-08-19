@@ -29,9 +29,14 @@ class ImageLabelInline(admin.TabularInline):
 class LabelerAdmin(admin.ModelAdmin):
     fieldsets = [
         ('User', {'fields': ['user']}),
+        ('Label Stats', {'fields': ['number_labeled']})
         #('Image Labels', {'fields': ['ImageLabel_set']})
     ]
+    readonly_fields = ('number_labeled', )
     inlines = [ImageLabelInline]
+
+    def number_labeled(self, obj):
+        return len(ImageLabel.objects.all().filter(labeler=obj))
 
 
 class ImageLabelAdminForm(forms.ModelForm):
@@ -48,8 +53,7 @@ class ImageLabelAdmin(admin.ModelAdmin):
     readonly_fields = ('overlayed_image', )
 
     def overlayed_image(self, obj):
-        print SVGString(obj.labelShapes, keepImage=True)
-        blob = RenderSVGString(SVGString(obj.labelShapes, keepImage=True))
+        blob = RenderSVGString(SVGString(obj.labelShapes))
         b64 = base64.b64encode(blob)
         return format_html('<img src="data:image/png;base64,{}" alt="Rendered Image Label"></>',
                            b64)
