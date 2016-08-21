@@ -1,5 +1,7 @@
 import json
+import io
 import os.path
+import re
 
 from django.conf import settings
 from django.core.exceptions import ValidationError, MultipleObjectsReturned
@@ -20,6 +22,8 @@ from image_ops import crop_images
 from .models import *
 from PIL import Image as PILImage
 
+from image_ops.convert_images import SVGString, RenderSVGString
+import base64
 
 ######
 #PAGES
@@ -437,3 +441,27 @@ def calculateEntropyMap(request):
     images = Image.objects.all()
     image_ops.crop_images.calculate_entropy_map(images[0], images[0].categoryType.all()[0])
     return HttpResponse('ok')
+
+
+
+############
+#Image Views
+############
+re_image_path = re.compile(r'/%s%s(.*)' %('webclient', settings.STATIC_URL))
+
+@require_GET
+def get_overlayed_image(request, image_label_id):
+    image_label = ImageLabel.objects.filter(id=image_label_id)
+    if not image_label:
+        return HttpResponseBadRequest('Bad image_label_id: ' + image_label_id)
+    image_label = image_label[0]
+    image = image_label.parentImage
+    blob = RenderSVGString(SVGString(image_label.labelShapes))
+    foreground = PILImage.open(StringIO(blob))
+    path = re.match(re_image_path, image.path).groups(1)[0]
+    print path
+    background = PILImage.open(settings.STATIC_ROOT + path + image.name)
+    background.paste(foreground, (0, 0), foreground)
+    output = io.BytesIO()
+    background.save(output, format='png')
+    return HttpResponse(output.getvalue(), content_type="image/png")

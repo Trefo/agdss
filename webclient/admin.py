@@ -5,6 +5,8 @@ from django import forms
 from django.db.models import Count
 from django.utils.html import mark_safe, format_html
 from image_ops.convert_images import SVGString, SVGStringToImageBlob, RenderSVGString
+from django.conf import settings
+
 import base64
 
 
@@ -53,7 +55,8 @@ class ImageLabelAdmin(admin.ModelAdmin):
     readonly_fields = ('overlayed_image', )
 
     def overlayed_image(self, obj):
-        blob = RenderSVGString(SVGString(obj.labelShapes))
-        b64 = base64.b64encode(blob)
-        return format_html('<img src="data:image/png;base64,{}" alt="Rendered Image Label"></>',
-                           b64)
+        return format_html('<img src="{}" alt="Rendered Image Label"></>' , '/webclient/get_overlayed_image/%d' % obj.id)
+        # blob = RenderSVGString(SVGString(obj.labelShapes))
+        # b64 = base64.b64encode(blob)
+        # return format_html('<img src="data:image/png;base64,{}" alt="Rendered Image Label"></>',
+        #                    b64)

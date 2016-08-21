@@ -29,4 +29,7 @@ urlpatterns = [
     url(r'^calculateEntropyMap$', 'webclient.views.calculateEntropyMap'),
     url(r'^applyLabels$', 'webclient.views.applyLabels'),
     url(r'^loadLabels$', 'webclient.views.loadLabels'),
+
+
+    url(r'^get_overlayed_image/(?P<image_label_id>[0-9]*)$', 'webclient.views.get_overlayed_image'),
     ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
