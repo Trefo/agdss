@@ -459,7 +459,7 @@ def get_overlayed_image(request, image_label_id):
     foreground = PILImage.open(StringIO(blob))
     path = re.match(re_image_path, image.path).groups(1)[0]
     print path
-    background = PILImage.open(settings.STATIC_ROOT + path + image.name)
+    background = PILImage.open(settings.STATIC_ROOT + path + image.name).convert('RGB')
     background.paste(foreground, (0, 0), foreground)
     output = io.BytesIO()
     background.save(output, format='png')

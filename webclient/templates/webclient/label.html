@@ -39,7 +39,9 @@
                 var svg = window.labelsLayer.exportSVG({embedImages: false, asString: false, matchShapes: true});
                 svg.getElementsByTagName('image')[1].remove(); //Remove image added by cropping
                for (i = 0, circles = svg.getElementsByTagName('circle'); i < circles.length; i++) {
-                    circles[i].setAttribute('transform', 'translate(' + imageX + ',' + imageY + ')');
+                   var x = parseInt(imageX) - parseInt(imagePadding)
+                   var y = parseInt(imageY) - parseInt(imagePadding)
+                    circles[i].setAttribute('transform', 'translate(' + (x) + ',' + (y) + ')');
                 }
                 svg.getElementsByTagName('image')[0].setAttribute('x', '0');
                 svg.getElementsByTagName('image')[0].setAttribute('y', '0');
@@ -274,6 +276,7 @@
                 $('#canvasWrapper').css('width', size.width).css('height', size.height);
                 //$('#canvas').css('box-shadow', " -20 -20 20px" +  imagePadding + "px rgba(255,0,0,0.5)");
                 point = new paper.Point(point.x - padding, point.y - padding);
+                console.log(point);
                 raster = new paper.Raster(img).getSubRaster(new paper.Rectangle(point, size));
                 raster.position = paper.view.center;
                 paper.view.update();
