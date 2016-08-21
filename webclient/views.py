@@ -23,7 +23,6 @@ from .models import *
 from PIL import Image as PILImage
 
 from image_ops.convert_images import SVGString, RenderSVGString
-import base64
 
 ######
 #PAGES

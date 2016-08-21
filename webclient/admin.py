@@ -2,12 +2,8 @@ from webclient.models import *
 
 from django.contrib import admin
 from django import forms
-from django.db.models import Count
-from django.utils.html import mark_safe, format_html
-from image_ops.convert_images import SVGString, SVGStringToImageBlob, RenderSVGString
-from django.conf import settings
+from django.utils.html import format_html
 
-import base64
 
 
 
