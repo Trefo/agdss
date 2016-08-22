@@ -458,7 +458,6 @@ def get_overlayed_image(request, image_label_id):
     blob = RenderSVGString(SVGString(image_label.labelShapes))
     foreground = PILImage.open(StringIO(blob))
     path = re.match(re_image_path, image.path).groups(1)[0]
-    print path
     background = PILImage.open(settings.STATIC_ROOT + path + image.name).convert('RGB')
     background.paste(foreground, (0, 0), foreground)
     output = io.BytesIO()
@@ -476,7 +475,11 @@ def fix_label_location(request):
         label.save()
     return HttpResponse("Changed")
 def subtractPadding(matchobj):
-    return '%s%d,%d%s' % (matchobj.group('prefix'),
-                          int(matchobj.group('x')) - 20,
-                          int (matchobj.group('y')) - 20,
-                          matchobj.group('suffix'))
+    try:
+        s = '%s%d,%d%s' % (matchobj.group('prefix'),
+                       int(matchobj.group('x')) - 20,
+                       int(matchobj.group('y')) - 20,
+                       matchobj.group('suffix'))
+    except ValueError:
+        s = matchobj.group(0)
+    return s
