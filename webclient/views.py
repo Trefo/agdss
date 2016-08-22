@@ -464,3 +464,19 @@ def get_overlayed_image(request, image_label_id):
     output = io.BytesIO()
     background.save(output, format='png')
     return HttpResponse(output.getvalue(), content_type="image/png")
+
+
+re_transform_xy = re.compile(r'(?P<prefix><circle[^\>]*transform="[^\>]*translate\()(?P<x>\d*),(?P<y>\d*)(?P<suffix>[^\>]*\)"[^\>]*/>)')
+@csrf_exempt
+@require_POST
+def fix_label_location(request):
+    for label in ImageLabel.objects.all():
+        shape = label.labelShapes
+        label.labelShapes = re.sub(re_transform_xy, subtractPadding, shape)
+        label.save()
+    return HttpResponse("Changed")
+def subtractPadding(matchobj):
+    return '%s%d,%d%s' % (matchobj.group('prefix'),
+                          int(matchobj.group('x')) - 20,
+                          int (matchobj.group('y')) - 20,
+                          matchobj.group('suffix'))
