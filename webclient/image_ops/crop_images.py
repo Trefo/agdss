@@ -1,7 +1,8 @@
-from PIL import Image as PILImage
-from webclient.models import *
-import convert_images
 import numpy
+
+import convert_images
+from webclient.models import *
+
 #import scipy
 import random
 
