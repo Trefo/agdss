@@ -37,7 +37,7 @@ def line_segment():
             if abs(crossproduct) != 0:
                 return False
             dotproduct = (x - self.x1) * (self.x2 - self.x1) + (y - self.y1)  * (self.y2 - self.y1)
-            squaredlengthba = (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y)
+            squaredlengthba = (self.y2 - self.x1) * (self.y2 - self.x1) + (self.y2 - self.y1) * (self.y2 - self.x1)
             if dotproduct > squaredlengthba: return False
 
             return True
@@ -47,3 +47,6 @@ def line_segment():
 def circle_window_overlap(circle, window):
     if window.point_in_window(circle.center):
         return True
+    if circle.point_in_circle(window.top_left):
+        return True
+

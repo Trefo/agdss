@@ -46,6 +46,10 @@ def calculateEntropy(arr):
 
 
 def getImageWindow(image, user):
+    if user.username == "god":
+        print "god"
+
+
     return getPaddedWindow(image, user)
 
 def getRandomImageWindow(image):
@@ -68,6 +72,7 @@ def getGeometricImageWindow(image):
 
 
 def getPaddedWindow(image, user):
+
     #Crop out sidemost pixels
     windowWidth = (image.width - (2* WINDOW_PADDING))/NUM_WINDOW_COLS
     windowHeight = (image.height - (2* WINDOW_PADDING))/NUM_WINDOW_ROWS
