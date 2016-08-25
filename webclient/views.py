@@ -210,6 +210,9 @@ def getInfo(request):
 
 @require_GET
 def getNewImage(request):
+
+
+
     # if not 'image_name' in request.GET or not 'path' in request.GET:
     #     hasPrior = False
     # else:
@@ -235,14 +238,27 @@ def getNewImage(request):
     # if hasPrior and len(Image.objects.all()) > 1:
     #     img = img.exclude(name=request.GET['image_name'], path=request.GET['path'])
 
+
     labelsPerImage = crop_images.NUM_WINDOW_COLS * \
                      crop_images.NUM_WINDOW_ROWS * crop_images.NUM_LABELS_PER_WINDOW
+
+
     images = img.annotate(count=Count('imagelabel')) \
         .filter(count__lt=labelsPerImage).order_by('count').reverse()
 
+
+
+
     subimage = None
+
+    user = request.user
+    if user.groups.filter(name='god').exists():
+        ignore_max_count = True
+    else:
+        ignore_max_count = False
+
     for i in images:
-        subimage = crop_images.getImageWindow(i, request.user)
+        subimage = crop_images.getImageWindow(i, request.user, ignore_max_count=ignore_max_count)
         if subimage is not None:
             img = i
             break
