@@ -9,6 +9,7 @@ import os
 from PIL import Image as PILImage
 import numpy
 import SVGRegex
+from webclient.image_ops import crop_images
 
 IMAGE_FILE_EXTENSION = '.png'
 
@@ -199,7 +200,11 @@ def combineImageLabelsToArr(image, category, thresholdPercent=50):
 
     height, width = SVGDimensions(labels[0].labelShapes)[1:]
     arr = numpy.zeros((height,width),numpy.float)
-    N = len(labelImages)
+
+    #TODO: Make this code better by taking into account ImageWindows
+    ###Temp code
+    #N = len(labelImages)
+    N = crop_images.NUM_LABELS_PER_WINDOW
     for im in labelImages:
         if im is None:
             continue
@@ -236,6 +241,8 @@ def saveCombinedImage(imageNPArr, image, category, threshold):
 
 def combineAllLabels(threshold):
     for image in Image.objects.all():
+        if len(ImageLabel.objects.all.filter(parentImage=image)) <  crop_images.NUM_LABELS_PER_WINDOW * crop_images.NUM_WINDOW_ROWS * crop_images.NUM_WINDOW_COLS:
+            continue
         combineImageLabels(image, threshold)
 
 def combineImageLabels(image, threshold):

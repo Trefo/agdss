@@ -1,9 +1,14 @@
-import json
 import io
+import json
 import os.path
 import re
+import sys
+import urllib
+from cStringIO import StringIO
 
+from PIL import Image as PILImage
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError, MultipleObjectsReturned
 from django.core.validators import URLValidator
 from django.db.models import Count
@@ -12,17 +17,12 @@ from django.http import JsonResponse
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
-from django.contrib.auth.decorators import login_required
-import urllib
-from cStringIO import StringIO
-import sys
 
 import helper_ops
-from image_ops import crop_images
-from .models import *
-from PIL import Image as PILImage
-
 from image_ops.convert_images import SVGString, RenderSVGString
+from webclient.image_ops import crop_images
+from .models import *
+
 
 ######
 #PAGES
@@ -137,7 +137,7 @@ def applyLabels(request):
                                    labeler=labeler)
     image_filter_obj.save()
 
-    from image_ops.convert_images import convertSVG, combineImageLabels
+    from webclient.image_ops.convert_images import convertSVG
     convertSVG(labelObject)
     #combineImageLabels(parentImage_[0], 50)
     return HttpResponse(label_list_)
@@ -210,6 +210,9 @@ def getInfo(request):
 
 @require_GET
 def getNewImage(request):
+
+
+
     # if not 'image_name' in request.GET or not 'path' in request.GET:
     #     hasPrior = False
     # else:
@@ -235,14 +238,30 @@ def getNewImage(request):
     # if hasPrior and len(Image.objects.all()) > 1:
     #     img = img.exclude(name=request.GET['image_name'], path=request.GET['path'])
 
+
     labelsPerImage = crop_images.NUM_WINDOW_COLS * \
                      crop_images.NUM_WINDOW_ROWS * crop_images.NUM_LABELS_PER_WINDOW
-    images = img.annotate(count=Count('imagelabel')) \
-        .filter(count__lt=labelsPerImage).order_by('count').reverse()
+
+
+    images = img.annotate(count=Count('imagelabel'))
+    user = request.user
+    if user.groups.filter(name='god').exists():
+        ignore_max_count = True
+    else:
+        ignore_max_count = False
+        images = images.filter(count__lt=labelsPerImage) #.filter(categoryType__category_name='orange')
+
+    images = images.order_by('count').reverse()
+
+
+
 
     subimage = None
+
+
+
     for i in images:
-        subimage = crop_images.getImageWindow(i, request.user)
+        subimage = crop_images.getImageWindow(i, request.user, ignore_max_count=ignore_max_count)
         if subimage is not None:
             img = i
             break
@@ -405,7 +424,7 @@ def updateImage(request):
 @csrf_exempt
 @require_POST
 def convertAll(request):
-    from image_ops.convert_images import convertAll
+    from webclient.image_ops.convert_images import convertAll
     convertAll(request.POST.get('reconvert', False))
     return HttpResponse('Ok')
 
@@ -426,7 +445,7 @@ def numImageLabels(request):
 @require_POST
 def combineAllImages(request):
     thresholdPercent = int(request.POST.get('thresholdPercent', 50))
-    from image_ops.convert_images import combineAllLabels
+    from webclient.image_ops.convert_images import combineAllLabels
     #for img in Image.objects.all():
     #    combineImageLabels(img, thresholdPercent)
     combineAllLabels(thresholdPercent)
@@ -436,9 +455,9 @@ def combineAllImages(request):
 @csrf_exempt
 @require_POST
 def calculateEntropyMap(request):
-    import image_ops.crop_images
+    import webclient.image_ops.crop_images
     images = Image.objects.all()
-    image_ops.crop_images.calculate_entropy_map(images[0], images[0].categoryType.all()[0])
+    webclient.image_ops.crop_images.calculate_entropy_map(images[0], images[0].categoryType.all()[0])
     return HttpResponse('ok')
 
 
