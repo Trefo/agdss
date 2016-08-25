@@ -1,6 +1,7 @@
 from webclient.models import *
 import numpy
 import re
+import matplotlib.pyplot as plt
 
 #Note that this geometry uses the top left as (0,0) and going down and to the right is positive
 
@@ -13,6 +14,8 @@ class Circle:
         self.x, self.y = center
         self.center = center
         self.radius = radius
+    def __str__(self):
+        return "(x,y): (%f, %f), radius: %f" %(self.x, self.y, self.radius)
 
     def point_in_circle(self, point):
         return distance(point, self.center) <= self.radius
@@ -66,10 +69,25 @@ def circle_window_overlap(circle, window):
 re_circle_path = re.compile(r'(<circle[^/>]*cx="(?P<cx>\d*\.?\d*)"[^/>]*cy="(?P<cy>\d*\.?\d*)"[^/>]*r="(?P<radius>\d*\.?\d*)"[^/>]*/>)')
 
 def circles_from_label(label):
-    circle_strs = re.findall(re_circle_path, label.labelShapes)
+    circle_strs = re.finditer(re_circle_path, label.labelShapes)
     circles = []
     for circle_str in circle_strs:
-        circles.append(Circle(center=(int(circle_str.group('cx')), int(circle_str.group('cy'))), radius=int(circle_str.group('radius'))))
+        circles.append(Circle(center=(float(circle_str.group('cx')), float(circle_str.group('cy'))), radius=float(circle_str.group('radius'))))
     return circles
 
 
+def show_circles(circles):
+    fig, ax = plt.subplots()
+    ax.set_xlim((0, 1920))
+    ax.set_ylim((0, 1080))
+    for circle in circles:
+        print circle
+        pltCircle = plt.Circle(circle.center, circle.radius, color='red')
+        ax.add_artist(pltCircle)
+    fig.savefig('C:/Users/Sandeep/Dropbox/kumar-prec-ag/temp/t.png')
+    plt.show()
+
+
+# def temp_test():
+#     circles = circles_from_label(ImageLabel.objects.all()[0])
+#     show_circles(circles)
