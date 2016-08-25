@@ -1,12 +1,14 @@
 from webclient.models import *
 import numpy
+import re
 
+#Note that this geometry uses the top left as (0,0) and going down and to the right is positive
 
 def distance(point1, point2):
     return numpy.linalg.norm(numpy.subtract(point1, point2))
 
 
-class circle():
+class Circle:
     def __init__(self, center, radius):
         self.x, self.y = center
         self.center = center
@@ -15,32 +17,37 @@ class circle():
     def point_in_circle(self, point):
         return distance(point, self.center) <= self.radius
 
-def window():
+class Window:
     def __init__(self, top_left, width, height):
         self.x, self.y = top_left
         self.center = top_left
         self.width = width
         self.height = height
 
+        #Note that vertices are: 0---------1
+        #                        |         |
+        #                        3---------2
+        self.vertices = (top_left, (top_left[0] + width, top_left[1]), (top_left[0] + width, top_left[1] + height), (top_left[0], top_left[1] + height))
+
     def point_in_window(self, point):
         return point.x >= self.x and point.x <= self.x + self.width and point.y >= self.y and point.y <= self.y + self.height
 
-def line_segment():
-    def __init__(self, x1, y1, x2, y2, m):
-        self.x1, self.y1, self.x2, self.y2 = x1, y1, x2, y2
-        self.m = m
-        self.b = self.y - (self.m * self.x)
-
-        def point_on_line_segment(self, point):
-            x, y = point
-            crossproduct = (y - self.y1) * (self.x2 - self.x1) - (x - self.x1) * (self.x2 - self.x1)
-            if abs(crossproduct) != 0:
-                return False
-            dotproduct = (x - self.x1) * (self.x2 - self.x1) + (y - self.y1)  * (self.y2 - self.y1)
-            squaredlengthba = (self.y2 - self.x1) * (self.y2 - self.x1) + (self.y2 - self.y1) * (self.y2 - self.x1)
-            if dotproduct > squaredlengthba: return False
-
-            return True
+# class line_segment:
+#     def __init__(self, x1, y1, x2, y2, m):
+#         self.x1, self.y1, self.x2, self.y2 = x1, y1, x2, y2
+#         self.m = m
+#         self.b = self.y - (self.m * self.x)
+#
+#         def point_on_line_segment(self, point):
+#             x, y = point
+#             crossproduct = (y - self.y1) * (self.x2 - self.x1) - (x - self.x1) * (self.x2 - self.x1)
+#             if abs(crossproduct) != 0:
+#                 return False
+#             dotproduct = (x - self.x1) * (self.x2 - self.x1) + (y - self.y1)  * (self.y2 - self.y1)
+#             squaredlengthba = (self.y2 - self.x1) * (self.y2 - self.x1) + (self.y2 - self.y1) * (self.y2 - self.x1)
+#             if dotproduct > squaredlengthba: return False
+#
+#             return True
 
 #Returns whether circle and window share at least 1 common point
 #True iff circle's center is in rectangle or an edge of rectange intersects circle (or is inside circle)
@@ -49,4 +56,20 @@ def circle_window_overlap(circle, window):
         return True
     if circle.point_in_circle(window.top_left):
         return True
+    ##Check if one of the edges of the window is in the circle
+    if(abs(circle.x - window.x) < circle.radius or abs(circle.x - window.x + window.height) < circle.radius or
+       abs(circle.y - window.y) < circle.radius or abs(circle.y - window.y + window.height) < circle.radius):
+        return True
+    return False
+
+
+re_circle_path = re.compile(r'(<circle[^/>]*cx="(?P<cx>\d*\.?\d*)"[^/>]*cy="(?P<cy>\d*\.?\d*)"[^/>]*r="(?P<radius>\d*\.?\d*)"[^/>]*/>)')
+
+def circles_from_label(label):
+    circle_strs = re.findall(re_circle_path, label.labelShapes)
+    circles = []
+    for circle_str in circle_strs:
+        circles.append(Circle(center=(int(circle_str.group('cx')), int(circle_str.group('cy'))), radius=int(circle_str.group('radius'))))
+    return circles
+
 
