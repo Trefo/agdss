@@ -243,19 +243,22 @@ def getNewImage(request):
                      crop_images.NUM_WINDOW_ROWS * crop_images.NUM_LABELS_PER_WINDOW
 
 
-    images = img.annotate(count=Count('imagelabel')) \
-        .filter(count__lt=labelsPerImage).order_by('count').reverse()
+    images = img.annotate(count=Count('imagelabel'))
+    user = request.user
+    if user.groups.filter(name='god').exists():
+        ignore_max_count = True
+    else:
+        ignore_max_count = False
+        images = images.filter(count__lt=labelsPerImage)
+
+    images = images.order_by('count').reverse()
 
 
 
 
     subimage = None
 
-    user = request.user
-    if user.groups.filter(name='god').exists():
-        ignore_max_count = True
-    else:
-        ignore_max_count = False
+
 
     for i in images:
         subimage = crop_images.getImageWindow(i, request.user, ignore_max_count=ignore_max_count)
