@@ -249,7 +249,7 @@ def getNewImage(request):
         ignore_max_count = True
     else:
         ignore_max_count = False
-        images = images.filter(count__lt=labelsPerImage)
+        images = images.filter(count__lt=labelsPerImage) #.filter(categoryType__category_name='orange')
 
     images = images.order_by('count').reverse()
 
