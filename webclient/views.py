@@ -243,15 +243,16 @@ def getNewImage(request):
                      crop_images.NUM_WINDOW_ROWS * crop_images.NUM_LABELS_PER_WINDOW
 
 
-    images = img.annotate(count=Count('imagelabel'))
+    images = img.annotate(count=Count('imagelabel')).filter(count__lt=labelsPerImage)
     user = request.user
     if user.groups.filter(name='god').exists():
         ignore_max_count = True
     else:
         ignore_max_count = False
         categories_to_label = ['nighttime_apple', 'orange']
+        all_unfinished_images = images
         for cat in categories_to_label:
-            images = images.filter(count__lt=labelsPerImage).filter(categoryType__category_name=cat)
+            images = all_unfinished_images.filter(categoryType__category_name=cat)
             if images:
                 break
 
