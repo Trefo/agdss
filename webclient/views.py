@@ -234,7 +234,6 @@ def getNewImage(request):
     #
 
     #Least number of labels which was not just seen
-    img = Image.objects.all()
     # if hasPrior and len(Image.objects.all()) > 1:
     #     img = img.exclude(name=request.GET['image_name'], path=request.GET['path'])
 
@@ -243,13 +242,13 @@ def getNewImage(request):
                      crop_images.NUM_WINDOW_ROWS * crop_images.NUM_LABELS_PER_WINDOW
 
 
-    images = img.annotate(count=Count('imagelabel')).filter(count__lt=labelsPerImage)
+    images = Image.objects.all().annotate(count=Count('imagelabel')).filter(count__lt=labelsPerImage)
     user = request.user
     if user.groups.filter(name='god').exists():
         ignore_max_count = True
     else:
         ignore_max_count = False
-        categories_to_label = ['nighttime_apple', 'orange']
+        categories_to_label = ['nighttime_apple', 'orange', 'apple']
         all_unfinished_images = images
         for cat in categories_to_label:
             images = all_unfinished_images.filter(categoryType__category_name=cat)
@@ -265,13 +264,14 @@ def getNewImage(request):
     subimage = None
 
 
-
+    img = None
     for i in images:
         subimage = crop_images.getImageWindow(i, request.user, ignore_max_count=ignore_max_count)
         if subimage is not None:
             img = i
             break
-
+    if not img:
+        return HttpResponseBadRequest("Could not find image to serve")
     label_list = ImageLabel.objects.all().filter(parentImage=img).order_by('pub_date').last()
     response = {
         'path': img.path,
