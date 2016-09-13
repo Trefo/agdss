@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^applyLabels$', 'webclient.views.applyLabels'),
     url(r'^loadLabels$', 'webclient.views.loadLabels'),
     url(r'^fix_label_location$', 'webclient.views.fix_label_location'),
+    url(r'^print_label_data', 'webclient.views.print_label_data'),
 
 
     url(r'^get_overlayed_image/(?P<image_label_id>[0-9]*)$', 'webclient.views.get_overlayed_image'),

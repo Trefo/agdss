@@ -23,6 +23,8 @@ from image_ops.convert_images import SVGString, RenderSVGString
 from webclient.image_ops import crop_images
 from .models import *
 
+import csv
+
 
 ######
 #PAGES
@@ -508,3 +510,34 @@ def subtractPadding(matchobj):
     except ValueError:
         s = matchobj.group(0)
     return s
+
+
+@csrf_exempt
+@require_POST
+def print_label_data(request):
+    with open('imageLabel_data.csv', 'w') as csvfile:
+        fieldnames = ['parentImage_name', 'parentImage_path', 'categoryType',
+                      'pub_date', 'labeler', 'iw_x', 'iw_y', 'iw_width', 'iw_height', 'timeTaken',
+                      'if_brightness', 'if_contrast', 'if_saturation']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for label in ImageLabel.objects.all():
+            imageFilter = ImageFilter.objects.all().get(imageLabel=label)
+            labelDict = {
+                'parentImage_name' : label.parentImage.name,
+                'parentImage_path' : label.parentImage.path,
+                'categoryType' : label.categoryType.category_name,
+                'pub_date' : label.pub_date,
+                'labeler' : label.labeler,
+                'iw_x' : label.imageWindow.x,
+                'iw_y' : label.imageWindow.y,
+                'iw_width' : label.imageWindow.width,
+                'iw_height' : label.imageWindow.height,
+                'timeTaken' : label.timeTaken,
+                'if_brightness' : imageFilter.brightness,
+                'if_contrast' : imageFilter.contrast,
+                'if_saturation' : imageFilter.saturation,
+            }
+            writer.writerow(labelDict)
+    return HttpResponse("Printed")
+
