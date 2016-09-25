@@ -30,7 +30,6 @@ class Image(models.Model):
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
     width = models.PositiveSmallIntegerField(default=1920)
     height = models.PositiveSmallIntegerField(default=1080)
-    #TODO: Cascade if last entry is deleted
     categoryType = models.ManyToManyField(CategoryType)
     class Meta:
         unique_together = ('name', 'path')

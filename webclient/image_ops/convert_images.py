@@ -10,6 +10,7 @@ from PIL import Image as PILImage
 import numpy
 import SVGRegex
 from webclient.image_ops import crop_images
+import sys
 
 IMAGE_FILE_EXTENSION = '.png'
 
@@ -32,9 +33,8 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
     #Convert copy of image to new format
     #print(img_file.getvalue())
     if not img_file:
-        #TODO: Some error checking
+        sys.stderr.write("convertSVGtoPNG Passed empty img_file with file:%s/%s" %(foldername, filename))
         return
-    #TODO: error checking on foldername and filename
     foldername_ = foldername
     if foldername_[0] == '/' or foldername_[0] == '\\':
         foldername_ = foldername_[1:]

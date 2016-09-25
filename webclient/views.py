@@ -299,8 +299,6 @@ def getNewImage(request):
 #     return HttpResponse("PURGED TABLES!")
 
 
-
-#TODO: Check for bad input
 '''
 Request: POST
 {

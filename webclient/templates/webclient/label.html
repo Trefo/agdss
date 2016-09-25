@@ -241,7 +241,7 @@
                 }
             });
         }
-        //TODO: Input validation and error checking
+        //TODO: Make work for external images
         function displayImage(image_name, image_path, categories, point, width, height, padding) {
             if(width <= 0 || height <= 0 || padding < 0) {
                 alert("Problem with width, height, or padding value");
@@ -307,10 +307,6 @@
 
         }
 
-        //TODO: Make work for both JSON string and JSON object
-        function displayLabels(labels) {
-            //window.labelsLayer.importJSON(JSON.parse(data));
-        }
 
 
 

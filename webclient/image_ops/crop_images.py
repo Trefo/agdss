@@ -55,7 +55,7 @@ def getRandomImageWindow(image):
     return retDict
 
 
-def getGeometricImageWindow(image):
+def get_geometric_image_window(image):
     windowDict = {'width': image.width/4, 'height': image.height/4}
     topLeftArr = []
     for x in range(0, image.width, image.width / 8):
