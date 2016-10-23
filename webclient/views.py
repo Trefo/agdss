@@ -22,6 +22,8 @@ import helper_ops
 from image_ops.convert_images import SVGString, RenderSVGString
 from webclient.image_ops import crop_images
 from .models import *
+from webclient.image_ops.convert_images import convertSVG
+import webclient.tasks as tasks
 
 import csv
 
@@ -139,9 +141,11 @@ def applyLabels(request):
                                    labeler=labeler)
     image_filter_obj.save()
 
-    from webclient.image_ops.convert_images import convertSVG
-    convertSVG(labelObject)
+
+    #convertSVG(labelObject)
+    tasks.task_convertSVG.delay(labelObject.id)
     #combineImageLabels(parentImage_[0], 50)
+    tasks.task_combineImageLabels.delay(parentImage_[0].id, 50)
     return HttpResponse(label_list_)
 
 @require_GET
@@ -214,7 +218,6 @@ def getInfo(request):
 def getNewImage(request):
 
 
-
     # if not 'image_name' in request.GET or not 'path' in request.GET:
     #     hasPrior = False
     # else:
@@ -272,6 +275,7 @@ def getNewImage(request):
         if subimage is not None:
             img = i
             break
+
     if not img:
         return HttpResponseBadRequest("Could not find image to serve")
     label_list = ImageLabel.objects.all().filter(parentImage=img).order_by('pub_date').last()

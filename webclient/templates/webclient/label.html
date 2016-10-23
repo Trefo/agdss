@@ -219,8 +219,9 @@
                 }, */
                 success: function (response) {
                     data = response.labels;
-                    if (data) {
-                        displayLabels(response.labels);
+                    if (!data) {
+                        console.log('Error: no response.labels');
+                        console.log(response);
                     }
                     imageX = response.subimage.x;
                     imageY = response.subimage.y;
