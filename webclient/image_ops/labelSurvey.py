@@ -13,6 +13,10 @@ def reportLabelStats(labelIndex):
     vecAll = labelNParray(labelIndex)
     label = labelFromLabelIndex(labelIndex)
     imgParent = parentImageFromImageLabelDB(label)
+    #plotImageWithLabels(vecAll, imgParent)
+    return [imgParent, vecAll]
+    
+def plotImageWithLabels(vecAll, imgParent):
     dpi = 80.0
     xpixels, ypixels = 1280, 1920
     fig = plt.figure(figsize=(ypixels/dpi, xpixels/dpi), dpi=dpi)
@@ -20,8 +24,6 @@ def reportLabelStats(labelIndex):
     plt.imshow(imgParent)
     plt.hold('on')
     plt.scatter(vecAll[:,0].astype(np.float)+vecAll[:,3].astype(np.float), vecAll[:,1].astype(np.float)+vecAll[:,4].astype(np.float), s=vecAll[:,2].astype(np.float)*vecAll[:,2].astype(np.float), facecolors='none', edgecolors='y', marker='o')
-    return [imgParent, vecAll]
-    
     
 def labelNParray(labelIndex):
     label = labelFromLabelIndex(labelIndex)
@@ -63,7 +65,9 @@ def translate(xt,yt):
     return [xt, yt]
              
         
-def labelPatch(vecAll, imgParent,i):
+def labelPatch(labelInfo):
+    vecAll = labelInfo[1]
+    imgParent = labelInfo[0]
     xc=vecAll[:,0].astype(np.float)+vecAll[:,3].astype(np.float)
     yc=vecAll[:,1].astype(np.float)+vecAll[:,4].astype(np.float)
     delta = 1.3*vecAll[:,2].astype(np.float)
@@ -71,23 +75,20 @@ def labelPatch(vecAll, imgParent,i):
     yr=(yc+delta).astype(np.int16)
     xl = (xc-delta).astype(np.int16)
     yl = (yc-delta).astype(np.int16)
-    labelPatchImage = imgParent[yl[i]:yr[i],xl[i]:xr[i],:]
+    allLabelPatches = []
+    for i in range(0,len(vecAll)):
+        allLabelPatches.append(imgParent[yl[i]:yr[i],xl[i]:xr[i],:])
     #plt.imshow(labelPatchImage)
-    return labelPatchImage
+    return allLabelPatches
 
+def plotAllPatchesForLabel():
+    dpi = 4.0
+    xpixels, ypixels = 400, 400
+    for idx,img in enumerate(labelSurvey.labelPatch(labelSurvey.reportLabelStats(80))):
+        fig = plt.figure(figsize=(ypixels/dpi, xpixels/dpi), dpi=dpi)
+        plt.subplot(25,1,idx+1)
+        plt.imshow(val)
 
-def labelPatches(labelIndex):
-    vecAll = labelNParray(labelIndex);
-    xc=vecAll[:,0].astype(np.float)+vecAll[:,3].astype(np.float)
-    yc=vecAll[:,1].astype(np.float)+vecAll[:,4].astype(np.float)
-    delta = 1.3*vecAll[:,2].astype(np.float)
-    xr=(xc+delta).astype(np.int16)
-    yr=(yc+delta).astype(np.int16)
-    xl = (xc-delta).astype(np.int16)
-    yl = (yc-delta).astype(np.int16)
-    labelPatchImage = imgParent[yl[i]:yr[i],xl[i]:xr[i],:]
-    #plt.imshow(labelPatchImage)
-    return labelPatchImage
 
     
 
