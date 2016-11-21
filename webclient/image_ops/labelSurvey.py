@@ -10,23 +10,36 @@ import urllib2
 from webclient.image_ops import convert_images
 
 def reportLabelStats(labelIndex):
-    categories = CategoryType.objects.all().filter(category_name='tomatoes')
-    catTomatoes = categories[0]
-    image = ImageLabel.objects.all()[labelIndex].parentImage
-    label = ImageLabel.objects.all()[labelIndex]
-    hostpath = 'http://airborne.ddns.net:8000'
-    imageURL = hostpath + image.path + image.name
-    imgParent = plt.imread(urllib2.urlopen(imageURL), format='jpeg')
-    separatedPaths = convert_images.separatePaths(label.labelShapes)
-    imgLabel = plt.imread(StringIO(separatedPaths[0]))
-    vecAll = np.array(svgStringToXML(label))
+    vecAll = labelNParray(labelIndex)
+    label = labelFromLabelIndex(labelIndex)
+    imgParent = parentImageFromImageLabelDB(label)
     dpi = 80.0
     xpixels, ypixels = 1280, 1920
     fig = plt.figure(figsize=(ypixels/dpi, xpixels/dpi), dpi=dpi)
+
     plt.imshow(imgParent)
     plt.hold('on')
     plt.scatter(vecAll[:,0].astype(np.float)+vecAll[:,3].astype(np.float), vecAll[:,1].astype(np.float)+vecAll[:,4].astype(np.float), s=vecAll[:,2].astype(np.float)*vecAll[:,2].astype(np.float), facecolors='none', edgecolors='y', marker='o')
-    return [image, label, imgParent, imgLabel, vecAll,plt]
+    return [imgParent, vecAll]
+    
+    
+def labelNParray(labelIndex):
+    label = labelFromLabelIndex(labelIndex)
+    separatedPaths = convert_images.separatePaths(label.labelShapes)
+    imgLabel = plt.imread(StringIO(separatedPaths[0]))
+    return np.array(svgStringToXML(label))
+
+
+def labelFromLabelIndex(labelIndex):
+    categories = CategoryType.objects.all().filter(category_name='tomatoes')
+    catTomatoes = categories[0]
+    return ImageLabel.objects.all()[labelIndex]
+
+def parentImageFromImageLabelDB(label):
+    image = label.parentImage
+    hostpath = 'http://airborne.ddns.net:8000'
+    imageURL = hostpath + image.path + image.name
+    return plt.imread(urllib2.urlopen(imageURL), format='jpeg')
     
     
 def svgStringToXML(labelDBObj):
@@ -58,10 +71,23 @@ def labelPatch(vecAll, imgParent,i):
     yr=(yc+delta).astype(np.int16)
     xl = (xc-delta).astype(np.int16)
     yl = (yc-delta).astype(np.int16)
-    plt.imshow(imgParent[yl[i]:yr[i],xl[i]:xr[i],:])
-    return [xl,yl,xr,yr]
+    labelPatchImage = imgParent[yl[i]:yr[i],xl[i]:xr[i],:]
+    #plt.imshow(labelPatchImage)
+    return labelPatchImage
 
 
+def labelPatches(labelIndex):
+    vecAll = labelNParray(labelIndex);
+    xc=vecAll[:,0].astype(np.float)+vecAll[:,3].astype(np.float)
+    yc=vecAll[:,1].astype(np.float)+vecAll[:,4].astype(np.float)
+    delta = 1.3*vecAll[:,2].astype(np.float)
+    xr=(xc+delta).astype(np.int16)
+    yr=(yc+delta).astype(np.int16)
+    xl = (xc-delta).astype(np.int16)
+    yl = (yc-delta).astype(np.int16)
+    labelPatchImage = imgParent[yl[i]:yr[i],xl[i]:xr[i],:]
+    #plt.imshow(labelPatchImage)
+    return labelPatchImage
 
     
 
