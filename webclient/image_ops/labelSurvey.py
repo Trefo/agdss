@@ -9,9 +9,8 @@ import requests
 import urllib2
 from webclient.image_ops import convert_images
 
-def reportLabelStats(labelIndex):
-    vecAll = labelNParray(labelIndex)
-    label = labelFromLabelIndex(labelIndex)
+def reportLabelStats(label):
+    vecAll = labelNParray(label)
     imgParent = parentImageFromImageLabelDB(label)
     #plotImageWithLabels(vecAll, imgParent)
     return [imgParent, vecAll]
@@ -25,11 +24,13 @@ def plotImageWithLabels(vecAll, imgParent):
     plt.hold('on')
     plt.scatter(vecAll[:,0].astype(np.float)+vecAll[:,3].astype(np.float), vecAll[:,1].astype(np.float)+vecAll[:,4].astype(np.float), s=vecAll[:,2].astype(np.float)*vecAll[:,2].astype(np.float), facecolors='none', edgecolors='y', marker='o')
     
-def labelNParray(labelIndex):
-    label = labelFromLabelIndex(labelIndex)
+def labelNParray(label):
+    npArray = []
     separatedPaths = convert_images.separatePaths(label.labelShapes)
-    imgLabel = plt.imread(StringIO(separatedPaths[0]))
-    return np.array(svgStringToXML(label))
+    if len(separatedPaths) > 0:
+        imgLabel = plt.imread(StringIO(separatedPaths[0]))
+        npArray = np.array(svgStringToXML(label))
+    return npArray
 
 
 def labelFromLabelIndex(labelIndex):
@@ -68,17 +69,18 @@ def translate(xt,yt):
 def labelPatch(labelInfo):
     vecAll = labelInfo[1]
     imgParent = labelInfo[0]
-    xc=vecAll[:,0].astype(np.float)+vecAll[:,3].astype(np.float)
-    yc=vecAll[:,1].astype(np.float)+vecAll[:,4].astype(np.float)
-    delta = 1.3*vecAll[:,2].astype(np.float)
-    xr=(xc+delta).astype(np.int16)
-    yr=(yc+delta).astype(np.int16)
-    xl = (xc-delta).astype(np.int16)
-    yl = (yc-delta).astype(np.int16)
     allLabelPatches = []
-    for i in range(0,len(vecAll)):
-        allLabelPatches.append(imgParent[yl[i]:yr[i],xl[i]:xr[i],:])
-    #plt.imshow(labelPatchImage)
+
+    if len(vecAll)>0:
+        xc=vecAll[:,0].astype(np.float)+vecAll[:,3].astype(np.float)
+        yc=vecAll[:,1].astype(np.float)+vecAll[:,4].astype(np.float)
+        delta = 1.3*vecAll[:,2].astype(np.float)
+        xr=(xc+delta).astype(np.int16)
+        yr=(yc+delta).astype(np.int16)
+        xl = (xc-delta).astype(np.int16)
+        yl = (yc-delta).astype(np.int16)
+        for i in range(0,len(vecAll)):
+            allLabelPatches.append(imgParent[yl[i]:yr[i],xl[i]:xr[i],:])
     return allLabelPatches
 
 def plotAllPatchesForLabel():
