@@ -9,11 +9,13 @@ import requests
 import urllib2
 from webclient.image_ops import convert_images
 
-def reportLabelStats(label):
-    vecAll = labelNParray(label)
-    imgParent = parentImageFromImageLabelDB(label)
-    #plotImageWithLabels(vecAll, imgParent)
-    return [imgParent, vecAll]
+def reportLabelStats(labelList):
+    result = []
+    for label in labelList:
+        vecAll = labelNParray(label)
+        imgParent = parentImageFromImageLabelDB(label)
+        result.append([imgParent, vecAll])
+    return result
     
 def plotImageWithLabels(vecAll, imgParent):
     dpi = 80.0
@@ -66,31 +68,57 @@ def translate(xt,yt):
     return [xt, yt]
              
         
-def labelPatch(labelInfo):
-    vecAll = labelInfo[1]
-    imgParent = labelInfo[0]
+def labelPatch(labelInfoList):
     allLabelPatches = []
-
-    if len(vecAll)>0:
-        xc=vecAll[:,0].astype(np.float)+vecAll[:,3].astype(np.float)
-        yc=vecAll[:,1].astype(np.float)+vecAll[:,4].astype(np.float)
-        delta = 1.3*vecAll[:,2].astype(np.float)
-        xr=(xc+delta).astype(np.int16)
-        yr=(yc+delta).astype(np.int16)
-        xl = (xc-delta).astype(np.int16)
-        yl = (yc-delta).astype(np.int16)
-        for i in range(0,len(vecAll)):
-            allLabelPatches.append(imgParent[yl[i]:yr[i],xl[i]:xr[i],:])
+    for labelInfo in labelInfoList:
+        vecAll = labelInfo[1]
+        imgParent = labelInfo[0]
+        if len(vecAll)>0:
+            xc=vecAll[:,0].astype(np.float)+vecAll[:,3].astype(np.float)
+            yc=vecAll[:,1].astype(np.float)+vecAll[:,4].astype(np.float)
+            delta = 1.3*vecAll[:,2].astype(np.float)
+            xr=(xc+delta).astype(np.int16)
+            yr=(yc+delta).astype(np.int16)
+            xl = (xc-delta).astype(np.int16)
+            yl = (yc-delta).astype(np.int16)
+            for i in range(0,len(vecAll)):
+                allLabelPatches.append(imgParent[yl[i]:yr[i],xl[i]:xr[i],:])
     return allLabelPatches
 
-def plotAllPatchesForLabel():
+def plotAllPatchesForLabel(label):
     dpi = 4.0
     xpixels, ypixels = 400, 400
-    for idx,img in enumerate(labelSurvey.labelPatch(labelSurvey.reportLabelStats(80))):
+    for idx,img in enumerate(labelSurvey.labelPatch(labelSurvey.reportLabelStats(label))):
         fig = plt.figure(figsize=(ypixels/dpi, xpixels/dpi), dpi=dpi)
         plt.subplot(25,1,idx+1)
         plt.imshow(val)
 
+def plotPatchList(labelList):
+    nrows=5 
+    ncols=5
+    dpi = 40.0
+    xpixels, ypixels = 150, 150
+    for idx,patch in enumerate(labelSurvey.labelPatch(labelSurvey.reportLabelStats(labelList))):    
+        if idx%25==0:
+            fig = plt.figure(figsize=(ypixels/dpi, xpixels/dpi), dpi=dpi)
+            plt.subplots(nrows, ncols)
+        #fig = plt.figure(figsize=(ypixels/dpi, xpixels/dpi), dpi=dpi)
+        plt.subplot(nrows,ncols,(idx%25)+1)
+        plt.imshow(patch)
+        
+        
+def reflect(labelList = [ImageLabel.objects.all().last()]):
+    nrows=5 
+    ncols=5
+    allLabels = labelPatch(reportLabelStats(labelList))
+    for idx,patch in enumerate(allLabels):    
+        if idx%25==0:
+            plt.subplots(nrows, ncols)
+        plt.subplot(nrows,ncols,(idx%25)+1)
+        plt.imshow(patch)
+    return allLabels
+
+        
 
     
 
