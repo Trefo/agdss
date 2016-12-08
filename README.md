@@ -24,7 +24,7 @@
 
 
 
-5. Run `python manage.py migrate` to create the tables in the database.
+5. Run `python manage.py migrate --settings=agdss.settings.prod` to create the tables in the database.
 6. To create admin credentials (required to access /admin), run `python manage.py createsuperuser` and enter the requested information.
 7. TEMPORARY: Set `STATIC_ROOT` to parent directory of images (in agdss/settings.py).
 8. TEMPORARY: Place all images directly in directory named `tag_images` which is a child of the `STATIC_ROOT` directory.
