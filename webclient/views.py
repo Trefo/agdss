@@ -549,7 +549,7 @@ def upload(request):
         form = ImageForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('home')
+            return redirect('upload')
     else:
         form = ImageForm()
     return render(request, 'webclient/upload.html', {

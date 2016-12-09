@@ -5,10 +5,6 @@ from unicodedata import decimal
 
 from django.db import models
 
-# class Document(models.Model):
-#     description = models.CharField(max_length=255, blank=True)
-#     image = models.FileField(upload_to='image_uploads/')
-#     uploaded_at = models.DateTimeField(auto_now_add=True)
 
 class CategoryType(models.Model):
     category_name = models.CharField(default='unknown', max_length=100, unique=True)
@@ -36,13 +32,26 @@ class Image(models.Model):
     height = models.PositiveSmallIntegerField(default=1080)
     #TODO: Cascade if last entry is deleted
     categoryType = models.ManyToManyField(CategoryType)
-    upload = models.FileField(upload_to='image_uploads/')
+    upload = models.FileField(upload_to='image_uploads/', null = True)
 
     class Meta:
         unique_together = ('name', 'path')
     def __unicode__(self):
         return 'Name: ' + self.name
 
+# class Upload_IMG(models.Model):
+#     name = models.CharField(max_length=200)
+#     path = models.CharField(max_length=500)
+#     pub_date = models.DateTimeField(default=datetime.now, blank=True)
+#     width = models.PositiveSmallIntegerField(default=1920)
+#     height = models.PositiveSmallIntegerField(default=1080)
+#     categoryType = models.ManyToManyField(CategoryType)
+#     upload = models.FileField(upload_to='image_uploads/')
+#
+#     class Meta:
+#         unique_together = ('name', 'path')
+#     def __unicode__(self):
+#         return 'Name: ' + self.name
 
 from django.contrib.auth.models import User
 class Labeler(models.Model):
