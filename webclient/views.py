@@ -25,6 +25,8 @@ from .models import *
 
 import csv
 
+from forms import *
+from django.shortcuts import render, redirect
 
 ######
 #PAGES
@@ -541,3 +543,15 @@ def print_label_data(request):
             writer.writerow(labelDict)
     return HttpResponse("Printed")
 
+@csrf_exempt
+def upload(request):
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = DocumentForm()
+    return render(request, 'webclient/upload.html', {
+        'form': form
+    })

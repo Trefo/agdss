@@ -67,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -134,5 +135,3 @@ LOGIN_REDIRECT_URL = '/webclient'
 STATIC_URL = '/static/'
 STATIC_ROOT = "/home/jdas/Dropbox/Research/UPenn/kumar-prec-ag"
 #STATIC_ROOT = "/home/sdcunha/Dropbox/kumar-prec-ag"
-
-

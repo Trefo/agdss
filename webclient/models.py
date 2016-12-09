@@ -5,6 +5,10 @@ from unicodedata import decimal
 
 from django.db import models
 
+class Document(models.Model):
+    description = models.CharField(max_length=255, blank=True)
+    document = models.FileField(upload_to='image_uploads/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
 
 class CategoryType(models.Model):
     category_name = models.CharField(default='unknown', max_length=100, unique=True)
@@ -92,6 +96,3 @@ class ImageFilter(models.Model):
     def __unicode__(self):
         return 'ImageFilter: brightness:' + str(self.brightness) + ' contrast: ' + str(self.contrast)\
                + ' saturation: ' + str(self.saturation) + ' labeler: ' + str(self.labeler)
-
-
-

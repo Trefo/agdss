@@ -31,7 +31,12 @@ urlpatterns = [
     url(r'^loadLabels$', 'webclient.views.loadLabels'),
     url(r'^fix_label_location$', 'webclient.views.fix_label_location'),
     url(r'^print_label_data', 'webclient.views.print_label_data'),
-
+    url(r'^upload$', views.upload, name='upload'),
 
     url(r'^get_overlayed_image/(?P<image_label_id>[0-9]*)$', 'webclient.views.get_overlayed_image'),
     ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# MEDIA_URL for development server only:
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # print urlpatterns
