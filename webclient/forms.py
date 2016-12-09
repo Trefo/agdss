@@ -1,7 +1,7 @@
 from django import forms
-from webclient.models import Document
+from webclient.models import Image
 
-class DocumentForm(forms.ModelForm):
+class ImageForm(forms.ModelForm):
     class Meta:
-        model = Document
-        fields = ('description', 'document', )
+        model = Image
+        fields = ('description','categoryType', 'upload', )

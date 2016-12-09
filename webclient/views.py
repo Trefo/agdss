@@ -546,12 +546,12 @@ def print_label_data(request):
 @csrf_exempt
 def upload(request):
     if request.method == 'POST':
-        form = DocumentForm(request.POST, request.FILES)
+        form = ImageForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('home')
     else:
-        form = DocumentForm()
+        form = ImageForm()
     return render(request, 'webclient/upload.html', {
         'form': form
     })

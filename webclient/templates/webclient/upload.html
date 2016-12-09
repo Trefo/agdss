@@ -1,11 +1,16 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Image Upload</title>
+  </head>
+  <body>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Upload</button>
+    </form>
 
-{% block content %}
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Upload</button>
-  </form>
-
-  <p><a href="/webclient">Return to front page</a></p>
-{% endblock %}
+    <p><a href="/webclient">Return to front page</a></p>
+  </body>
+</html>
