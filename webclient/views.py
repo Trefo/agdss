@@ -250,7 +250,7 @@ def getNewImage(request):
         ignore_max_count = True
     else:
         ignore_max_count = False
-        categories_to_label = ['nighttime_apple', 'orange', 'apple']
+        categories_to_label = ['nighttime_apple', 'orange', 'apple','tomatoes']
         all_unfinished_images = images
         for cat in categories_to_label:
             images = all_unfinished_images.filter(categoryType__category_name=cat)
