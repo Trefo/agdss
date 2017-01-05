@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -84,7 +85,7 @@ DATABASES = {
             'NAME': 'agdss',                      # Or path to database file if using sqlite3.
             # The following settings are not used with sqlite3:
             'USER': 'aguser',
-            'PASSWORD': 'aguser',
+            'PASSWORD': 'GRASPag2016#',
             'HOST': 'localhost',                      # Empty for localhost through domain sockets or           '127.0.0.1' for localhost through TCP.
             'PORT': '',                      # Set to empty string for default.
         }
@@ -135,4 +136,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = "/home/jdas/Dropbox/Research/UPenn/kumar-prec-ag"
 #STATIC_ROOT = "/home/sdcunha/Dropbox/kumar-prec-ag"
 
-
+NOTEBOOK_ARGUMENTS = [
+        '--config=jupyter_notebook_config.py',
+        ]
