@@ -9,5 +9,4 @@ SECRET_KEY = 'q82m6os5(_m4s7tabkfsz1y90dsnz1q(_c^+u&zs+ffftgs*2$'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(STATIC_ROOT, 'media')
 HOST_ROOT = 'http://localhost:8000'
-# print BASE_DIR
 # print MEDIA_ROOT

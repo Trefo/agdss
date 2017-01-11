@@ -10,7 +10,8 @@ import urllib2
 from webclient.image_ops import convert_images
 
 def reflect(labelList = [ImageLabel.objects.all().last()]):
-    for idx,patch in enumerate(labelPatch(map(lambda label:list([parentImg(label), labels(label)]),labelList))):
+    allLabels = labelPatch(map(lambda label:[parentImg(label), labels(label)],labelList))
+    for idx,patch in enumerate(allLabels):
         if idx%25==0:
             plt.subplots(5, 5)
         plt.subplot(5,5,(idx%25)+1)
@@ -24,11 +25,6 @@ def labels(label):
         imgLabel = plt.imread(StringIO(separatedPaths[0]))
         npArray = np.array(svgStringToXML(label))
     return npArray
-
-def labelFromLabelIndex(labelIndex):
-    categories = CategoryType.objects.all().filter(category_name='tomatoes')
-    catTomatoes = categories[0]
-    return ImageLabel.objects.all()[labelIndex]
 
 def parentImg(label):
     image = label.parentImage
@@ -92,23 +88,18 @@ def plotAllPatchesForLabel(label):
         fig = plt.figure(figsize=(ypixels/dpi, xpixels/dpi), dpi=dpi)
         plt.subplot(25,1,idx+1)
         plt.imshow(val)
-
-def plotPatchList(labelList):
-    nrows=5 
-    ncols=5
-    dpi = 40.0
-    xpixels, ypixels = 150, 150
-    for idx,patch in enumerate(labelSurvey.labelPatch(labelSurvey.reportLabelStats(labelList))):    
-        if idx%25==0:
-            fig = plt.figure(figsize=(ypixels/dpi, xpixels/dpi), dpi=dpi)
-            plt.subplots(nrows, ncols)
-        #fig = plt.figure(figsize=(ypixels/dpi, xpixels/dpi), dpi=dpi)
-        plt.subplot(nrows,ncols,(idx%25)+1)
-        plt.imshow(patch)
         
-        
-
-    
+def trainingsPatchForLabel(label):
+    imageParent = parentImg(label)
+    imageWindow = label.imageWindow
+    x = imageWindow.x
+    y = imageWindow.y
+    width = imageWindow.width
+    height = imageWindow.height 
+    croppedImage = imageParent[y-20:(y+height+20),x-20:(x+width+20),:]
+    labelImage = convert_images.countableLabel(label.labelShapes)
+    croppedLabelImage = labelImage[y-20:(y+height+20),x-20:(x+width+20)]
+    return croppedImage,croppedLabelImage
 
 
 
