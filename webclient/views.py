@@ -1,6 +1,8 @@
 import io
 import json
 import os.path
+from random import randint
+
 import re
 import sys
 import urllib
@@ -250,7 +252,7 @@ def getNewImage(request):
         ignore_max_count = True
     else:
         ignore_max_count = False
-        categories_to_label = ['nighttime_apple', 'orange', 'apple','tomatoes']
+        categories_to_label = ['forcings']
         all_unfinished_images = images
         for cat in categories_to_label:
             images = all_unfinished_images.filter(categoryType__category_name=cat)
@@ -266,9 +268,12 @@ def getNewImage(request):
     subimage = None
 
 
+    
     img = None
-    for i in images:
-        subimage = crop_images.getImageWindow(i, request.user, ignore_max_count=ignore_max_count)
+    for im in images:
+        index = randint(0, len(images))
+	i = images[index]
+	subimage = crop_images.getImageWindow(i, request.user, ignore_max_count=ignore_max_count)
         if subimage is not None:
             img = i
             break
