@@ -5,10 +5,11 @@ from random import randint
 
 import re
 import sys
+import io
 import urllib
 from cStringIO import StringIO
-
 from PIL import Image as PILImage
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError, MultipleObjectsReturned
@@ -69,8 +70,7 @@ def results(request):
 ##################
 #POST/GET REQUESTS
 ##################
-
-@csrf_exempt
+@csrf_exempt 
 def applyLabels(request):
     dict = json.load(request)
     label_list_ = dict['label_list']
@@ -90,7 +90,7 @@ def applyLabels(request):
         labeler.save()
     except MultipleObjectsReturned:
         print >> sys.stderr, "Multiple labelers for user object"
-        return
+        return HttpResponseBadRequest("Multiple labelers for user object")
     sourceType = ''
     categoryType = ''
     parentImage_ = Image.objects.all().filter(name=image_name, path=path)
@@ -252,7 +252,7 @@ def getNewImage(request):
         ignore_max_count = True
     else:
         ignore_max_count = False
-        categories_to_label = ['forcings']
+        categories_to_label = ['anomaly']
         all_unfinished_images = images
         for cat in categories_to_label:
             images = all_unfinished_images.filter(categoryType__category_name=cat)
@@ -295,13 +295,13 @@ def getNewImage(request):
 
 
 # #TODO: Remove csrf_exempt
-# @csrf_exempt
-# def purge(request):
-#     Image.objects.all().delete()
-#     ImageLabel.objects.all().delete()
-#     ImageSourceType.objects.all().delete()
-#     CategoryType.objects.all().delete()
-#     return HttpResponse("PURGED TABLES!")
+#@csrf_exempt
+#def purge(request):
+#    Image.objects.all().delete()
+#    ImageLabel.objects.all().delete()
+#    ImageSourceType.objects.all().delete()
+#    CategoryType.objects.all().delete()
+#    return HttpResponse("PURGED TABLES!")
 
 
 
@@ -352,7 +352,7 @@ def addImage(request):
             return HttpResponseBadRequest(
                 "Image in unreachable location. Make sure that it is in a subdirectory of " + settings.STATIC_ROOT +".\n")
         path = os.path.relpath(path_dir, root)
-        path = '/webclient' + settings.STATIC_URL + path
+        path = '/' + settings.STATIC_URL + path
         if path[-1] != '/' and path[-1] != '\\':
             path += '/'
 
@@ -489,8 +489,12 @@ def get_overlayed_image(request, image_label_id):
     image = image_label.parentImage
     blob = RenderSVGString(SVGString(image_label.labelShapes))
     foreground = PILImage.open(StringIO(blob))
-    path = re.match(re_image_path, image.path).groups(1)[0]
-    background = PILImage.open(settings.STATIC_ROOT + path + image.name).convert('RGB')
+    #path = re.match(re_image_path, image.path).groups(1)[0]
+    path = image.path
+    #background = PILImage.open(path + image.name).convert('RGB')
+    fd = urllib.urlopen(path+image.name)
+    image_file = io.BytesIO(fd.read())
+    background = PILImage.open(image_file)	    
     background.paste(foreground, (0, 0), foreground)
     output = io.BytesIO()
     background.save(output, format='png')
