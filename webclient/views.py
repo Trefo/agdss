@@ -5,6 +5,7 @@ from random import randint
 import subprocess
 import os
 import ansible.runner
+from django.shortcuts import render
 
 
 import re
@@ -402,8 +403,8 @@ def simulate(request):
     num_uavs = request.GET['num_uavs']
     port_prefix=request.GET['port_prefix']
     results = ansible.runner.Runner(pattern='172.19.0.1',module_name='command', module_args='sh /home/jdas/open-uav/Firmware/testScripts/ansible-openuav-launch.sh ' + num_uavs + ' ' + port_prefix,).run()
-    return JsonResponse(results)
-
+    #return JsonResponse(results)
+    return HttpResponse(render(request, 'webclient/console.html', {'port_prefix' : port_prefix, 'num_uavs' : num_uavs})) 
 
 
 '''

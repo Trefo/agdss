@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<script type="text/javascript" src="https://label.ag/static/scripts/eventemitter2.min.js"></script>
+<script type="text/javascript" src="https://label.ag/static/scripts//roslib.min.js"></script>
+
+<script type="text/javascript" type="text/javascript">
+  // Connecting to ROS
+  // -----------------
+
+
+websocket_url_str = 'wss://label.ag:{{port_prefix}}090';
+gzweb_url_str = 'https://label.ag:{{port_prefix}}86';
+  
+var ros = new ROSLIB.Ros({
+    url : websocket_url_str
+  });
+
+  ros.on('connection', function() {
+    console.log('Connected to websocket server.');
+  
+});
+function onLoad(){
+document.getElementById('gzweb-frame').src = gzweb_url_str;
+$('html, body').animate({scrollTop: 0},'slow');
+}  
+ros.on('error', function(error) {
+    console.log('Error connecting to websocket server: ', error);
+  });
+
+  ros.on('close', function() {
+    console.log('Connection to websocket server closed.');
+  });
+
+  
+  // Subscribing to a Topic
+  // ----------------------
+listener = ["1" , "2", "3", "4","5", "6", "7"]
+OFF = 10
+SCALE = 25
+for (i = 1; i < 8; i++) { 
+   listener[i-1]  = new ROSLIB.Topic({
+    ros : ros,
+    name : '/mavros' + i + '/local_position/pose',
+    messageType : 'geometry_msgs/PoseStamped'
+  });
+}
+
+var ALT_SCL=1.7
+listener[0].subscribe(function(message) {
+    //console.log(document.getElementById(listener[0]).name);
+   document.getElementById("/mavros1/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
+   document.getElementById("/mavros1/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
+   document.getElementById("/mavros1/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
+  });
+
+listener[1].subscribe(function(message) {
+    //console.log(document.getElementById(listener[0]).name);
+   document.getElementById("/mavros2/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
+   document.getElementById("/mavros2/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
+   document.getElementById("/mavros2/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);  
+});
+
+listener[2].subscribe(function(message) {
+    //console.log(document.getElementById(listener[0]).name);
+   document.getElementById("/mavros3/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
+   document.getElementById("/mavros3/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
+   document.getElementById("/mavros3/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
+  });
+  
+
+listener[3].subscribe(function(message) {
+    //console.log(document.getElementById(listener[0]).name);
+   document.getElementById("/mavros4/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
+   document.getElementById("/mavros4/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
+   document.getElementById("/mavros4/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
+  });
+  
+
+listener[4].subscribe(function(message) {
+    //console.log(document.getElementById(listener[0]).name);
+   document.getElementById("/mavros5/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
+   document.getElementById("/mavros5/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
+   document.getElementById("/mavros5/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
+  });
+  
+  listener[5].subscribe(function(message) {
+    //console.log(document.getElementById(listener[0]).name);
+   document.getElementById("/mavros6/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
+   document.getElementById("/mavros6/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
+   document.getElementById("/mavros6/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
+  });
+  
+
+listener[6].subscribe(function(message) {
+    //console.log(document.getElementById(listener[0]).name);
+   document.getElementById("/mavros7/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
+   document.getElementById("/mavros7/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
+   document.getElementById("/mavros7/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
+  });
+  
+
+
+</script>
+</head>
+
+<body onLoad="onLoad();">
+  <h1>OpenUAV Web Console</h1>
+
+ <svg version="1.1"
+     xmlns="http://www.w3.org/2000/svg" height="600" width="800">
+  <circle id="/mavros1/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />  
+<circle id="/mavros2/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />
+  <circle id="/mavros3/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />  
+<circle id="/mavros4/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />  
+<circle id="/mavros5/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />  
+<circle id="/mavros6/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />
+
+</svg>
+<iframe id='gzweb-frame' src='http://openuav.us' width="1600px" height="1200px" scrolling=yes >< /iframe>
+</td>
+
