@@ -49,70 +49,17 @@ for (i = 1; i < 10; i++) {
 X_OFFSET=10
 ALT_SCL=1.7
 Y_OFFSET = 10
-listener[0].subscribe(function(message) {
-    //console.log(document.getElementById(listener[0]).name);
-   document.getElementById("/mavros1/local_position/pose").setAttribute("cx", (X_OFFSET + message.pose.position.x)*SCALE);
-   document.getElementById("/mavros1/local_position/pose").setAttribute("cy", (-1*message.pose.position.y + Y_OFFSET)*SCALE);
-   document.getElementById("/mavros1/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
+
+{% for _ in num_uavs %}
+listener[{{ forloop.counter|add:"-1"}}].subscribe(function(message) {
+   document.getElementById("/mavros{{forloop.counter}}/local_position/pose").setAttribute("cx", (X_OFFSET + message.pose.position.x)*SCALE);
+   document.getElementById("/mavros{{forloop.counter}}/local_position/pose").setAttribute("cy", (-1*message.pose.position.y + Y_OFFSET)*SCALE);
+   document.getElementById("/mavros{{forloop.counter}}/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
   });
 
-listener[1].subscribe(function(message) {
-    //console.log(document.getElementById(listener[0]).name);
-   document.getElementById("/mavros2/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
-   document.getElementById("/mavros2/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
-   document.getElementById("/mavros2/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);  
-});
+{% endfor %}
 
-listener[2].subscribe(function(message) {
-    //console.log(document.getElementById(listener[0]).name);
-   document.getElementById("/mavros3/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
-   document.getElementById("/mavros3/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
-   document.getElementById("/mavros3/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
-  });
-  
 
-listener[3].subscribe(function(message) {
-    //console.log(document.getElementById(listener[0]).name);
-   document.getElementById("/mavros4/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
-   document.getElementById("/mavros4/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
-   document.getElementById("/mavros4/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
-  });
-  
-
-listener[4].subscribe(function(message) {
-    //console.log(document.getElementById(listener[0]).name);
-   document.getElementById("/mavros5/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
-   document.getElementById("/mavros5/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
-   document.getElementById("/mavros5/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
-  });
-  
-  listener[5].subscribe(function(message) {
-    //console.log(document.getElementById(listener[0]).name);
-   document.getElementById("/mavros6/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
-   document.getElementById("/mavros6/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
-   document.getElementById("/mavros6/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
-  });
-  
-
-listener[6].subscribe(function(message) {
-    //console.log(document.getElementById(listener[0]).name);
-   document.getElementById("/mavros7/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
-   document.getElementById("/mavros7/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
-   document.getElementById("/mavros7/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
-  });
-listener[7].subscribe(function(message) {
-    //console.log(document.getElementById(listener[0]).name);
-   document.getElementById("/mavros8/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
-   document.getElementById("/mavros8/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
-   document.getElementById("/mavros8/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
-  });
-
-listener[8].subscribe(function(message) {
-    //console.log(document.getElementById(listener[0]).name);
-   document.getElementById("/mavros9/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
-   document.getElementById("/mavros9/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
-   document.getElementById("/mavros9/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
-  });
 </script>
 </head>
 
