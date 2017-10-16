@@ -13,7 +13,6 @@
 
 websocket_url_str = 'wss://label.ag:{{port_prefix}}090';
 gzweb_url_str = 'https://label.ag:{{port_prefix}}86';
-  
 var ros = new ROSLIB.Ros({
     url : websocket_url_str
   });
@@ -37,22 +36,23 @@ ros.on('error', function(error) {
   
   // Subscribing to a Topic
   // ----------------------
-listener = ["1" , "2", "3", "4","5", "6", "7"]
+listener = ["1" , "2", "3", "4","5", "6", "7","8","9"]
 OFF = 10
 SCALE = 25
-for (i = 1; i < 8; i++) { 
+for (i = 1; i < 10; i++) { 
    listener[i-1]  = new ROSLIB.Topic({
     ros : ros,
     name : '/mavros' + i + '/local_position/pose',
     messageType : 'geometry_msgs/PoseStamped'
   });
 }
-
-var ALT_SCL=1.7
+X_OFFSET=10
+ALT_SCL=1.7
+Y_OFFSET = 10
 listener[0].subscribe(function(message) {
     //console.log(document.getElementById(listener[0]).name);
-   document.getElementById("/mavros1/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
-   document.getElementById("/mavros1/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
+   document.getElementById("/mavros1/local_position/pose").setAttribute("cx", (X_OFFSET + message.pose.position.x)*SCALE);
+   document.getElementById("/mavros1/local_position/pose").setAttribute("cy", (-1*message.pose.position.y + Y_OFFSET)*SCALE);
    document.getElementById("/mavros1/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
   });
 
@@ -100,9 +100,19 @@ listener[6].subscribe(function(message) {
    document.getElementById("/mavros7/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
    document.getElementById("/mavros7/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
   });
-  
+listener[7].subscribe(function(message) {
+    //console.log(document.getElementById(listener[0]).name);
+   document.getElementById("/mavros8/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
+   document.getElementById("/mavros8/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
+   document.getElementById("/mavros8/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
+  });
 
-
+listener[8].subscribe(function(message) {
+    //console.log(document.getElementById(listener[0]).name);
+   document.getElementById("/mavros9/local_position/pose").setAttribute("cx", (OFF + message.pose.position.x)*SCALE);
+   document.getElementById("/mavros9/local_position/pose").setAttribute("cy", (OFF + message.pose.position.y)*SCALE);
+   document.getElementById("/mavros9/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
+  });
 </script>
 </head>
 
@@ -111,14 +121,18 @@ listener[6].subscribe(function(message) {
 
  <svg version="1.1"
      xmlns="http://www.w3.org/2000/svg" height="600" width="800">
-  <circle id="/mavros1/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />  
-<circle id="/mavros2/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />
+  <circle id="/mavros1/local_position/pose" cx="250" cy="250" r="3" stroke="black" stroke-width="1" fill="red" />  
+<circle id="/mavros2/local_position/pose" cx="250" cy="250" r="3" stroke="black" stroke-width="1" fill="red" />
   <circle id="/mavros3/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />  
 <circle id="/mavros4/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />  
 <circle id="/mavros5/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />  
 <circle id="/mavros6/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />
+<circle id="/mavros7/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />
+<circle id="/mavros8/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />
+<circle id="/mavros9/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />
 
 </svg>
-<iframe id='gzweb-frame' src='http://openuav.us' width="1600px" height="1200px" scrolling=yes >< /iframe>
-</td>
-
+<iframe id='gzweb-frame' src='' width="1600px" height="1200px" scrolling=yes ></iframe>
+<iframe id='video-1' src='http://label.ag:{{port_prefix}}002/stream?topic=/uav_1_camera/image_raw_front'></iframe>
+</body>
+</html>
