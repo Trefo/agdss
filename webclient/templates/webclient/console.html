@@ -57,7 +57,7 @@ Y_OFFSET = 10
 
 {% for _ in range %}
 listener[{{ forloop.counter|add:"-1"}}].subscribe(function(message) {
-   document.getElementById("/traingle-{{forloop.counter}}").setAttribute("points", triangleCoords((X_OFFSET + message.pose.position.x)*SCALE,(Y_OFFSET + message.pose.position.y)*SCALE,20,0));
+   document.getElementById("/traingle-{{forloop.counter}}").setAttribute("points", triangleCoords((X_OFFSET + message.pose.position.x)*SCALE,(Y_OFFSET + -1*message.pose.position.y)*SCALE,20,90));
    document.getElementById("/mavros{{forloop.counter}}/local_position/pose").setAttribute("cx", (X_OFFSET + message.pose.position.x)*SCALE);
    document.getElementById("/mavros{{forloop.counter}}/local_position/pose").setAttribute("cy", (-1*message.pose.position.y + Y_OFFSET)*SCALE);
    document.getElementById("/mavros{{forloop.counter}}/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
