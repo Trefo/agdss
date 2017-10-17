@@ -27,6 +27,7 @@ return (angle*Math.PI)/180.0;
 }
 
 function triangleCoords(x,y,radius, angle){
+var angle = angle +180;
 return [radius*Math.cos(deg2rad(-60+angle))+x,radius*Math.sin(deg2rad(-60+angle))+y,radius*Math.cos(deg2rad(90 + angle))+x,radius*Math.sin(deg2rad(90 + angle))+y, radius*Math.cos(deg2rad(240 + angle))+x,radius*Math.sin(deg2rad(240 + angle))+y];
 }
 
@@ -57,7 +58,7 @@ Y_OFFSET = 10
 
 {% for _ in range %}
 listener[{{ forloop.counter|add:"-1"}}].subscribe(function(message) {
-   document.getElementById("/traingle-{{forloop.counter}}").setAttribute("points", triangleCoords((X_OFFSET + message.pose.position.x)*SCALE,(Y_OFFSET + -1*message.pose.position.y)*SCALE,20,90));
+   document.getElementById("/traingle-{{forloop.counter}}").setAttribute("points", triangleCoords((X_OFFSET + message.pose.position.x)*SCALE,(Y_OFFSET + -1*message.pose.position.y)*SCALE,20,0));
    document.getElementById("/mavros{{forloop.counter}}/local_position/pose").setAttribute("cx", (X_OFFSET + message.pose.position.x)*SCALE);
    document.getElementById("/mavros{{forloop.counter}}/local_position/pose").setAttribute("cy", (-1*message.pose.position.y + Y_OFFSET)*SCALE);
    document.getElementById("/mavros{{forloop.counter}}/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
