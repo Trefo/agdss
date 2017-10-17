@@ -21,10 +21,15 @@ var ros = new ROSLIB.Ros({
     console.log('Connected to websocket server.');
   
 });
-function onLoad(){
-document.getElementById('gzweb-frame').src = gzweb_url_str;
-$('html, body').animate({scrollTop: 0},'slow');
-}  
+
+function deg2rad(angle){
+return (angle*Math.PI)/180.0;
+}
+
+function triangleCoords(x,y,radius, angle){
+return [radius*Math.cos(deg2rad(-60+angle))+x,radius*Math.sin(deg2rad(-60+angle))+y,radius*Math.cos(deg2rad(90 + angle))+x,radius*Math.sin(deg2rad(90 + angle))+y, radius*Math.cos(deg2rad(240 + angle))+x,radius*Math.sin(deg2rad(240 + angle))+y];
+}
+
 ros.on('error', function(error) {
     console.log('Error connecting to websocket server: ', error);
   });
@@ -50,12 +55,14 @@ X_OFFSET=10
 ALT_SCL=1.7
 Y_OFFSET = 10
 
-{% for _ in num_uavs %}
+{% for _ in range %}
 listener[{{ forloop.counter|add:"-1"}}].subscribe(function(message) {
+   document.getElementById("/traingle-{{forloop.counter}}").setAttribute("points", triangleCoords((X_OFFSET + message.pose.position.x)*SCALE,(Y_OFFSET + message.pose.position.y)*SCALE,20,0));
    document.getElementById("/mavros{{forloop.counter}}/local_position/pose").setAttribute("cx", (X_OFFSET + message.pose.position.x)*SCALE);
    document.getElementById("/mavros{{forloop.counter}}/local_position/pose").setAttribute("cy", (-1*message.pose.position.y + Y_OFFSET)*SCALE);
    document.getElementById("/mavros{{forloop.counter}}/local_position/pose").setAttribute("r", (OFF + message.pose.position.z)/ALT_SCL);
-  });
+  
+});
 
 {% endfor %}
 
@@ -63,22 +70,18 @@ listener[{{ forloop.counter|add:"-1"}}].subscribe(function(message) {
 </script>
 </head>
 
-<body onLoad="onLoad();">
+<body>
   <h1>OpenUAV Web Console</h1>
 
  <svg version="1.1"
      xmlns="http://www.w3.org/2000/svg" height="600" width="800">
-  <circle id="/mavros1/local_position/pose" cx="250" cy="250" r="3" stroke="black" stroke-width="1" fill="red" />  
-<circle id="/mavros2/local_position/pose" cx="250" cy="250" r="3" stroke="black" stroke-width="1" fill="red" />
-  <circle id="/mavros3/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />  
-<circle id="/mavros4/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />  
-<circle id="/mavros5/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />  
-<circle id="/mavros6/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />
-<circle id="/mavros7/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />
-<circle id="/mavros8/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />
-<circle id="/mavros9/local_position/pose" cx="50" cy="50" r="3" stroke="black" stroke-width="1" fill="red" />
+{% for _ in range %}
+  <circle id="/mavros{{forloop.counter}}/local_position/pose" cx="250" cy="250" r="3" stroke="black" stroke-width="1" fill="red" />  
+  <polygon id="/traingle-{{forloop.counter}}" points="25,6 10,40 40,40" />
+{% endfor %}
 
 </svg>
+
 <iframe id='gzweb-frame' src='' width="1600px" height="1200px" scrolling=yes ></iframe>
 <iframe id='video-1' src='http://label.ag:{{port_prefix}}002/stream?topic=/uav_1_camera/image_raw_front'></iframe>
 </body>
