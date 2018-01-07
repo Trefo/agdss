@@ -4,15 +4,14 @@ import os.path
 from random import randint
 import subprocess
 import os
-import ansible.runner
 from django.shortcuts import render
 
 
 import re
 import sys
 import io
-import urllib
-from cStringIO import StringIO
+import urllib.request, urllib.parse, urllib.error
+from io import StringIO
 from PIL import Image as PILImage
 
 from django.conf import settings
@@ -26,8 +25,8 @@ from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 
-import helper_ops
-from image_ops.convert_images import SVGString, RenderSVGString
+from . import helper_ops
+from .image_ops.convert_images import SVGString, RenderSVGString
 from webclient.image_ops import crop_images
 from .models import *
 
@@ -94,7 +93,7 @@ def applyLabels(request):
         labeler = Labeler(user=user)
         labeler.save()
     except MultipleObjectsReturned:
-        print >> sys.stderr, "Multiple labelers for user object"
+        print("Multiple labelers for user object", file=sys.stderr)
         return HttpResponseBadRequest("Multiple labelers for user object")
     sourceType = ''
     categoryType = ''
@@ -154,7 +153,7 @@ def applyLabels(request):
 @require_GET
 def loadLabels(request):
     if 'image_name' not in request.GET or 'path' not in request.GET:
-        print(request.GET['path'] + ' ' + request.GET['image_name'])
+        print((request.GET['path'] + ' ' + request.GET['image_name']))
         return HttpResponseBadRequest('Path and Image Name required')
 
     parentImage_ = request.GET['image_name']
@@ -273,12 +272,12 @@ def getNewImage(request):
     subimage = None
 
 
-    
+
     img = None
     for im in images:
         index = randint(0, len(images))
-	i = images[index]
-	subimage = crop_images.getImageWindow(i, request.user, ignore_max_count=ignore_max_count)
+        i = images[index]
+        subimage = crop_images.getImageWindow(i, request.user, ignore_max_count=ignore_max_count)
         if subimage is not None:
             img = i
             break
@@ -326,7 +325,7 @@ Request: POST
 @require_POST
 def addImage(request):
     #Validate input
-    print request.POST
+    print(request.POST)
     if not ('image_name' in request.POST and 'path' in request.POST and 'category' in request.POST):
         return HttpResponseBadRequest("Missing required input")
     if request.POST['category'] == '':
@@ -340,8 +339,8 @@ def addImage(request):
     width, height = None, None
     try:
         url_check(path)
-        width, height = PILImage.open(StringIO(urllib.urlopen(path + request.POST['image_name']).read())).size
-    except ValidationError, e:
+        width, height = PILImage.open(StringIO(urllib.request.urlopen(path + request.POST['image_name']).read())).size
+    except ValidationError as e:
         #Validate image and get width, height
         try:
             width, height = PILImage.open(path + request.POST['image_name']).size
@@ -505,7 +504,7 @@ def get_overlayed_image(request, image_label_id):
     #path = re.match(re_image_path, image.path).groups(1)[0]
     path = image.path
     #background = PILImage.open(path + image.name).convert('RGB')
-    fd = urllib.urlopen(path+image.name)
+    fd = urllib.request.urlopen(path+image.name)
     image_file = io.BytesIO(fd.read())
     background = PILImage.open(image_file)	    
     background.paste(foreground, (0, 0), foreground)

@@ -1,6 +1,6 @@
 import numpy
 
-from . import convert_images
+import convert_images
 from webclient.models import *
 
 #import scipy
@@ -37,7 +37,7 @@ def calculate_entropy_map(image, category):
                 #print '%d %d' %(x, y)
                 aggregrate_array[x][y].append(imgList[x][y])
 
-    print(calculateEntropy(aggregrate_array))
+    print calculateEntropy(aggregrate_array)
 
 def calculateEntropy(arr):
     binArr = [[numpy.bincount(numpy.array(y, dtype=numpy.uint8)) for y in x] for x in arr]
@@ -78,9 +78,9 @@ def getPaddedWindow(image, user, ignore_max_count=False):
     for x in range(WINDOW_PADDING, image.width - WINDOW_PADDING,  windowWidth):
         for y in range(WINDOW_PADDING, image.height - WINDOW_PADDING, windowHeight):
             labels = image.imagelabel_set.all().filter(imageWindow__x=x, imageWindow__y=y)
-            print(labels)
+            print labels
             if (ignore_max_count and all(not label.labeler.user.groups.filter(name='god').exists() for label in labels)) or (len(labels) < NUM_LABELS_PER_WINDOW and all(label.labeler.user != user for label in labels)):
                 windowDict['x'], windowDict['y'] = (x,y)
-                print(windowDict)
+                print windowDict
                 return windowDict
     return None

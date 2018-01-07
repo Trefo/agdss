@@ -1,6 +1,6 @@
 from wand.image import Image as WandImage
 from wand.color import Color as WandColor
-import io
+import StringIO
 from webclient.models import Image, ImageLabel
 from django.conf import settings
 import re
@@ -66,21 +66,21 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
             if not os.path.exists(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/'):
                 os.makedirs(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/')
             img.save(filename=(settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + IMAGE_FILE_EXTENSION))
-            print(("converted Image " + filename))
+            print("converted Image " + filename)
             return settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + IMAGE_FILE_EXTENSION
  
 
     except wand.exceptions.CoderError as e:
-        print(('Failed to convert: ' + filename + ': '+ str(e)))
+        print('Failed to convert: ' + filename + ': '+ str(e))
     except wand.exceptions.MissingDelegateError as e:
-        print(('DE Failed to convert: ' + filename + ': '+ str(e)))
+        print('DE Failed to convert: ' + filename + ': '+ str(e))
     except wand.exceptions.WandError as e:
-        print(('Failed to convert ' + filename + ': '+ str(e)))
+        print('Failed to convert ' + filename + ': '+ str(e))
 
 def SVGStringToImageBlob(svg):
     if not svg:
         return
-    svgFile = io.StringIO(svg)
+    svgFile = StringIO.StringIO(svg)
     try:
         with WandImage(file=svgFile) as img:
             img.background_color = WandColor('white')
@@ -91,26 +91,26 @@ def SVGStringToImageBlob(svg):
             img.format = 'png'
             return img.make_blob()
     except wand.exceptions.CoderError as e:
-        print(('Failed to convert: ' + svg + ': ' + str(e)))
+        print('Failed to convert: ' + svg + ': ' + str(e))
     except wand.exceptions.MissingDelegateError as e:
-        print(('DE Failed to convert: ' + svg + ': ' + str(e)))
+        print('DE Failed to convert: ' + svg + ': ' + str(e))
     except wand.exceptions.WandError as e:
-        print(('Failed to convert ' + svg + ': ' + str(e)))
+        print('Failed to convert ' + svg + ': ' + str(e))
 
 def RenderSVGString(svg):
     if not svg:
         return
-    svgFile = io.StringIO(svg)
+    svgFile = StringIO.StringIO(svg)
     try:
         with WandImage(file=svgFile) as img:
             img.format = 'png'
             return img.make_blob()
     except wand.exceptions.CoderError as e:
-        print(('Failed to convert: ' + svg + ': ' + str(e)))
+        print('Failed to convert: ' + svg + ': ' + str(e))
     except wand.exceptions.MissingDelegateError as e:
-        print(('DE Failed to convert: ' + svg + ': ' + str(e)))
+        print('DE Failed to convert: ' + svg + ': ' + str(e))
     except wand.exceptions.WandError as e:
-        print(('Failed to convert ' + svg + ': ' + str(e)))
+        print('Failed to convert ' + svg + ': ' + str(e))
 #Returns array of SVGs each with 1 path
 def separatePaths(svg):
     #rePath = r'(<path[^/>]*/>)'
@@ -152,7 +152,7 @@ def SVGString(DBStr, height=None, width=None, keepImage=False):
              ' width="%s">%s</svg>\n' %(height, width, addedStr)
 
 def labelToSVGStringFile(str):
-    SVGStringFile = io.StringIO(SVGString(str))
+    SVGStringFile = StringIO.StringIO(SVGString(str))
     SVGStringFile.seek(0)
     return SVGStringFile
 
@@ -178,7 +178,7 @@ def countableLabel(svgString):
         return None
     image = numpy.zeros((height, width), numpy.uint8)
     for convertedImage in convertedImages:
-        img = PILImage.open(io.StringIO(convertedImage)).convert("L")
+        img = PILImage.open(StringIO.StringIO(convertedImage)).convert("L")
         imgArr = numpy.array(img, copy=True)
         imgArr[imgArr == 255] = 1
         image += imgArr

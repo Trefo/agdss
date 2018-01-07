@@ -40,7 +40,7 @@ class Image(models.Model):
 
 from django.contrib.auth.models import User
 class Labeler(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
 
     def __unicode__(self):
         return str(self.user)
