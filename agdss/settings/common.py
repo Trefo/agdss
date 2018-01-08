@@ -131,8 +131,7 @@ LOGIN_REDIRECT_URL = '/webclient'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = '/static/'
-STATIC_ROOT = "/home/jdas/Dropbox/Research/UPenn/kumar-prec-ag"
-#STATIC_ROOT = "/home/sdcunha/Dropbox/kumar-prec-ag"
+STATIC_ROOT = "/code/agdss-1/static-root/"
 
 NOTEBOOK_ARGUMENTS = [
         '--config=jupyter_notebook_config.py',
