@@ -70,8 +70,8 @@ def getGeometricImageWindow(image):
 def getPaddedWindow(image, user, ignore_max_count=False):
 
     #Crop out sidemost pixels
-    windowWidth = (image.width - (2* WINDOW_PADDING))/NUM_WINDOW_COLS
-    windowHeight = (image.height - (2* WINDOW_PADDING))/NUM_WINDOW_ROWS
+    windowWidth = int((image.width - (2* WINDOW_PADDING))/NUM_WINDOW_COLS)
+    windowHeight = int((image.height - (2* WINDOW_PADDING))/NUM_WINDOW_ROWS)
     windowDict = {'width': windowWidth, 'height': windowHeight,
                   'padding': WINDOW_PADDING}
 

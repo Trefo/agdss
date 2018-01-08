@@ -132,3 +132,6 @@ LOGIN_REDIRECT_URL = '/webclient'
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = "/code/agdss-1/static-root/"
+CATEGORY_TO_LABEL = 'tomato'
+APPEND_SLASH = False 
+

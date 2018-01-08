@@ -256,7 +256,7 @@ def getNewImage(request):
         ignore_max_count = True
     else:
         ignore_max_count = False
-        categories_to_label = ['anomaly']
+        categories_to_label = [settings.CATEGORY_TO_LABEL]
         all_unfinished_images = images
         for cat in categories_to_label:
             images = all_unfinished_images.filter(categoryType__category_name=cat)
@@ -356,7 +356,7 @@ def addImage(request):
             return HttpResponseBadRequest(
                 "Image in unreachable location. Make sure that it is in a subdirectory of " + settings.STATIC_ROOT +".\n")
         path = os.path.relpath(path_dir, root)
-        path = '/' + settings.STATIC_URL + path
+        path = settings.STATIC_URL + path
         if path[-1] != '/' and path[-1] != '\\':
             path += '/'
 
