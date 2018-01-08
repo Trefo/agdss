@@ -85,7 +85,7 @@ def applyLabels(request):
     subimage = dict['subimage']
     timeTaken = dict['timeTaken']
     user = request.user
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return HttpResponseBadRequest("Requires logged in user")
     try:
         labeler = Labeler.objects.get(user=user)
