@@ -134,4 +134,4 @@ STATIC_URL = '/static/'
 STATIC_ROOT = "/code/agdss-1/static-root/"
 CATEGORY_TO_LABEL = 'tomato'
 APPEND_SLASH = False 
-
+LABEL_FOLDER_NAME = '/labels'
