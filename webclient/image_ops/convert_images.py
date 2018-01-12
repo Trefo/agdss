@@ -45,7 +45,7 @@ def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
          return settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + foldername + '/' + filename + IMAGE_FILE_EXTENSION
     try:
         #svgs = separatePaths(img_file)
-        with WandImage(file=img_file) as img:
+        with WandImage(blob=img_file) as img:
             #img.depth = 1
             #img.colorspace = 'gray'
 
@@ -154,7 +154,8 @@ def SVGString(DBStr, height=None, width=None, keepImage=False):
 def labelToSVGStringFile(str):
     SVGStringFile = io.StringIO(SVGString(str))
     SVGStringFile.seek(0)
-    return SVGStringFile
+    print(SVGStringFile)
+    return SVGStringFile.read().encode('utf-8')
 
 def convertSVGs(LabelList, reconvert=False):
     return [convertSVG(label, reconvert) for label in LabelList if label is not None]

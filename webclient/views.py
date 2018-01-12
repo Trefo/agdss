@@ -146,7 +146,7 @@ def applyLabels(request):
     image_filter_obj.save()
 
     from webclient.image_ops.convert_images import convertSVG
-    #convertSVG(labelObject)
+    convertSVG(labelObject)
     #combineImageLabels(parentImage_[0], 50)
     return HttpResponse(label_list_)
 
