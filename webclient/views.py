@@ -6,6 +6,7 @@ import subprocess
 import os
 from django.shortcuts import render
 
+from urllib.request import urlopen
 
 import re
 import sys
@@ -499,14 +500,16 @@ def get_overlayed_image(request, image_label_id):
         return HttpResponseBadRequest('Bad image_label_id: ' + image_label_id)
     image_label = image_label[0]
     image = image_label.parentImage
-    blob = RenderSVGString(SVGString(image_label.labelShapes))
-    foreground = PILImage.open(StringIO(blob))
+    blob = RenderSVGString(image_label.labelShapes)
+    foreground = PILImage.open(io.BytesIO(blob))
     #path = re.match(re_image_path, image.path).groups(1)[0]
     path = image.path
     #background = PILImage.open(path + image.name).convert('RGB')
-    fd = urllib.request.urlopen(path+image.name)
-    image_file = io.BytesIO(fd.read())
-    background = PILImage.open(image_file)	    
+    #print(request.get_host())
+    #fd = urllib.request.urlopen(path+image.name)
+    #image_file = io.BytesIO(fd.read())
+    url = 'http://' + request.get_host() + path + image.name 
+    background = PILImage.open(urlopen(url))	    
     background.paste(foreground, (0, 0), foreground)
     output = io.BytesIO()
     background.save(output, format='png')

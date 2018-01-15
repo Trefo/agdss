@@ -30,7 +30,6 @@ def getAverageLabelImagePILFile(image, category, threshold):
 
 def convertSVGtoPNG(img_file, foldername, filename, reconvert=False):
     #Convert copy of image to new format
-    #print(img_file.getvalue())
     if not img_file:
         #TODO: Some error checking
         return
@@ -97,12 +96,17 @@ def SVGStringToImageBlob(svg):
     except wand.exceptions.WandError as e:
         print(('Failed to convert ' + svg + ': ' + str(e)))
 
+def labelToSVGStringFile(str):
+    SVGStringFile = io.StringIO(SVGString(str))
+    SVGStringFile.seek(0)
+    return SVGStringFile.read().encode('utf-8')
+
 def RenderSVGString(svg):
     if not svg:
         return
-    svgFile = io.StringIO(svg)
+    svgFile = labelToSVGStringFile(svg)
     try:
-        with WandImage(file=svgFile) as img:
+        with WandImage(blob=svgFile) as img:
             img.format = 'png'
             return img.make_blob()
     except wand.exceptions.CoderError as e:
@@ -151,11 +155,6 @@ def SVGString(DBStr, height=None, width=None, keepImage=False):
             ' xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve" height="%s"' \
              ' width="%s">%s</svg>\n' %(height, width, addedStr)
 
-def labelToSVGStringFile(str):
-    SVGStringFile = io.StringIO(SVGString(str))
-    SVGStringFile.seek(0)
-    print(SVGStringFile)
-    return SVGStringFile.read().encode('utf-8')
 
 def convertSVGs(LabelList, reconvert=False):
     return [convertSVG(label, reconvert) for label in LabelList if label is not None]
