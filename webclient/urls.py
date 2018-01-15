@@ -29,5 +29,5 @@ urlpatterns = [
     path('loadLabels', views.loadLabels),
     path('fix_label_location', views.fix_label_location),
     path('print_label_data', views.print_label_data),
-    path('get_overlayed_image/(<image_label_id>[0-9]*)', views.get_overlayed_image),
-    ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    url(r'^get_overlayed_image/(?P<image_label_id>[0-9]*)$', views.get_overlayed_image),    
+]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
