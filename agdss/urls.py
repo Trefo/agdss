@@ -30,18 +30,16 @@ admin.site = AdminSitePlus()
 admin.sites.site = admin.site
 admin.autodiscover()
 
-
-
 urlpatterns = [
-    path('webclient/', include('webclient.urls')),
-    path('admin/', admin.site.urls),
-    path('', include('django.contrib.auth.urls')),
-    path('register/', CreateView.as_view(
-        template_name='registration/register.html',
-        form_class=UserCreationForm,
+url(r'^webclient/', include('webclient.urls')),
+url(r'^admin/', admin.site.urls),
+url('^', include('django.contrib.auth.urls')),
+url('^register/', CreateView.as_view(
+template_name='registration/register.html',
+form_class=UserCreationForm,
         success_url= '/login'
     )),
-    path('accounts/', include('django.contrib.auth.urls')),
-    path('', RedirectView.as_view(url='/webclient/')),
+url(r'^accounts/', include('django.contrib.auth.urls')),
 
+url(r'^$', RedirectView.as_view(url='/webclient/')),
 ]
