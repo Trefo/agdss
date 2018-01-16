@@ -1,0 +1,7 @@
+Django
+gunicorn
+psycopg2
+pillow
+numpy
+wand
+	
