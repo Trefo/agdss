@@ -10,8 +10,9 @@ services:
     depends_on:
       - db
     volumes:
-      - ./annotable:/annotable
-    command: bash -c "cd agdss && cp -r /annotable/small-tomatoes/ webclient/static/ && rm -rf static-root && python3 manage.py collectstatic --settings=agdss.settings.common && python3 manage.py runserver 0.0.0.0:8000 --settings=agdss.settings.common && cd /code/agdss-1/static-root/small-tomatoes/ && bash addImages.sh tomato"
+      - ./:/app
+    #command: bash -c "sleep 3600"
+    command: bash -c "cd /app/agdss && cp -r /app/annotable/small-tomatoes/ /app/webclient/static/ && sleep 3600"
 
 
 networks:  
