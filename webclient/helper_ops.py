@@ -1,9 +1,9 @@
-from models import *
+from .models import *
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
-from cStringIO import StringIO
+from io import StringIO
 from PIL import Image as PILImage
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 def fixAllImagePaths():
     for image in Image.objects.all():
@@ -19,7 +19,7 @@ def updateAllImageSizes(scheme, host):
         try:
             url_check(image.path)
             im_url = image.path + image.name
-        except ValidationError, e:
+        except ValidationError as e:
             im_url = url + image.path + '/' + image.name
-        image.width, image.height = PILImage.open(StringIO(urllib.urlopen(im_url).read())).size
+        image.width, image.height = PILImage.open(StringIO(urllib.request.urlopen(im_url).read())).size
         image.save()

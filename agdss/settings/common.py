@@ -25,7 +25,7 @@ SECRET_KEY = 'q82m6os5(_m4s7tabkfsz1y90dsnz1q(_c^+u&zs+ffftgs*2$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -43,13 +43,12 @@ INSTALLED_APPS = [
     'django_extensions',
 ]
 
-MIDDLEWARE_CLASSES = [
-    'django.middleware.security.SecurityMiddleware',
+MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -63,7 +62,6 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                "django.core.context_processors.request",
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -133,9 +131,7 @@ LOGIN_REDIRECT_URL = '/webclient'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = '/static/'
-STATIC_ROOT = "/home/jdas/Dropbox/Research/UPenn/kumar-prec-ag"
-#STATIC_ROOT = "/home/sdcunha/Dropbox/kumar-prec-ag"
-
-NOTEBOOK_ARGUMENTS = [
-        '--config=jupyter_notebook_config.py',
-        ]
+STATIC_ROOT = "/code/agdss-1/static-root/"
+CATEGORY_TO_LABEL = 'tomato'
+APPEND_SLASH = False 
+LABEL_FOLDER_NAME = '/labels'
