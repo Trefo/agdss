@@ -11,8 +11,8 @@ services:
       - db
     volumes:
       - ./:/app
-    #command: bash -c "sleep 3600"
-    command: bash -c "cd /app/agdss && cp -r /app/annotable/small-tomatoes/ /app/webclient/static/ && sleep 3600"
+    working_dir: /app
+    command: bash -c "cp -r annotable/small-tomatoes/ webclient/static/ && python3 manage.py runserver 0.0.0.0:8000 --settings=agdss.settings.common"
 
 
 networks:  
