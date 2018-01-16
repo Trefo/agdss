@@ -7,8 +7,8 @@ from webclient.models import *
 import random
 
 
-NUM_WINDOW_ROWS = 4
-NUM_WINDOW_COLS = 4
+NUM_WINDOW_ROWS = 1
+NUM_WINDOW_COLS = 1
 WINDOW_PADDING = 20
 NUM_LABELS_PER_WINDOW = 3
 
