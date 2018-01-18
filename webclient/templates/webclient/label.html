@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="/static/css/simple-sidebar.css" rel="stylesheet">
 
     <script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.min.js"></script>
@@ -351,45 +352,61 @@
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
-                    <a href="#">
-                        Label.ag
+                    <a href="#" style="font-size: 150%; text-align: center;">
+                        𝓁𝒶𝒷𝑒𝓁.𝒶𝑔
                     </a>
                 </li>
 
-                <li>
+                <!-- <li>
                     <p>Category: <select id="categories"></select></p>
                     <span name="categoryName" id="categoryName" style="font-size: 30px;"></span>
+                </li> -->
+
+                <li data-toggle="collapse" data-target="#categories_coll" class="collapsed active">
+                      <p><i class="fa fa-list" aria-hidden="true"></i> Categories <span class="arrow"></span></p>
                 </li>
-                <li>
-                        <p><input type="checkbox" id="noLabels" /> No labels in image</p>
+                <ul class="sidebar-nav2 sub-menu collapse" id="categories_coll">
+                    <li class="active">
+                            <p><label id="brightnessLabel" style=" margin-bottom: 0px; ">Category1</label> </p>
+                    </li>
+                    <li>
+                            <p><label id="brightnessLabel" style=" margin-bottom: 0px; ">Category2</label> </p>
+                    </li>
+                </ul>
+
+
+                <li data-toggle="collapse" data-target="#products" class="collapsed active">
+                      <p><i class="fa fa-picture-o" aria-hidden="true"></i> Image Operations <span class="arrow"></span></p>
                 </li>
+                <ul class="sidebar-nav2 sub-menu collapse show" id="products">
+                    <!-- <li class="active"><a href="#">CSS3 Animation</a></li> -->
+                    <li>
+                            <p><label id="brightnessLabel" style=" margin-bottom: 0px; ">Brightness:</label> <span id="brightness">1</span></p>
+                    </li>
+                    <li>
+                            <input type="range" min="1" max="10" step="0.1" value="1" id="brightnessControl" style="margin-left: 10%;" />
+                    </li>
+                    <li>
+                            <p><label id="contrastLabel" style=" margin-bottom: 0px; ">Contrast:</label> <span id="contrast">1</span></p>
+                    </li>
+                    <li>
+                            <input type="range" min="1" max="3" step="0.1" value="1" id="contrastControl" style="margin-left: 10%;" />
+                    </li>
+                    <li>
+                            <p><label id="saturationLabel" style=" margin-bottom: 0px; ">Saturation:</label> <span id="saturation">1</span></p>
+                    </li>
+                    <li>
+                            <input type="range" min="1" max="5" step="0.1" value="1" id="saturationControl" style="margin-left: 10%;" />
+                    </li>
+                    <li>
+                            <input type="button" id="resetImageControl" value="Reset" class="btn btn-warning" style="position: relative; left: 30%; ">
+                    </li>
+                </ul>
                 <li>
-                    <br>
-                    <br>
-                </li>
-                <li>
-                        <p><label id="brightnessLabel" style=" margin-bottom: 0px; ">Brightness:</label> <span id="brightness">1</span></p>
-                </li>
-                <li>
-                        <input type="range" min="1" max="10" step="0.1" value="1" id="brightnessControl" />
-                </li>
-                <li>
-                        <p><label id="contrastLabel" style=" margin-bottom: 0px; ">Contrast:</label> <span id="contrast">1</span></p>
-                </li>
-                <li>
-                        <input type="range" min="1" max="3" step="0.1" value="1" id="contrastControl" />
-                </li>
-                <li>
-                        <p><label id="saturationLabel" style=" margin-bottom: 0px; ">Saturation:</label> <span id="saturation">1</span></p>
-                </li>
-                <li>
-                        <input type="range" min="1" max="5" step="0.1" value="1" id="saturationControl" />
-                </li>
-                <li>
-                        <input type="button" id="resetImageControl" value="Reset" class="btn btn-warning" style="position: absolute; left: 30%; ">
-                        <br>
+                        <p><label><input type="checkbox" id="noLabels" /> No labels in image</p></label>
                 </li>
             </ul>
+
             <form method="post" name="applyLabelsForm">
                 {% csrf_token %}
                 <input id="applyLabels" type="button" value="Submit labels" class="btn btn-success" style="position: absolute; bottom: 5%; left: 25%; ">
