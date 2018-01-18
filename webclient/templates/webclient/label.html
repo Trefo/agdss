@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>AgDSS Web</title>
     <!--<link rel="stylesheet" href="/static/scripts/paperjs/examples/css/style.css"> -->
+
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+    <link href="/static/css/simple-sidebar.css" rel="stylesheet">
+
     <script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.min.js"></script>
-   <!-- <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script> -->
+    <!-- <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script> -->
     <script type='text/javascript' src='/static/scripts/jQuery/jquery-3.0.0.min.js'></script>
     <!--<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"> -->
-
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
     <script type="text/paperscript" canvas="canvas">
-       var startPoint;
+        var startPoint;
         var raster;
         var labelsLayer = new paper.Layer();
         var isActive = false;
@@ -26,9 +32,9 @@
                 timeTaken = endTime - startTime;
 
                 //Check if there are labels or if the no label checkbox is checked
-                if(labelsDrawn <= 0 && !$('#noLabels').prop('checked')) {
+                if (labelsDrawn <= 0 && !$('#noLabels').prop('checked')) {
                     alert('No labels drawn in image. If there are no labelable features in this image,' +
-                            ' check the "No Labels in image" checkbox');
+                        ' check the "No Labels in image" checkbox');
                     return false;
                 }
                 var updated_category = $("#categories").val();
@@ -36,11 +42,15 @@
                 $('#noLabels').prop('checked', false);
                 prevLabels = labelsDrawn;
                 labelsDrawn = 0;
-                var svg = window.labelsLayer.exportSVG({embedImages: false, asString: false, matchShapes: true});
+                var svg = window.labelsLayer.exportSVG({
+                    embedImages: false,
+                    asString: false,
+                    matchShapes: true
+                });
                 svg.getElementsByTagName('image')[1].remove(); //Remove image added by cropping
-               for (i = 0, circles = svg.getElementsByTagName('circle'); i < circles.length; i++) {
-                   var x = parseInt(imageX) - parseInt(imagePadding)
-                   var y = parseInt(imageY) - parseInt(imagePadding)
+                for (i = 0, circles = svg.getElementsByTagName('circle'); i < circles.length; i++) {
+                    var x = parseInt(imageX) - parseInt(imagePadding)
+                    var y = parseInt(imageY) - parseInt(imagePadding)
                     circles[i].setAttribute('transform', 'translate(' + (x) + ',' + (y) + ')');
                 }
                 svg.getElementsByTagName('image')[0].setAttribute('x', '0');
@@ -48,11 +58,11 @@
                 xmlSer = new XMLSerializer();
                 svg = xmlSer.serializeToString(svg);
                 $('#debug').text('loading next image...');
-		$.ajax({
-                    url : "/webclient/applyLabels",
-                    type : "POST",
+                $.ajax({
+                    url: "/webclient/applyLabels",
+                    type: "POST",
                     dataType: 'text',
-                    data : JSON.stringify({
+                    data: JSON.stringify({
                         image_name: currentImage.image_name,
                         path: currentImage.path,
                         category_name: updated_category,
@@ -70,9 +80,9 @@
                         },
                         timeTaken: timeTaken,
                     }),
-                    success : function(data) {
+                    success: function(data) {
                         $('#debug').text('');
-                        if(window.labelsLayer.hasChildren()){
+                        if (window.labelsLayer.hasChildren()) {
                             window.labelsLayer.removeChildren();
                         }
                         aboveExistingLabel = false;
@@ -80,7 +90,7 @@
                         //$('#noLabels').prop('checked', false);
                         getNewImage();
                     },
-                    error : function(xhr,errmsg,err) {
+                    error: function(xhr, errmsg, err) {
                         alert(xhr.status + ": " + xhr.responseText);
                         labelsDrawn = prevLabels;
 
@@ -91,40 +101,39 @@
         });
 
         function onMouseDown(event) {
-            if(!aboveExistingLabel){ //Create new label
+            if (!aboveExistingLabel) { //Create new label
                 startPoint = event.point;
                 isActive = true; //Whether the path is currently being created
-                var center = (startPoint + event.point)/2
-                //window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
+                var center = (startPoint + event.point) / 2
+                    //window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
                 dragged = false; //Whether the path has been created with a click and dragged to be larger than a simgle point
-            }
-            else {
+            } else {
                 dragStartPoint = event.point;
             }
 
         }
 
         function onMouseDrag(event) {
-            if(isActive){
-                if(!dragged) {
-                    var center = (startPoint + event.point)/2
-                    window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
+            if (isActive) {
+                if (!dragged) {
+                    var center = (startPoint + event.point) / 2
+                    window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point) / 2);
                     dragged = true;
                     labelsDrawn += 1;
                 }
-                var center = (startPoint + event.point)/2
-                newPath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
+                var center = (startPoint + event.point) / 2
+                newPath = new Path.Circle(center, startPoint.getDistance(event.point) / 2);
                 newPath.strokeColor = 'yellow';
                 newPath.strokeWidth = 2;
                 newPath.opacity = 0.5;
-                newPath.onMouseEnter= function(event){
-                    if(!isActive) {
+                newPath.onMouseEnter = function(event) {
+                    if (!isActive) {
                         aboveExistingLabel = true;
                         this.fillColor = 'red';
                         window.circlePath = this;
                     }
                 }
-                newPath.onMouseLeave= function(event){
+                newPath.onMouseLeave = function(event) {
                     aboveExistingLabel = false;
                     this.fillColor = 'aqua';
                 }
@@ -137,7 +146,7 @@
                 }
                 window.circlePath.remove();
                 window.circlePath = newPath;
-            }else{
+            } else {
                 window.circlePath.position += event.point - dragStartPoint;
                 dragStartPoint = event.point;
             }
@@ -148,18 +157,13 @@
             isActive = false;
             if (!dragged) {
                 aboveExistingLabel = false;
-            }
-            else {
+            } else {
                 window.circlePath.opacity = 0.3;
                 window.circlePath.fillColor = 'aqua';
             }
 
         }
-
-
-
     </script>
-
 
     <script type="text/javascript">
         imageX = 0;
@@ -196,14 +200,13 @@
                 }
             });
 
-
         } */
 
         function getNewImage() {
             startTime = Date.now();
             if (!window.labelsLayer) {
                 window.labelsLayer = new paper.Layer();
-            }else{
+            } else {
                 raster.remove();
             }
             //selectedImage = JSON.parse($('#imageCombo').val());
@@ -216,7 +219,7 @@
                     image_name: selectedImage.image_name,
                     path: selectedImage.path
                 }, */
-                success: function (response) {
+                success: function(response) {
                     data = response.labels;
                     if (data) {
                         displayLabels(response.labels);
@@ -226,45 +229,44 @@
                     imageWidth = response.subimage.width;
                     imageHeight = response.subimage.height;
                     imagePadding = response.subimage.padding;
-                    if(typeof padding == 'undefined') {
+                    if (typeof padding == 'undefined') {
                         padding = 0;
                     }
                     displayImage(response.image_name, response.path, response.categories,
-                        new paper.Point(response.subimage.x,response.subimage.y),
+                        new paper.Point(response.subimage.x, response.subimage.y),
                         imageWidth, imageHeight, imagePadding);
                     currentImage = response
                 },
 
-                error: function (xhr, errmsg, err) {
+                error: function(xhr, errmsg, err) {
                     alert(xhr.status + ": " + xhr.responseText);
                 }
             });
         }
         //TODO: Input validation and error checking
         function displayImage(image_name, image_path, categories, point, width, height, padding) {
-            if(width <= 0 || height <= 0 || padding < 0) {
+            if (width <= 0 || height <= 0 || padding < 0) {
                 alert("Problem with width, height, or padding value");
                 return;
             }
-            size = new paper.Size(width + 2*padding, height + 2*padding);
+            size = new paper.Size(width + 2 * padding, height + 2 * padding);
             //Add new image and resize canvas to fit image
             img = new Image();
             img.onload = function() {
-                if(!img.complete || img.naturalWidth == 0) {
+                if (!img.complete || img.naturalWidth == 0) {
                     alert("Could not load image");
                     console.log(img);
                     return;
-                    }
-                if(point.x + width + padding > img.naturalWidth || point.y + height + padding > img.naturalHeight) {
+                }
+                if (point.x + width + padding > img.naturalWidth || point.y + height + padding > img.naturalHeight) {
                     alert("Window out of bounds of image.");
                     return;
                 }
             };
             img.crossOrigin = "Anonymous";
-            try{
+            try {
                 img.src = image_path + image_name;
-            }
-            catch(err) {
+            } catch (err) {
                 alert("Image cannot be opened. Note that currently external URLs cannot be used. Error: " + err.message)
             }
 
@@ -281,21 +283,20 @@
                 paper.view.update();
 
             }
-            if(img.complete) {
+            if (img.complete) {
                 setup_images();
-            }else {
-              img.addEventListener('load', setup_images);
-              img.addEventListener('error', function() {
-                  alert('Error loading image');
-              })
+            } else {
+                img.addEventListener('load', setup_images);
+                img.addEventListener('error', function() {
+                    alert('Error loading image');
+                })
             }
 
             //Category selection setup
             var output = [];
             $('#categories')[0].options.length = 0;
-            $.each(categories, function(i, val)
-            {
-              output.push('<option value="'+ val +'">'+ val +'</option>');
+            $.each(categories, function(i, val) {
+                output.push('<option value="' + val + '">' + val + '</option>');
             });
             $('#categories').html(output.join(''));
             //$('#categoryName').html(response.categories[0]);
@@ -311,27 +312,24 @@
             //window.labelsLayer.importJSON(JSON.parse(data));
         }
 
-
-
-        $('document').ready(function(){
-
+        $('document').ready(function() {
 
             //Canvas Controls
             $('#brightnessControl').on('input', function() {
                 var brightness = $('#brightnessControl').val();
                 $('span#brightness').html(brightness);
-                cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' +  $('#saturationControl').val() + ')';
+                cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' + $('#saturationControl').val() + ')';
                 $('#canvas').css('-webkit-filter', cssText).css('filter', cssText);
             });
             $('#contrastControl').on('input', function() {
                 var contrast = $('#contrastControl').val();
-                cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' +  $('#saturationControl').val() + ')';
+                cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' + $('#saturationControl').val() + ')';
                 $('span#contrast').html($('#contrastControl').val());
                 $('#canvas').css('-webkit-filter', cssText).css('filter', cssText);
             });
             $('#saturationControl').on('input', function() {
                 var saturation = $('#saturationControl').val();
-                cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' +  $('#saturationControl').val() + ')';
+                cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' + $('#saturationControl').val() + ')';
                 $('span#saturation').html($('#saturationControl').val());
                 $('#canvas').css('-webkit-filter', cssText).css('filter', cssText);
             });
@@ -343,16 +341,66 @@
             });
 
         });
-
-
-
     </script>
 
-
 </head>
+
 <body onload="getNewImage()" bgcolor="#c0c0c0">
-<div id="main>">
-    <!--<div id="toolbars">
+    <div id="wrapper"  class="toggled">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="#">
+                        Label.ag
+                    </a>
+                </li>
+
+                <li>
+                    <p>Category: <select id="categories"></select></p>
+                    <span name="categoryName" id="categoryName" style="font-size: 30px;"></span>
+                </li>
+                <li>
+                        <p><input type="checkbox" id="noLabels" /> No labels in image</p>
+                </li>
+                <li>
+                    <br>
+                    <br>
+                </li>
+                <li>
+                        <p><label id="brightnessLabel" style=" margin-bottom: 0px; ">Brightness:</label> <span id="brightness">1</span></p>
+                </li>
+                <li>
+                        <input type="range" min="1" max="10" step="0.1" value="1" id="brightnessControl" />
+                </li>
+                <li>
+                        <p><label id="contrastLabel" style=" margin-bottom: 0px; ">Contrast:</label> <span id="contrast">1</span></p>
+                </li>
+                <li>
+                        <input type="range" min="1" max="3" step="0.1" value="1" id="contrastControl" />
+                </li>
+                <li>
+                        <p><label id="saturationLabel" style=" margin-bottom: 0px; ">Saturation:</label> <span id="saturation">1</span></p>
+                </li>
+                <li>
+                        <input type="range" min="1" max="5" step="0.1" value="1" id="saturationControl" />
+                </li>
+                <li>
+                        <input type="button" id="resetImageControl" value="Reset" class="btn btn-warning" style="position: absolute; left: 30%; ">
+                        <br>
+                </li>
+            </ul>
+            <form method="post" name="applyLabelsForm">
+                {% csrf_token %}
+                <input id="applyLabels" type="button" value="Submit labels" class="btn btn-success" style="position: absolute; bottom: 5%; left: 25%; ">
+            </form>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">   
+            <div id="main>">
+                <!--<div id="toolbars">
         <select id="imageCombo"  onchange="onImageFormChange()">
             {#% for image in latest_image_list %#}
                 {#% ifequal image selected_image %#}
@@ -363,71 +411,65 @@
             {#% endfor %#}
         </select>
     </div> -->
- <div id="debug">
+                <div id="debug">
 
+                </div>
+
+                <div id="controls">
+                    <a href="/logout" class="btn btn-danger" style="position: absolute; top: 1%; right: 1%; "> Logout </a>
+                    <br/>
+                    <div id="tips">
+                        <p> <h3>Instructions</h3>
+                            <ul class="list-group">
+                              <li class="list-group-item">Encircle occluded fruits <i>entirely</i>, use your best guess!</li>
+                              <li class="list-group-item">Click and drag to select region.</li>
+                              <li class="list-group-item">Labels can be moved by clicking and dragging.</li>
+                              <li class="list-group-item">Double click to delete an area.</li>
+                            </ul>
+                        </p>
+                    </div>
+
+                </div>
+                <table id="displayTable">
+                    <tr>
+                        <td>
+                            <div id="canvasDiv">
+                                <!--<canvas id="canvas" resize></canvas> -->
+                                <div id="canvasWrapper">
+                                    <canvas id="canvas" width="1920" height="1080"></canvas>
+                                </div>
+                                <div id="image_info">
+                                    <p id="image_info_name"></p>
+                                    <p id="image_info_path"></p>
+                                </div>
+
+                                <div>
+                                    <p>To report a bug, go to the github page <a href="https://github.com/dcunhas/agdss/issues" target="_blank">here</a> and open a new issue</p>
+
+                                </div>
+
+                            </div>
+                        </td>
+
+                    </tr>
+                </table>
+                <!-- <a href="#menu-toggle" class="btn btn-secondary" id="menu-toggle">Toggle Menu</a> -->
+            </div>
+        </div>
     </div>
 
-    <div id="controls">
-        <form method="post" name="applyLabelsForm" >
-            {% csrf_token %}
-            <!--<input name="categoryName" id="categoryName" type="text"> -->
-                <span id="categoryWord">Category: </span>
-                <select id="categories"></select>
-                <span name="categoryName" id="categoryName" style="font-size: 30px;"></span>
-            <input id="applyLabels" type="button" value="submit" style="font-size : 20px; height:50px; width:130px"> <br>
-            <input type="checkbox" id="noLabels" /> No labels in image
-        </form>
-        <a href="/logout">logout</a>
-        <br/>
-<div id="tips">
-    <p>
-        <ol style="text-align: left;padding-left: 0px;">
-        <ul>Encircle occluded fruits <i>entirely</i>, use your best guess!</ul>
-        <ul>Click and drag to select region.</ul>
-		<ul>Labels can be moved by clicking and dragging.</ul> 
-		<ul>Double click to delete an area.</ul>
-        </ol>
-    </p>
-</div>
+    <!-- Bootstrap core JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
 
-</div>
-    <table id="displayTable"><tr>
-    <td><div id="canvasDiv">
-        <!--<canvas id="canvas" resize></canvas> -->
-       <div id="canvasWrapper">
-           <canvas id="canvas" width="1920" height="1080"></canvas>
-        </div>
-        <div id="image_info">
-            <p id="image_info_name"></p>
-            <p id="image_info_path"></p>
-        </div>
+    <!-- Menu Toggle Script -->
+    <script>
+        $("#menu-toggle").click(function(e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+        });
+    </script>
 
-         <div>
-             <p>To report a bug, go to the github page <a href="https://github.com/dcunhas/agdss/issues" target="_blank">here</a> and open a new issue</p>
-
-        </div>
-
-    </div></td>
-
-
-    <td id="imageControlTd"><div id="imageControlContainer">
-        <div id="imageControl">
-            <label id=brightnessLabel>Brightness:</label> <span id="brightness">1</span><br>
-            <input type="range"  min="1" max="10" step="0.1" value="1" id="brightnessControl"/><br>
-            <label id="contrastLabel">Contrast:</label> <span id="contrast">1</span><br>
-            <input type="range"  min="1" max="3" step="0.1" value="1" id="contrastControl"/><br>
-            <label id="saturationLabel">Saturation:</label> <span id="saturation">1</span> <br>
-            <input type="range"  min="1" max="5" step="0.1" value="1" id="saturationControl"/><br>
-            <button type="button" id="resetImageControl" >Reset</button>
-        </div>
-    </div></td>
-
-
-    </tr></table>
-    <!--<div id="submitImage">
-        <button id="next">Submit</button>
-    </div> -->
-
-</div>
 </body>
+
 </html>
