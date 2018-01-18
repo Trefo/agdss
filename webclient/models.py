@@ -10,7 +10,7 @@ class CategoryType(models.Model):
     category_name = models.CharField(default='unknown', max_length=100, unique=True)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Category name: ' + self.category_name
 
 
@@ -18,7 +18,7 @@ class ImageSourceType(models.Model):
     description = models.CharField(default='unknown',max_length=200, unique=True)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Description: ' + self.description
 
 
@@ -34,7 +34,7 @@ class Image(models.Model):
     categoryType = models.ManyToManyField(CategoryType)
     class Meta:
         unique_together = ('name', 'path')
-    def __unicode__(self):
+    def __str__(self):
         return 'Name: ' + self.name
 
 
@@ -42,7 +42,7 @@ from django.contrib.auth.models import User
 class Labeler(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
 
-    def __unicode__(self):
+    def __str__(self):
         return str(self.user)
 class ImageWindow(models.Model):
     x = models.PositiveSmallIntegerField()
@@ -53,7 +53,7 @@ class ImageWindow(models.Model):
     class Meta:
         unique_together = ('x', 'y', 'width', 'height')
 
-    def __unicode__(self):
+    def __str__(self):
         return '(x,y)=(%d,%d), width: %d, height: %d' %(self.x,self.y,self.width, self.height)
 
 def getDefaultImageWindowId():
@@ -75,7 +75,7 @@ class ImageLabel(models.Model):
     timeTaken = models.PositiveIntegerField(null=True, default=None)
     #ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Image: ' + self.parentImage.name + ' | Category: ' + self.categoryType.category_name  + ' | Labeler: ' + str(self.labeler)
 
 
@@ -89,7 +89,7 @@ class ImageFilter(models.Model):
     imageLabel = models.ForeignKey(ImageLabel, on_delete=models.CASCADE, null=True, blank=True, default=None)
     labeler = models.ForeignKey(Labeler, on_delete=models.CASCADE, null=True, blank=True, default=None)
 
-    def __unicode__(self):
+    def __str__(self):
         return 'ImageFilter: brightness:' + str(self.brightness) + ' contrast: ' + str(self.contrast)\
                + ' saturation: ' + str(self.saturation) + ' labeler: ' + str(self.labeler)
 

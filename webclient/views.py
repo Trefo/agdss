@@ -307,7 +307,7 @@ Request: POST
     image_name:name of image REQUIRED
     description: A description NOT REQUIRED
     source_description: Description of image_source. NOT REQUIRED
-    category: Category of the image (e.g. 'apple'). REQUIRED.
+    categories: List of categories of the image (e.g. ['apple', 'day']). REQUIRED, must be NONEMPTY.
 }
 
 '''
@@ -316,11 +316,22 @@ Request: POST
 def addImage(request):
     #Validate input
     print(request.POST)
-    if not ('image_name' in request.POST and 'path' in request.POST and 'category' in request.POST):
-        return HttpResponseBadRequest("Missing required input")
-    if request.POST['category'] == '':
-        return HttpResponseBadRequest("Missing category")
-
+    if not ('image_name' in request.POST and 'path' in request.POST and 'categories' in request.POST):
+        return HttpResponseBadRequest("Missing required input.")
+    print(request.POST['categories'])
+    try:
+        request_categories = json.loads(request.POST['categories'])
+    except json.JSONDecodeError:
+        return HttpResponseBadRequest(
+            'Category list could not be understood. Please provide a list in the format: '
+            '["category_1", "category_2", ... , "category_n"]. Please note that you may need to '
+            'escape quotes with a backslash (\\)')
+    if not request_categories: #if empty
+        return HttpResponseBadRequest("Missing a category, 'categories' field required to be nonempty list")
+    for category in request_categories:
+        if category == "":
+            HttpResponseBadRequest("A category cannot be an empty string")
+    print(request_categories)
     #Determine wheter 'path' is URL or file path
     path = request.POST['path']
     if path[-1] != '/' and path[-1] != '\\':
@@ -359,14 +370,8 @@ def addImage(request):
         sourceType = ImageSourceType(description=request.POST.get('source_description', default="human"), pub_date=datetime.now())
         sourceType.save()
 
-    #Get CategoryType entry or add one if necessary.
-    cn = request.POST.get('category', 'unknown')
-    categoryTypeList = CategoryType.objects.all().filter(category_name = cn)
-    if categoryTypeList:
-        categoryType = categoryTypeList[0]
-    else:
-        categoryType = CategoryType(category_name=request.POST.get('category', 'unknown'))
-        categoryType.save()
+    #Get CategoryType entries or add if necessary.
+    category_list = [CategoryType.objects.get_or_create(category_name=category)[0] for category in request_categories]
 
     imageList = Image.objects.all().filter(name=request.POST['image_name'], path=path, description=request.POST.get('description', default=''), source=sourceType)
     if imageList:
@@ -374,7 +379,9 @@ def addImage(request):
     else:
         img = Image(name=request.POST['image_name'], path=path, description=request.POST.get('description', default=''), source=sourceType, width=width, height=height)
         img.save()
-    img.categoryType.add(categoryType)
+
+    print(category_list)
+    img.categoryType.add(*category_list)
     #imgLabel = ImageLabel(parentImage=img, categoryType=categoryType, pub_date=datetime.now())
     #imgLabel.save()
     return HttpResponse("Added image " + request.POST['image_name'] + '\n')
