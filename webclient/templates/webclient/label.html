@@ -295,11 +295,14 @@
 
             //Category selection setup
             var output = [];
-            $('#categories')[0].options.length = 0;
+            $('#categories_coll')[0].html = '';
             $.each(categories, function(i, val) {
-                output.push('<option value="' + val + '">' + val + '</option>');
+                cat_list_item = '<li><table style="width:100%"><tr><td><p><label id="' + val +
+                    '" style=" margin-bottom: 0px; ">' + val +
+                '</label></p></td><td><p><span class="circle" style="color:"red";background-color: "red";"></span></p></td></tr></table></li>';
+                output.push(cat_list_item);
             });
-            $('#categories').html(output.join(''));
+            $('#categories_coll').html(output.join(''));
             //$('#categoryName').html(response.categories[0]);
 
             $('#image_name').html("Image name: " + image_name);
@@ -361,7 +364,7 @@
                       <p><i class="fa fa-list" aria-hidden="true"></i> Categories <span class="arrow"></span></p>
                 </li>
                 <ul class="sidebar-nav2 sub-menu collapse" id="categories_coll">
-                    <li class="text-active">
+                    <!--<li class="text-active">
                             <table style="width:100%">
                                 <tr>
                                     <td><p><label style=" margin-bottom: 0px; ">Category1</label></p></td>
@@ -376,18 +379,18 @@
                                     <td><p><span class="circle" style="color: red;background-color: red;"></span></p></td>
                                 </tr>
                             </table>
-                    </li>
+                    </li> -->
 
-                    <!-- {% for category in category_list %}
+                    <!--{% for category in category_list %}
                         <li>
                             <table style="width:100%">
                                 <tr>
                                     <td><p><label id="{{category.id}}" style=" margin-bottom: 0px; ">{{category.name}}</label></p></td>
-                                    <td><p><span class="circle" style="color: {{category.color}};background-color: {{category.color}};"></span></p></td>
+                                    <td><p><span class="circle" style="color:{{category.color}};background-color: {{category.color}};"></span></p></td>
                                 </tr>
                             </table>
                         </li>
-                    {% endfor %} -->
+                    {% endfor %}-->
                 </ul>
 
 
