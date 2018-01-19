@@ -78,13 +78,17 @@ def results(request):
 @csrf_exempt 
 def applyLabels(request):
     dict = json.load(request)
-    label_list_ = dict['label_list']
-    image_name = dict['image_name']
-    path = dict['path']
-    category_name = dict['category_name']
-    image_filters = dict['image_filters']
-    subimage = dict['subimage']
-    timeTaken = dict['timeTaken']
+    print(dict)
+    try:
+        label_list_ = dict['label_list']
+        image_name = dict['image_name']
+        path = dict['path']
+        category_name = dict['category_name']
+        image_filters = dict['image_filters']
+        subimage = dict['subimage']
+        timeTaken = dict['timeTaken']
+    except KeyError as e:
+        return HttpResponseBadRequest("Missing required key {}".format(e))
     user = request.user
     if not user.is_authenticated:
         return HttpResponseBadRequest("Requires logged in user")
