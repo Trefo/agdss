@@ -357,21 +357,37 @@
                     </a>
                 </li>
 
-                <!-- <li>
-                    <p>Category: <select id="categories"></select></p>
-                    <span name="categoryName" id="categoryName" style="font-size: 30px;"></span>
-                </li> -->
-
                 <li data-toggle="collapse" data-target="#categories_coll" class="collapsed active">
                       <p><i class="fa fa-list" aria-hidden="true"></i> Categories <span class="arrow"></span></p>
                 </li>
                 <ul class="sidebar-nav2 sub-menu collapse" id="categories_coll">
-                    <li class="active">
-                            <p><label id="brightnessLabel" style=" margin-bottom: 0px; ">Category1</label> </p>
+                    <li class="text-active">
+                            <table style="width:100%">
+                                <tr>
+                                    <td><p><label style=" margin-bottom: 0px; ">Category1</label></p></td>
+                                    <td><p><span class="circle" style="color: blue;background-color: blue;"></span></p></td>
+                                </tr>
+                            </table>
                     </li>
                     <li>
-                            <p><label id="brightnessLabel" style=" margin-bottom: 0px; ">Category2</label> </p>
+                            <table style="width:100%">
+                                <tr>
+                                    <td><p><label style=" margin-bottom: 0px; ">Category2</label></p></td>
+                                    <td><p><span class="circle" style="color: red;background-color: red;"></span></p></td>
+                                </tr>
+                            </table>
                     </li>
+
+                    <!-- {% for category in category_list %}
+                        <li>
+                            <table style="width:100%">
+                                <tr>
+                                    <td><p><label id="{{category.id}}" style=" margin-bottom: 0px; ">{{category.name}}</label></p></td>
+                                    <td><p><span class="circle" style="color: {{category.color}};background-color: {{category.color}};"></span></p></td>
+                                </tr>
+                            </table>
+                        </li>
+                    {% endfor %} -->
                 </ul>
 
 
