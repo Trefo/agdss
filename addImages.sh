@@ -12,7 +12,7 @@ then
     exit 1
 fi
 IMAGE_TYPES="{jpg, jpeg, png, bmp}"
-shopt -s nullglob
+shopt -s nullglob nocaseglob
 for file in *.jpg *.jpeg *.png *.bmp; do
     curl --data "path=$(pwd)&image_name=$file&categories=$1" "$SERVER$URL"
 done

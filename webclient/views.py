@@ -191,7 +191,7 @@ def getInfo(request):
     label_list = []
     sourceType = ''
     categoryType = ''
-    sourceTypeList = ImageSourceType.objects.all().filter(description="human");
+    sourceTypeList = ImageSourceType.objects.all().filter(description="human")
     if (sourceTypeList):
         sourceType = sourceTypeList[0]
     else:
@@ -393,15 +393,6 @@ def cleanUpAndFixImages(request):
     helper_ops.fixAllImagePaths()
     helper_ops.updateAllImageSizes(request.scheme, request.get_host())
     return HttpResponse("All images rows cleaned up and fixed.")
-
-@csrf_exempt
-def simulate(request):
-    num_uavs = request.GET['num_uavs']
-    port_prefix=request.GET['port_prefix']
-    results = ansible.runner.Runner(pattern='172.19.0.1',module_name='command', module_args='sh /home/jdas/open-uav/Firmware/testScripts/ansible-openuav-launch.sh ' + num_uavs + ' ' + port_prefix,).run()
-    #return JsonResponse(results)
-    return HttpResponse(render(request, 'webclient/console.html', {'port_prefix' : port_prefix, 'num_uavs' : num_uavs})) 
-
 
 '''
 Request: POST
