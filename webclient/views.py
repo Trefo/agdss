@@ -219,9 +219,6 @@ def getInfo(request):
 
 @require_GET
 def getNewImage(request):
-
-
-
     # if not 'image_name' in request.GET or not 'path' in request.GET:
     #     hasPrior = False
     # else:
@@ -231,9 +228,7 @@ def getNewImage(request):
     if len(Image.objects.all()) == 0:
         return HttpResponseBadRequest("No images in database")
 
-
     ##Choose image
-
 
     #Random choice
     # if len(Image.objects.all()) > 1 and hasPrior:
@@ -250,7 +245,6 @@ def getNewImage(request):
     labelsPerImage = crop_images.NUM_WINDOW_COLS * \
                      crop_images.NUM_WINDOW_ROWS * crop_images.NUM_LABELS_PER_WINDOW
 
-
     images = Image.objects.all().annotate(count=Count('imagelabel')).filter(count__lt=labelsPerImage)
     user = request.user
     if user.groups.filter(name='god').exists():
@@ -264,15 +258,9 @@ def getNewImage(request):
             if images:
                 break
 
-
     images = images.order_by('count').reverse()
-
-
-
-
+    print(images)
     subimage = None
-
-
 
     img = None
     for im in images:
@@ -282,6 +270,7 @@ def getNewImage(request):
         if subimage is not None:
             img = i
             break
+
     if not img:
         return HttpResponseBadRequest("Could not find image to serve")
     label_list = ImageLabel.objects.all().filter(parentImage=img).order_by('pub_date').last()
@@ -346,13 +335,13 @@ def addImage(request):
         try:
             width, height = PILImage.open(path + request.POST['image_name']).size
         except IOError:
-            return HttpResponseBadRequest("Image file %s cannot be found or the image cannot be opened and identified" %(path+request.POST['image_name']))
+            return HttpResponseBadRequest("Image file %s cannot be found or the image cannot be opened and identified.\n" %(path+request.POST['image_name']))
 
         #Convert Filepath to webpath if necessary
         ##Check if path is in STATIC_ROOT (https://stackoverflow.com/questions/3812849/how-to-check-whether-a-directory-is-a-sub-directory-of-another-directory)
         root = os.path.join(os.path.realpath(settings.STATIC_ROOT), '')
         path_dir = os.path.realpath(request.POST['path'])
-
+        print(path_dir)
         if not os.path.commonprefix([root, path_dir]) == root:
             return HttpResponseBadRequest(
                 "Image in unreachable location. Make sure that it is in a subdirectory of " + settings.STATIC_ROOT +".\n")

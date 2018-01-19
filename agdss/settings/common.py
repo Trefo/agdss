@@ -133,5 +133,5 @@ LOGIN_REDIRECT_URL = '/webclient'
 STATIC_URL = '/static/'
 STATIC_ROOT = "/app/static-root/"
 CATEGORY_TO_LABEL = 'tomato'
-LABEL_FOLDER_NAME = 'labels-'
+LABEL_FOLDER_NAME = 'labels'
 
