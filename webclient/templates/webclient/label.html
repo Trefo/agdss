@@ -115,6 +115,8 @@
         }
 
         function onMouseDrag(event) {
+            color = $('input[name=category_select]:checked', '#categories').parent().find(".circle").css('background-color')
+            console.log(color)
             if (isActive) {
                 if (!dragged) {
                     var center = (startPoint + event.point) / 2
@@ -124,7 +126,7 @@
                 }
                 var center = (startPoint + event.point) / 2
                 newPath = new Path.Circle(center, startPoint.getDistance(event.point) / 2);
-                newPath.strokeColor = 'yellow';
+                newPath.strokeColor = color;
                 newPath.strokeWidth = 2;
                 newPath.opacity = 0.5;
                 newPath.onMouseEnter = function(event) {
@@ -297,9 +299,9 @@
             var output = [];
             $('#categories_coll')[0].html = '';
             $.each(categories, function(i, val) {
-                cat_list_item = '<li><table style="width:100%"><tr><td><p><label id="' + val +
-                    '" style=" margin-bottom: 0px; ">' + val +
-                '</label></p></td><td><p><span class="circle" style="color:"red";background-color: "red";"></span></p></td></tr></table></li>';
+                cat_list_item = '<li><input type="radio" name="category_select" value="' + val + '">' +
+                    ' <label for="' + val + '"><table style="width:100%"><tr><td><p>'+ val +
+                '</p></td><td><p><span class="circle" style="color:blue; background-color: blue;"></span></p></td></tr></table></label></li>';
                 output.push(cat_list_item);
             });
             $('#categories_coll').html(output.join(''));
@@ -363,14 +365,15 @@
                 <li data-toggle="collapse" data-target="#categories_coll" class="collapsed active">
                       <p><i class="fa fa-list" aria-hidden="true"></i> Categories <span class="arrow"></span></p>
                 </li>
-                <ul class="sidebar-nav2 sub-menu collapse" id="categories_coll">
-                </ul>
+                <form action="" id="categories">
+                    <ul class="sidebar-nav2 sub-menu collapse show" id="categories_coll">
+                    </ul>
+                </form>
 
-
-                <li data-toggle="collapse" data-target="#products" class="collapsed active">
+                <li data-toggle="collapse" data-target="#image_ops" class="collapsed active">
                       <p><i class="fa fa-picture-o" aria-hidden="true"></i> Image Operations <span class="arrow"></span></p>
                 </li>
-                <ul class="sidebar-nav2 sub-menu collapse show" id="products">
+                <ul class="sidebar-nav2 sub-menu collapse" id="image_ops">
                     <!-- <li class="active"><a href="#">CSS3 Animation</a></li> -->
                     <li>
                             <p><label id="brightnessLabel" style=" margin-bottom: 0px; ">Brightness:</label> <span id="brightness">1</span></p>
