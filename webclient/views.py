@@ -77,8 +77,13 @@ def results(request):
 ##################
 @csrf_exempt 
 def applyLabels(request):
-    dict = json.load(request)
-    print(dict)
+    try:
+
+        dict = json.load(request)
+    except json.JSONDecodeError:
+        print("Could not decode")
+        return HttpResponseBadRequest("Could not decode JSON")
+    print("dict", dict)
     try:
         label_list_ = dict['label_list']
         image_name = dict['image_name']
@@ -158,7 +163,7 @@ def applyLabels(request):
 @require_GET
 def loadLabels(request):
     if 'image_name' not in request.GET or 'path' not in request.GET:
-        print((request.GET['path'] + ' ' + request.GET['image_name']))
+        print('Path and Image Name required', (request.GET['path'] + ' ' + request.GET['image_name']))
         return HttpResponseBadRequest('Path and Image Name required')
 
     parentImage_ = request.GET['image_name']
@@ -263,7 +268,6 @@ def getNewImage(request):
                 break
 
     images = images.order_by('count').reverse()
-    print(images)
     subimage = None
 
     img = None
@@ -320,10 +324,10 @@ Request: POST
 @require_POST
 def addImage(request):
     #Validate input
-    print(request.POST)
+    #print(request.POST)
     if not ('image_name' in request.POST and 'path' in request.POST and 'categories' in request.POST):
         return HttpResponseBadRequest("Missing required input.")
-    print(request.POST['categories'])
+    #print(request.POST['categories'])
     try:
         request_categories = json.loads(request.POST['categories'])
     except json.JSONDecodeError:
@@ -336,7 +340,7 @@ def addImage(request):
     for category in request_categories:
         if category == "":
             HttpResponseBadRequest("A category cannot be an empty string")
-    print(request_categories)
+    #print(request_categories)
     #Determine wheter 'path' is URL or file path
     path = request.POST['path']
     if path[-1] != '/' and path[-1] != '\\':
@@ -357,7 +361,7 @@ def addImage(request):
         ##Check if path is in STATIC_ROOT (https://stackoverflow.com/questions/3812849/how-to-check-whether-a-directory-is-a-sub-directory-of-another-directory)
         root = os.path.join(os.path.realpath(settings.STATIC_ROOT), '')
         path_dir = os.path.realpath(request.POST['path'])
-        print(path_dir)
+        #print(path_dir)
         if not os.path.commonprefix([root, path_dir]) == root:
             return HttpResponseBadRequest(
                 "Image in unreachable location. Make sure that it is in a subdirectory of " + settings.STATIC_ROOT +".\n")
@@ -385,7 +389,7 @@ def addImage(request):
         img = Image(name=request.POST['image_name'], path=path, description=request.POST.get('description', default=''), source=sourceType, width=width, height=height)
         img.save()
 
-    print(category_list)
+    #print(category_list)
     img.categoryType.add(*category_list)
     #imgLabel = ImageLabel(parentImage=img, categoryType=categoryType, pub_date=datetime.now())
     #imgLabel.save()
@@ -457,7 +461,7 @@ def unlabeledImages(request):
 @require_GET
 def numImageLabels(request):
     images = Image.objects.all().annotate(num=Count('imagelabel')).order_by('-num')
-    print(images)
+    #print(images)
     return HttpResponse("Images: " + ','.join(map(str, images)) )
 @csrf_exempt
 @require_POST

@@ -42,7 +42,6 @@
                     visible: true
                 });
             }
-            console.log(groups);
             category_groups = groups;
 
         };
@@ -70,20 +69,22 @@
                     asString: false,
                     matchShapes: true
                 });
-                svg.getElementsByTagName('image')[1].remove(); //Remove image added by cropping
 
                 //Align circles to original image
+                console.log(svg);
+                svg.getElementsByTagName('image')[0].remove(); //Remove embedded image
                 for (i = 0, circles = svg.getElementsByTagName('circle'); i < circles.length; i++) {
                     var x = parseInt(imageX) - parseInt(imagePadding);
                     var y = parseInt(imageY) - parseInt(imagePadding);
                     circles[i].setAttribute('transform', 'translate(' + (x) + ',' + (y) + ')');
                 }
-
-
-                svg.getElementsByTagName('image')[0].setAttribute('x', '0');
-                svg.getElementsByTagName('image')[0].setAttribute('y', '0');
+                var orig_img = svg.getElementsByTagName('image')[0];
+                console.log(orig_img);
+                orig_img.setAttribute('x', '0');
+                orig_img.setAttribute('y', '0');
                 xmlSer = new XMLSerializer();
                 svg = xmlSer.serializeToString(svg);
+                console.log(svg);
                 $('#debug').text('loading next image...');
                 $.ajax({
                     url: "/webclient/applyLabels",
@@ -117,6 +118,7 @@
                         getNewImage();
                     },
                     error: function(xhr, errmsg, err) {
+                        console.log(xhr.status + ": " + xhr.responseText);
                         alert(xhr.status + ": " + xhr.responseText);
                         labelsDrawn = prevLabels;
 
@@ -310,11 +312,14 @@
                 //$('#canvas').css('box-shadow', " -20 -20 20px" +  imagePadding + "px rgba(255,0,0,0.5)");
                 point = new paper.Point(point.x - padding, point.y - padding);
                 console.log(point);
-                temp_raster = new paper.Raster(img);
-                raster = temp_raster.getSubRaster(new paper.Rectangle(point, size));
+                var original_image_raster = new paper.Raster(img);
+                original_image_raster.id = "original image";
+                var raster = original_image_raster.getSubRaster(new paper.Rectangle(point, size));
                 raster.position = paper.view.center;
+                original_image_raster.sendToBack();
                 raster.sendToBack();
-                temp_raster.remove();
+                original_image_raster.visible = false;
+                raster.id = "shifted image";
                 paper.view.update();
 
             }
@@ -436,7 +441,7 @@
                     </li>
                 </ul>
                 <li>
-                        <p><label><input type="checkbox" id="noLabels" /> No labels in image</p></label>
+                        <p><label><input type="checkbox" id="noLabels" /> No labels in image</label></p>
                 </li>
             </ul>
 
