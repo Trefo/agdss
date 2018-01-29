@@ -4,13 +4,13 @@ from datetime import datetime
 from unicodedata import decimal
 
 from django.db import models
-
-
+from django.core.validators import MaxValueValidator
+import random
 
 class Color(models.Model):
-    red = models.PositiveSmallIntegerField(default=0)
-    green = models.PositiveSmallIntegerField(default=0)
-    blue = models.PositiveSmallIntegerField(default=0)
+    red = models.PositiveSmallIntegerField(default=0, validators=[MaxValueValidator(255)])
+    green = models.PositiveSmallIntegerField(default=0, validators=[MaxValueValidator(255)])
+    blue = models.PositiveSmallIntegerField(default=0, validators=[MaxValueValidator(255)])
     class Meta:
         unique_together = ('red', 'green', 'blue')
 
@@ -26,10 +26,24 @@ def get_default_Color():
         default_Color.save()
     return default_Color.id
 
+def get_color():
+    if Color.objects.all().count() <= 1:
+        with open('webclient/distinct_colors.txt') as f:
+            for line in f:
+                r, g, b = [int(n) for n in line.split()]
+                Color.objects.get_or_create(red=r, green=g, blue=b)
+    query = Color.objects.filter(categorytype=None)
+    if query:
+        return query[0]
+    else:
+        #return random color
+        i = random.randrange(Color.objects.count())
+        return Color.objects.all()[i]
+
 class CategoryType(models.Model):
     category_name = models.CharField(default='unknown', max_length=100, unique=True)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
-    color = models.ForeignKey(Color, on_delete=models.CASCADE, default=get_default_Color)
+    color = models.ForeignKey(Color, on_delete=models.CASCADE, default=get_color)
 
     def __str__(self):
         return 'Category name: ' + self.category_name
