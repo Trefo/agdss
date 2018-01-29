@@ -6,12 +6,34 @@ from unicodedata import decimal
 from django.db import models
 
 
+
+class Color(models.Model):
+    red = models.PositiveSmallIntegerField(default=0)
+    green = models.PositiveSmallIntegerField(default=0)
+    blue = models.PositiveSmallIntegerField(default=0)
+    class Meta:
+        unique_together = ('red', 'green', 'blue')
+
+    def __str__(self):
+        return "rgb({}, {}, {})".format(self.red, self.green, self.blue)
+
+def get_default_Color():
+    default_Color = Color.objects.all()
+    if default_Color:
+        default_Color = default_Color[0]
+    else:
+        default_Color = Color()
+        default_Color.save()
+    return default_Color.id
+
 class CategoryType(models.Model):
     category_name = models.CharField(default='unknown', max_length=100, unique=True)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
+    color = models.ForeignKey(Color, on_delete=models.CASCADE, default=get_default_Color)
 
     def __str__(self):
         return 'Category name: ' + self.category_name
+
 
 
 class ImageSourceType(models.Model):
@@ -92,6 +114,4 @@ class ImageFilter(models.Model):
     def __str__(self):
         return 'ImageFilter: brightness:' + str(self.brightness) + ' contrast: ' + str(self.contrast)\
                + ' saturation: ' + str(self.saturation) + ' labeler: ' + str(self.labeler)
-
-
 

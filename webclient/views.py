@@ -282,6 +282,7 @@ def getNewImage(request):
         'path': img.path,
         'image_name': img.name,
         'categories': [c.category_name for c in img.categoryType.all()],
+        'colors': [str(c.color) for c in img.categoryType.all()],
         'subimage': subimage,
             }
     if label_list:

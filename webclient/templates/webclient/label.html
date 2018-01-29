@@ -235,7 +235,7 @@
                     if (typeof padding == 'undefined') {
                         padding = 0;
                     }
-                    displayImage(response.image_name, response.path, response.categories,
+                    displayImage(response.image_name, response.path, response.categories, response.colors,
                         new paper.Point(response.subimage.x, response.subimage.y),
                         imageWidth, imageHeight, imagePadding);
                     currentImage = response
@@ -247,7 +247,7 @@
             });
         }
         //TODO: Input validation and error checking
-        function displayImage(image_name, image_path, categories, point, width, height, padding) {
+        function displayImage(image_name, image_path, categories, colors, point, width, height, padding) {
             if (width <= 0 || height <= 0 || padding < 0) {
                 alert("Problem with width, height, or padding value");
                 return;
@@ -301,7 +301,9 @@
             $.each(categories, function(i, val) {
                 cat_list_item = '<li><input type="radio" name="category_select" value="' + val + '">' +
                     ' <label for="' + val + '"><table style="width:100%"><tr><td><p>'+ val +
-                '</p></td><td><p><span class="circle" style="color:blue; background-color: blue;"></span></p></td></tr></table></label></li>';
+                '</p></td><td><p><span class="circle" style="color:' + colors[i] + '; background-color:' + colors[i] +
+                    ';"></span></p></td></tr></table></label></li>';
+
                 output.push(cat_list_item);
             });
             $('#categories_coll').html(output.join(''));
