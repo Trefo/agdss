@@ -83,7 +83,7 @@ def applyLabels(request):
         label_list_ = dict['label_list']
         image_name = dict['image_name']
         path = dict['path']
-        category_name = dict['category_name']
+        #category_name = dict['category_name']
         image_filters = dict['image_filters']
         subimage = dict['subimage']
         timeTaken = dict['timeTaken']

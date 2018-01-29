@@ -27,6 +27,28 @@
         var labelsDrawn = 0; //Whether a label has been drawn on this image
         var prevLabels = 0;
 
+
+        window.globals = {};
+        category_groups = {};
+        var create_groups = function(categories, colors) {
+            groups = {};
+            for (i = 0; i < categories.length; i++) {
+                groups[categories[i]] = new Group({
+                    name: categories[i],
+                    strokeColor: colors[i],
+                    fillColor: colors[i],
+                    strokeWidth: 2,
+                    opacity: 0.5,
+                    visible: true
+                });
+            }
+            console.log(groups);
+            category_groups = groups;
+
+        };
+
+        globals.create_groups = create_groups;
+
         $(document).ready(function() {
             $("#applyLabels").click(function() {
                 endTime = Date.now();
@@ -38,7 +60,7 @@
                         ' check the "No Labels in image" checkbox');
                     return false;
                 }
-                var updated_category = $("#categories").val();
+                //var updated_category = $("#categories").val();
                 //selectedImage = JSON.parse($('#imageCombo').val().toString());
                 $('#noLabels').prop('checked', false);
                 prevLabels = labelsDrawn;
@@ -49,11 +71,15 @@
                     matchShapes: true
                 });
                 svg.getElementsByTagName('image')[1].remove(); //Remove image added by cropping
+
+                //Align circles to original image
                 for (i = 0, circles = svg.getElementsByTagName('circle'); i < circles.length; i++) {
-                    var x = parseInt(imageX) - parseInt(imagePadding)
-                    var y = parseInt(imageY) - parseInt(imagePadding)
+                    var x = parseInt(imageX) - parseInt(imagePadding);
+                    var y = parseInt(imageY) - parseInt(imagePadding);
                     circles[i].setAttribute('transform', 'translate(' + (x) + ',' + (y) + ')');
                 }
+
+
                 svg.getElementsByTagName('image')[0].setAttribute('x', '0');
                 svg.getElementsByTagName('image')[0].setAttribute('y', '0');
                 xmlSer = new XMLSerializer();
@@ -66,20 +92,19 @@
                     data: JSON.stringify({
                         image_name: currentImage.image_name,
                         path: currentImage.path,
-                        category_name: updated_category,
                         label_list: svg,
                         subimage: {
                             x: imageX,
                             y: imageY,
                             width: imageWidth,
-                            height: imageHeight,
+                            height: imageHeight
                         },
                         image_filters: {
                             brightness: $('#brightnessControl').val(),
                             contrast: $('#brightnessControl').val(),
                             saturation: $('#brightnessControl').val()
                         },
-                        timeTaken: timeTaken,
+                        timeTaken: timeTaken
                     }),
                     success: function(data) {
                         $('#debug').text('');
@@ -105,7 +130,7 @@
             if (!aboveExistingLabel) { //Create new label
                 startPoint = event.point;
                 isActive = true; //Whether the path is currently being created
-                var center = (startPoint + event.point) / 2
+                var center = (startPoint + event.point) / 2;
                     //window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
                 dragged = false; //Whether the path has been created with a click and dragged to be larger than a simgle point
             } else {
@@ -115,43 +140,48 @@
         }
 
         function onMouseDrag(event) {
-            color = $('input[name=category_select]:checked', '#categories').parent().find(".circle").css('background-color')
-            console.log(color)
+            var category = $('input[name=category_select]:checked', '#categories').val();
             if (isActive) {
+                var center = (startPoint + event.point) / 2;
                 if (!dragged) {
-                    var center = (startPoint + event.point) / 2
                     window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point) / 2);
                     dragged = true;
                     labelsDrawn += 1;
+                    category_groups[category].addChild(window.circlePath);
+                    window.circlePath.style = category_groups[category].style;
+                    window.circlePath.opacity = 1;
                 }
-                var center = (startPoint + event.point) / 2
                 newPath = new Path.Circle(center, startPoint.getDistance(event.point) / 2);
-                newPath.strokeColor = color;
-                newPath.strokeWidth = 2;
-                newPath.opacity = 0.5;
+                category_groups[category].addChild(newPath);
+                newPath.style = category_groups[category].style;
+                newPath.opacity = 1;
+
                 newPath.onMouseEnter = function(event) {
                     if (!isActive) {
                         aboveExistingLabel = true;
-                        this.fillColor = 'red';
+                        this.opacity = 1;
                         window.circlePath = this;
                     }
-                }
+                };
                 newPath.onMouseLeave = function(event) {
                     aboveExistingLabel = false;
-                    this.fillColor = 'aqua';
-                }
+                    this.style = category_groups[category].style;
+                    this.opacity = category_groups[category].opacity;
+                };
                 newPath.onDoubleClick = function(event) {
                     isActive = false;
                     aboveExistingLabel = false;
                     this.remove();
                     //console.log(window.labelsLayer.exportSVG({embedImages: false, asString: false}));
-                    labelsDrawn -= 1
-                }
+                    labelsDrawn -= 1;
+                };
                 window.circlePath.remove();
                 window.circlePath = newPath;
+
             } else {
                 window.circlePath.position += event.point - dragStartPoint;
                 dragStartPoint = event.point;
+
             }
 
         }
@@ -162,7 +192,6 @@
                 aboveExistingLabel = false;
             } else {
                 window.circlePath.opacity = 0.3;
-                window.circlePath.fillColor = 'aqua';
             }
 
         }
@@ -281,8 +310,11 @@
                 //$('#canvas').css('box-shadow', " -20 -20 20px" +  imagePadding + "px rgba(255,0,0,0.5)");
                 point = new paper.Point(point.x - padding, point.y - padding);
                 console.log(point);
-                raster = new paper.Raster(img).getSubRaster(new paper.Rectangle(point, size));
+                temp_raster = new paper.Raster(img);
+                raster = temp_raster.getSubRaster(new paper.Rectangle(point, size));
                 raster.position = paper.view.center;
+                raster.sendToBack();
+                temp_raster.remove();
                 paper.view.update();
 
             }
@@ -307,11 +339,15 @@
                 output.push(cat_list_item);
             });
             $('#categories_coll').html(output.join(''));
+            $("input:radio[name=category_select]:first").attr('checked', true);
+            //$("#categories").data("categories", categories);
             //$('#categoryName').html(response.categories[0]);
 
             $('#image_name').html("Image name: " + image_name);
             $('#image_info_name').html("Image name: " + image_name);
             $('#image_info_path').html("Image path: " + image_path);
+
+            globals.create_groups(categories, colors);
 
         }
 
