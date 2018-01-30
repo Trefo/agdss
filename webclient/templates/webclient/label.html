@@ -253,6 +253,7 @@
             if (!window.labelsLayer) {
                 window.labelsLayer = new paper.Layer();
             } else {
+                original_image_raster.remove();
                 raster.remove();
             }
             //selectedImage = JSON.parse($('#imageCombo').val());
@@ -324,9 +325,9 @@
                 //$('#canvas').css('box-shadow', " -20 -20 20px" +  imagePadding + "px rgba(255,0,0,0.5)");
                 point = new paper.Point(point.x - padding, point.y - padding);
                 console.log(point);
-                var original_image_raster = new paper.Raster(img);
+                original_image_raster = new paper.Raster(img);
                 original_image_raster.id = "original image";
-                var raster = original_image_raster.getSubRaster(new paper.Rectangle(point, size));
+                raster = original_image_raster.getSubRaster(new paper.Rectangle(point, size));
                 raster.position = paper.view.center;
                 original_image_raster.sendToBack();
                 raster.sendToBack();
