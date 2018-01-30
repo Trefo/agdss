@@ -64,6 +64,18 @@
                 $('#noLabels').prop('checked', false);
                 prevLabels = labelsDrawn;
                 labelsDrawn = 0;
+
+                var group_svgs = {};
+                for (var key in category_groups) {
+                    var g_svg = category_groups[key].exportSVG({
+                    embedImages: false,
+                    asString: true,
+                    matchShapes: true
+                });
+                    group_svgs[key] = g_svg;
+
+                }
+                console.log(group_svgs);
                 var svg = window.labelsLayer.exportSVG({
                     embedImages: false,
                     asString: false,
@@ -71,7 +83,6 @@
                 });
 
                 //Align circles to original image
-                console.log(svg);
                 svg.getElementsByTagName('image')[0].remove(); //Remove embedded image
                 for (i = 0, circles = svg.getElementsByTagName('circle'); i < circles.length; i++) {
                     var x = parseInt(imageX) - parseInt(imagePadding);
@@ -94,6 +105,7 @@
                         image_name: currentImage.image_name,
                         path: currentImage.path,
                         label_list: svg,
+                        category_labels: group_svgs,
                         subimage: {
                             x: imageX,
                             y: imageY,
