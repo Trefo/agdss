@@ -86,6 +86,7 @@ def applyLabels(request):
     print("dict", dict)
     try:
         label_list_ = dict['label_list']
+        category_labels = dict['category_labels']
         image_name = dict['image_name']
         path = dict['path']
         #category_name = dict['category_name']
@@ -105,15 +106,17 @@ def applyLabels(request):
     except MultipleObjectsReturned:
         print("Multiple labelers for user object", file=sys.stderr)
         return HttpResponseBadRequest("Multiple labelers for user object")
-    sourceType = ''
-    categoryType = ''
+
     parentImage_ = Image.objects.all().filter(name=image_name, path=path)
-    categoryTypeList = CategoryType.objects.all().filter(category_name=category_name)
-    if (categoryTypeList):
-        categoryType = categoryTypeList[0]
+
+    imageWindowList = ImageWindow.objects.all().filter(
+        x=subimage['x'], y=subimage['y'], width=subimage['width'], height=subimage['height'])
+    if imageWindowList:
+        imageWindow = imageWindowList[0]
     else:
-        categoryType = CategoryType(category_name=category_name, pub_date=datetime.now())
-        categoryType.save()
+        imageWindow = ImageWindow(x=subimage['x'], y=subimage['y'],
+                                  width=subimage['width'], height=subimage['height'])
+        imageWindow.save()
 
     sourceTypeList = ImageSourceType.objects.all().filter(description="human")
     if (sourceTypeList):
@@ -121,6 +124,34 @@ def applyLabels(request):
     else:
         sourceType = ImageSourceType(description="human", pub_date=datetime.now())
         sourceType.save()
+
+
+    for category_name, labels in category_labels.items():
+        categoryTypeList = CategoryType.objects.all().filter(category_name=category_name)
+        if (categoryTypeList):
+            categoryType = categoryTypeList[0]
+        else:
+            categoryType = CategoryType(category_name=category_name, pub_date=datetime.now())
+            categoryType.save()
+
+        labelObject = ImageLabel(parentImage=parentImage_[0], labelShapes=label_list_,
+                                 pub_date=datetime.now(), categoryType=categoryType,
+                                 labeler=labeler, imageWindow=imageWindow,
+                                 timeTaken=timeTaken)
+        labelObject.save()
+
+        image_filter_obj = ImageFilter(brightness=image_filters['brightness'],
+                                       contrast=image_filters['contrast'],
+                                       saturation=image_filters['saturation'],
+                                       imageLabel=labelObject,
+                                       labeler=labeler)
+        image_filter_obj.save()
+
+
+        from webclient.image_ops.convert_images import convertSVG
+        convertSVG(labelObject)
+
+
 
 
 #    if not parentImage_:
@@ -134,29 +165,8 @@ def applyLabels(request):
     #     #ipaddress = x_forwarded_for.split(',')[-1].strip()
     # else:
     #     #ipaddress = request.META.get('REMOTE_ADDR')
-    imageWindowList = ImageWindow.objects.all().filter(
-        x=subimage['x'], y=subimage['y'], width=subimage['width'], height=subimage['height'])
-    if imageWindowList:
-        imageWindow = imageWindowList[0]
-    else:
-        imageWindow = ImageWindow(x=subimage['x'], y=subimage['y'],
-                                  width=subimage['width'], height=subimage['height'])
-        imageWindow.save()
 
-    labelObject = ImageLabel(parentImage = parentImage_[0], labelShapes=label_list_,
-                             pub_date=datetime.now(),categoryType=categoryType,
-                             labeler=labeler, imageWindow=imageWindow,
-                             timeTaken=timeTaken)
-    labelObject.save()
-    image_filter_obj = ImageFilter(brightness=image_filters['brightness'],
-                                   contrast=image_filters['contrast'],
-                                   saturation=image_filters['saturation'],
-                                   imageLabel=labelObject,
-                                   labeler=labeler)
-    image_filter_obj.save()
 
-    from webclient.image_ops.convert_images import convertSVG
-    convertSVG(labelObject)
     #combineImageLabels(parentImage_[0], 50)
     return HttpResponse(label_list_)
 
