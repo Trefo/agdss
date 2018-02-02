@@ -45,6 +45,11 @@ class CategoryType(models.Model):
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
     color = models.ForeignKey(Color, on_delete=models.CASCADE, default=get_color)
 
+    # def save(self, *args, **kwargs):
+    #     if self.color is None:
+    #         self.color = get_color
+    #     super().save(*args, **kwargs)
+
     def __str__(self):
         return 'Category name: ' + self.category_name
 
