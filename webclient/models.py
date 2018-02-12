@@ -43,7 +43,7 @@ def get_color():
 class CategoryType(models.Model):
     category_name = models.CharField(default='unknown', max_length=100, unique=True)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
-    color = models.ForeignKey(Color, on_delete=models.CASCADE, default=get_color)
+    color = models.ForeignKey(Color, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return 'Category name: ' + self.category_name

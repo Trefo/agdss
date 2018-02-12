@@ -131,7 +131,7 @@ def applyLabels(request):
         if (categoryTypeList):
             categoryType = categoryTypeList[0]
         else:
-            categoryType = CategoryType(category_name=category_name, pub_date=datetime.now())
+            categoryType = CategoryType(category_name=category_name, pub_date=datetime.now(), color=get_color())
             categoryType.save()
 
         labelObject = ImageLabel(parentImage=parentImage_[0], labelShapes=label_list_,
@@ -391,6 +391,9 @@ def addImage(request):
 
     #Get CategoryType entries or add if necessary.
     category_list = [CategoryType.objects.get_or_create(category_name=category)[0] for category in request_categories]
+    for cat in category_list:
+        if cat.color is None:
+            cat.color = get_color()
 
     imageList = Image.objects.all().filter(name=request.POST['image_name'], path=path, description=request.POST.get('description', default=''), source=sourceType)
     if imageList:
