@@ -85,10 +85,13 @@
 
                 //Align circles to original image
                 svg.getElementsByTagName('image')[0].remove(); //Remove embedded image
+                var x = parseInt(imageX) - parseInt(imagePadding);
+                var y = parseInt(imageY) - parseInt(imagePadding);
                 for (i = 0, circles = svg.getElementsByTagName('circle'); i < circles.length; i++) {
-                    var x = parseInt(imageX) - parseInt(imagePadding);
-                    var y = parseInt(imageY) - parseInt(imagePadding);
                     circles[i].setAttribute('transform', 'translate(' + (x) + ',' + (y) + ')');
+                }
+                for (i = 0, rectangles = svg.getElementsByTagName('rectangle'); i < rectangles.length; i++) {
+                    rectangles[i].setAttribute('transform', 'translate(' + (x) + ',' + (y) + ')');
                 }
                 var orig_img = svg.getElementsByTagName('image')[0];
                 console.log(orig_img);
@@ -229,36 +232,7 @@
         imageWidth = 0;
         imageHeight = 0;
         var currentImage = {};
-        /*function onImageFormChange() {
-            if (!window.labelsLayer) {
-                window.labelsLayer = new paper.Layer();
-            }else{
-                raster.remove();
-            }
-            //var myselect = document.getElementById("imageCombo");
-            selectedImage = JSON.parse($('#imageCombo').val().toString());
-            $.ajax({
-                url: "/webclient/getInfo",
-                type: "GET",
-                dataType: "json",
-                data: {
-                    image_name: selectedImage.image_name,
-                    path: selectedImage.path
-                },
-                success: function (response) {
-                    data = response.labels;
-                    if (data) {
-                        window.labelsLayer.importJSON(JSON.parse(data));
-                    }
-                    displayImage(selectedImage.image_name, selectedImage.path, response.categories)
-                },
 
-                error: function (xhr, errmsg, err) {
-                    alert(xhr.status + ": " + xhr.responseText);
-                }
-            });
-
-        } */
 
         function getNewImage() {
             startTime = Date.now();
