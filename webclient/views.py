@@ -392,8 +392,10 @@ def addImage(request):
     #Get CategoryType entries or add if necessary.
     category_list = [CategoryType.objects.get_or_create(category_name=category)[0] for category in request_categories]
     for cat in category_list:
-        if cat.color is None:
+        print(cat.color)
+        if not cat.color:
             cat.color = get_color()
+            cat.save()
 
     imageList = Image.objects.all().filter(name=request.POST['image_name'], path=path, description=request.POST.get('description', default=''), source=sourceType)
     if imageList:

@@ -44,11 +44,15 @@ class CategoryType(models.Model):
     category_name = models.CharField(default='unknown', max_length=100, unique=True)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
     color = models.ForeignKey(Color, on_delete=models.CASCADE, null=True)
-
-    # def save(self, *args, **kwargs):
-    #     if self.color is None:
-    #         self.color = get_color
-    #     super().save(*args, **kwargs)
+    label_type_enum = (
+        ("R", "Rectangle"),
+        ("C", "Circle"),
+    )
+    label_type = models.CharField(
+        max_length=1,
+        choices=label_type_enum,
+        default="C"
+    )
 
     def __str__(self):
         return 'Category name: ' + self.category_name
