@@ -30,8 +30,9 @@
 
         window.globals = {};
         category_groups = {};
-        var create_groups = function(categories, colors) {
-            groups = {};
+        category_shapes = {};
+        var create_groups_shapes = function(categories, colors, shapes) {
+            var groups = {};
             for (i = 0; i < categories.length; i++) {
                 groups[categories[i]] = new Group({
                     name: categories[i],
@@ -41,12 +42,12 @@
                     opacity: 0.5,
                     visible: true
                 });
+                category_shapes[categories[i]] = shapes[i];
             }
             category_groups = groups;
-
         };
 
-        globals.create_groups = create_groups;
+        globals.create_groups_shapes = create_groups_shapes;
 
         $(document).ready(function() {
             $("#applyLabels").click(function() {
@@ -155,17 +156,28 @@
 
         function onMouseDrag(event) {
             var category = $('input[name=category_select]:checked', '#categories').val();
+            var shape = category_shapes[category];
             if (isActive) {
                 var center = (startPoint + event.point) / 2;
                 if (!dragged) {
-                    window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point) / 2);
+                    if(shape == "Circle"){
+                        window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point) / 2);
+                    }
+                    else {
+                        window.circlePath = new Path.Rectangle(startPoint, event.point);
+                    }
                     dragged = true;
                     labelsDrawn += 1;
                     category_groups[category].addChild(window.circlePath);
                     window.circlePath.style = category_groups[category].style;
                     window.circlePath.opacity = 1;
                 }
-                newPath = new Path.Circle(center, startPoint.getDistance(event.point) / 2);
+                if(shape == "Circle"){
+                    newPath = new Path.Circle(center, startPoint.getDistance(event.point) / 2);
+                }
+                else {
+                    newPath = new Path.Rectangle(startPoint, event.point);
+                }
                 category_groups[category].addChild(newPath);
                 newPath.style = category_groups[category].style;
                 newPath.opacity = 1;
@@ -279,7 +291,7 @@
                     if (typeof padding == 'undefined') {
                         padding = 0;
                     }
-                    displayImage(response.image_name, response.path, response.categories, response.colors,
+                    displayImage(response.image_name, response.path, response.categories, response.shapes, response.colors,
                         new paper.Point(response.subimage.x, response.subimage.y),
                         imageWidth, imageHeight, imagePadding);
                     currentImage = response
@@ -291,7 +303,7 @@
             });
         }
         //TODO: Input validation and error checking
-        function displayImage(image_name, image_path, categories, colors, point, width, height, padding) {
+        function displayImage(image_name, image_path, categories, shapes, colors, point, width, height, padding) {
             if (width <= 0 || height <= 0 || padding < 0) {
                 alert("Problem with width, height, or padding value");
                 return;
@@ -365,7 +377,7 @@
             $('#image_info_name').html("Image name: " + image_name);
             $('#image_info_path').html("Image path: " + image_path);
 
-            globals.create_groups(categories, colors);
+            globals.create_groups_shapes(categories, colors, shapes);
 
         }
 
