@@ -112,20 +112,22 @@ def getDefaultImageWindowId():
 
 class ImageLabel(models.Model):
     parentImage = models.ForeignKey(Image, on_delete=models.CASCADE)
-    categoryType = models.ForeignKey(CategoryType, on_delete=models.CASCADE)
-    labelShapes = models.TextField(max_length=10000)
+    combined_labelShapes = models.TextField(max_length=10000)
     pub_date = models.DateTimeField(default=datetime.now, blank=True)
     labeler = models.ForeignKey(Labeler, on_delete=models.CASCADE, null=True, blank=True, default=None)
     imageWindow = models.ForeignKey(ImageWindow, on_delete=models.CASCADE, default=getDefaultImageWindowId)
     timeTaken = models.PositiveIntegerField(null=True, default=None)
-    #ip_address = models.GenericIPAddressField(default=None, blank=True, null=True)
 
     def __str__(self):
-        return 'Image: ' + self.parentImage.name + ' | Category: ' + self.categoryType.category_name  + ' | Labeler: ' + str(self.labeler)
+        return 'Image: ' + self.parentImage.name  + ' | Labeler: ' + str(self.labeler) + ' | Date: ' + str(self.pub_date)
 
+class CategoryLabel(models.Model):
+    categoryType = models.ForeignKey(CategoryType, on_delete=models.CASCADE)
+    labelShapes = models.TextField(max_length=10000)
+    parent_label = models.ForeignKey(ImageLabel, on_delete=models.CASCADE)
 
-
-
+    def __str__(self):
+        return str(self.parent_label) + " | Category: {}".format(str(self.categoryType))
 
 class ImageFilter(models.Model):
     brightness = models.DecimalField(max_digits=3, decimal_places=1, default=1)

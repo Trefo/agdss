@@ -30,6 +30,7 @@ from . import helper_ops
 from .image_ops.convert_images import SVGString, RenderSVGString
 from webclient.image_ops import crop_images
 from .models import *
+from webclient.image_ops.convert_images import convertSVG
 
 import csv
 
@@ -83,7 +84,6 @@ def applyLabels(request):
     except json.JSONDecodeError:
         print("Could not decode")
         return HttpResponseBadRequest("Could not decode JSON")
-    print("dict", dict)
     try:
         label_list_ = dict['label_list']
         category_labels = dict['category_labels']
@@ -126,6 +126,12 @@ def applyLabels(request):
         sourceType.save()
 
 
+    labelObject = ImageLabel(parentImage=parentImage_[0], combined_labelShapes=label_list_,
+                             pub_date=datetime.now(),
+                             labeler=labeler, imageWindow=imageWindow,
+                             timeTaken=timeTaken)
+    labelObject.save()
+
     for category_name, labels in category_labels.items():
         categoryTypeList = CategoryType.objects.all().filter(category_name=category_name)
         if (categoryTypeList):
@@ -134,12 +140,9 @@ def applyLabels(request):
             categoryType = CategoryType(category_name=category_name, pub_date=datetime.now(), color=get_color())
             categoryType.save()
 
-        labelObject = ImageLabel(parentImage=parentImage_[0], labelShapes=label_list_,
-                                 pub_date=datetime.now(), categoryType=categoryType,
-                                 labeler=labeler, imageWindow=imageWindow,
-                                 timeTaken=timeTaken)
-        labelObject.save()
-
+        category_label = CategoryLabel(categoryType=categoryType,
+                                       labelShapes=category_labels[category_name], parent_label=labelObject)
+        category_label.save()
         image_filter_obj = ImageFilter(brightness=image_filters['brightness'],
                                        contrast=image_filters['contrast'],
                                        saturation=image_filters['saturation'],
@@ -148,8 +151,8 @@ def applyLabels(request):
         image_filter_obj.save()
 
 
-        from webclient.image_ops.convert_images import convertSVG
-        convertSVG(labelObject)
+
+        #convertSVG(labelObject)
 
 
 
@@ -505,6 +508,7 @@ def calculateEntropyMap(request):
 ############
 re_image_path = re.compile(r'/%s%s(.*)' %('webclient', settings.STATIC_URL))
 
+
 @require_GET
 def get_overlayed_image(request, image_label_id):
     image_label = ImageLabel.objects.filter(id=image_label_id)
@@ -512,7 +516,11 @@ def get_overlayed_image(request, image_label_id):
         return HttpResponseBadRequest('Bad image_label_id: ' + image_label_id)
     image_label = image_label[0]
     image = image_label.parentImage
-    blob = RenderSVGString(image_label.labelShapes)
+    try:
+        blob = RenderSVGString(image_label.labelShapes)
+    except RuntimeError as e:
+        print(e, file=sys.stderr)
+        return HttpResponseServerError(str(e))
     foreground = PILImage.open(io.BytesIO(blob))
     #path = re.match(re_image_path, image.path).groups(1)[0]
     path = image.path
@@ -562,7 +570,7 @@ def print_label_data(request):
             labelDict = {
                 'parentImage_name' : label.parentImage.name,
                 'parentImage_path' : label.parentImage.path,
-                'categoryType' : label.categoryType.category_name,
+                'categoryTypes' : [cat_label.categoryType.category_name for cat_label in label.categorylabel_set],
                 'pub_date' : label.pub_date,
                 'labeler' : label.labeler,
                 'iw_x' : label.imageWindow.x,

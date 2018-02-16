@@ -11,13 +11,22 @@ admin.site.register(Image)
 #admin.site.register(ImageLabel)
 admin.site.register(ImageSourceType)
 admin.site.register(CategoryType)
+admin.site.register(CategoryLabel)
 admin.site.register(ImageFilter)
+admin.site.register(Color)
 
-
+class CategoryLabelInline(admin.TabularInline):
+    model = CategoryLabel
+    fields = ('categoryType', 'labelShapes')
+    readonly_fields = ('categoryType', 'labelShapes')
+    extra = 0
+    show_change_link = True
+    can_delete = False
+    ordering = ['categoryType']
 class ImageLabelInline(admin.TabularInline):
     model = ImageLabel
-    fields = ( 'categoryType', 'parentImage', 'imageWindow', 'pub_date')
-    readonly_fields = ('parentImage', 'categoryType', 'imageWindow', 'pub_date')
+    fields = ( 'categorylabel_set', 'parentImage', 'imageWindow', 'pub_date')
+    readonly_fields = ('parentImage', 'categorylabel_set', 'imageWindow', 'pub_date')
     extra = 0
     show_change_link = True
     can_delete = False
@@ -47,8 +56,9 @@ class ImageLabelAdminForm(forms.ModelForm):
 
 @admin.register(ImageLabel)
 class ImageLabelAdmin(admin.ModelAdmin):
-    list_display = ('parentImage', 'categoryType', 'imageWindow', 'labeler', 'timeTaken', 'pub_date')
+    list_display = ('parentImage', 'imageWindow', 'labeler', 'timeTaken', 'pub_date')
     readonly_fields = ('overlayed_image', )
+    inlines = [CategoryLabelInline]
 
     def overlayed_image(self, obj):
         return format_html('<img src="{}" alt="Rendered Image Label"></>' , '/webclient/get_overlayed_image/%d' % obj.id)

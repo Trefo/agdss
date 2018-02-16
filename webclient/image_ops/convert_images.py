@@ -18,7 +18,7 @@ def getLabelImagePILFile(label):
     #filename = labelFilename(label) + IMAGE_FILE_EXTENSION
     #if not os.path.exists(foldername + filename):
     #    return None
-    return PILImage.fromarray(countableLabel(label.labelShapes))#.convert("L")
+    return PILImage.fromarray(countableLabel(label.combined_labelShapes))#.convert("L")
 
 def getAverageLabelImagePILFile(image, category, threshold):
     foldername = category.category_name + '/Threshold_' + str(threshold) + '/'
@@ -110,11 +110,14 @@ def RenderSVGString(svg):
             img.format = 'png'
             return img.make_blob()
     except wand.exceptions.CoderError as e:
-        print(('Failed to convert: ' + svg + ': ' + str(e)))
+        raise RuntimeError(('Failed to convert: ' + svg + ': ' + str(e)))
     except wand.exceptions.MissingDelegateError as e:
-        print(('DE Failed to convert: ' + svg + ': ' + str(e)))
+        raise RuntimeError(('DE Failed to convert: ' + svg + ': ' + str(e)))
     except wand.exceptions.WandError as e:
-        print(('Failed to convert ' + svg + ': ' + str(e)))
+        raise RuntimeError(('Failed to convert ' + svg + ': ' + str(e)))
+    except ValueError as e:
+        raise RuntimeError(('Failed to convert ' + svg + ': ' + str(e)))
+
 #Returns array of SVGs each with 1 path
 def separatePaths(svg):
     #rePath = r'(<path[^/>]*/>)'
@@ -160,7 +163,7 @@ def convertSVGs(LabelList, reconvert=False):
     return [convertSVG(label, reconvert) for label in LabelList if label is not None]
 
 def convertSVG(label, reconvert=False):
-    return convertSVGtoPNG(img_file=labelToSVGStringFile(label.labelShapes), foldername=label.categoryType.category_name,
+    return convertSVGtoPNG(img_file=labelToSVGStringFile(label.combined_labelShapes), foldername=label.categoryType.category_name,
                     filename=labelFilename(label),
                     reconvert=reconvert)
 
@@ -194,11 +197,11 @@ def combineImageLabelsToArr(image, category, thresholdPercent=50):
     labels = ImageLabel.objects.all().filter(parentImage=image, categoryType=category)
     if not labels:
         return
-    labelImages = [countableLabel(label.labelShapes) for label in labels]
+    labelImages = [countableLabel(label.combined_labelShapes) for label in labels]
 
     #Based on https://stackoverflow.com/questions/17291455/how-to-get-an-average-picture-from-100-pictures-using-pil
 
-    height, width = SVGDimensions(labels[0].labelShapes)[1:]
+    height, width = SVGDimensions(labels[0].combined_labelShapes)[1:]
     arr = numpy.zeros((height,width),numpy.float)
 
     #TODO: Make this code better by taking into account ImageWindows
