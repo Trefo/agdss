@@ -30,7 +30,7 @@ from . import helper_ops
 from .image_ops.convert_images import SVGString, RenderSVGString
 from webclient.image_ops import crop_images
 from .models import *
-from webclient.image_ops.convert_images import convertSVG
+from webclient.image_ops.convert_images import convert_image_label_to_SVG
 
 import csv
 
@@ -152,7 +152,7 @@ def applyLabels(request):
 
 
 
-        #convertSVG(labelObject)
+        convert_image_label_to_SVG(labelObject)
 
 
 

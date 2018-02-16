@@ -160,16 +160,16 @@ def SVGString(DBStr, height=None, width=None, keepImage=False):
 
 
 def convertSVGs(LabelList, reconvert=False):
-    return [convertSVG(label, reconvert) for label in LabelList if label is not None]
+    return [convert_image_label_to_SVG(label, reconvert) for label in LabelList if label is not None]
 
-def convertSVG(label, reconvert=False):
-    return convertSVGtoPNG(img_file=labelToSVGStringFile(label.combined_labelShapes), foldername=label.categoryType.category_name,
-                    filename=labelFilename(label),
-                    reconvert=reconvert)
+def convert_image_label_to_SVG(image_label, reconvert=False):
+    return convertSVGtoPNG(img_file=labelToSVGStringFile(image_label.combined_labelShapes), foldername="combined_image_labels",
+                           filename=image_label_filename(image_label),
+                           reconvert=reconvert)
 
-def labelFilename(label):
-    return 'P%iL%iC%sI%s' % (
-            label.parentImage.id, label.id, label.categoryType.category_name, label.parentImage.name)
+def image_label_filename(label):
+    return 'P%iL%iI%s' % (
+            label.parentImage.id, label.id, label.parentImage.name)
 def convertAll(reconvert=False):
     convertSVGs(ImageLabel.objects.all(), reconvert=reconvert)
 
