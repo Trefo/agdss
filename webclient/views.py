@@ -27,7 +27,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 
 from . import helper_ops
-from .image_ops.convert_images import SVGString, RenderSVGString
+from .image_ops.convert_images import image_label_string_to_SVG_string, render_SVG_from_label
 from webclient.image_ops import crop_images
 from .models import *
 from webclient.image_ops.convert_images import convert_image_label_to_SVG
@@ -510,14 +510,14 @@ re_image_path = re.compile(r'/%s%s(.*)' %('webclient', settings.STATIC_URL))
 
 
 @require_GET
-def get_overlayed_image(request, image_label_id):
+def get_overlayed_combined_image(request, image_label_id):
     image_label = ImageLabel.objects.filter(id=image_label_id)
     if not image_label:
         return HttpResponseBadRequest('Bad image_label_id: ' + image_label_id)
     image_label = image_label[0]
     image = image_label.parentImage
     try:
-        blob = RenderSVGString(image_label.labelShapes)
+        blob = render_SVG_from_label(image_label)
     except RuntimeError as e:
         print(e, file=sys.stderr)
         return HttpResponseServerError(str(e))
@@ -535,6 +535,31 @@ def get_overlayed_image(request, image_label_id):
     background.save(output, format='png')
     return HttpResponse(output.getvalue(), content_type="image/png")
 
+@require_GET
+def get_overlayed_category_image(request, category_label_id):
+    category_label = CategoryLabel.objects.filter(id=category_label_id)
+    if not category_label:
+        return HttpResponseBadRequest('Bad category_label_id: ' + category_label_id)
+    category_label = category_label[0]
+    image = category_label.parent_label.parentImage
+    try:
+        blob = render_SVG_from_label(category_label)
+    except RuntimeError as e:
+        print(e, file=sys.stderr)
+        return HttpResponseServerError(str(e))
+    foreground = PILImage.open(io.BytesIO(blob))
+    #path = re.match(re_image_path, image.path).groups(1)[0]
+    path = image.path
+    #background = PILImage.open(path + image.name).convert('RGB')
+    #print(request.get_host())
+    #fd = urllib.request.urlopen(path+image.name)
+    #image_file = io.BytesIO(fd.read())
+    url = 'http://' + request.get_host() + path + image.name
+    background = PILImage.open(urlopen(url))
+    background.paste(foreground, (0, 0), foreground)
+    output = io.BytesIO()
+    background.save(output, format='png')
+    return HttpResponse(output.getvalue(), content_type="image/png")
 
 re_transform_xy = re.compile(r'(?P<prefix><circle[^\>]*transform="[^\>]*translate\()(?P<x>\d*),(?P<y>\d*)(?P<suffix>[^\>]*\)"[^\>]*/>)')
 @csrf_exempt

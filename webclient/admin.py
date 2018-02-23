@@ -11,7 +11,6 @@ admin.site.register(Image)
 #admin.site.register(ImageLabel)
 admin.site.register(ImageSourceType)
 admin.site.register(CategoryType)
-admin.site.register(CategoryLabel)
 admin.site.register(ImageFilter)
 admin.site.register(Color)
 
@@ -54,14 +53,23 @@ class ImageLabelAdminForm(forms.ModelForm):
             'overlayed_image': forms.ImageField()
         }
 
+@admin.register(CategoryLabel)
+class CategoryLabelAdmin(admin.ModelAdmin):
+    list_display = ('categoryType', 'labelShapes', 'parent_label')
+    readonly_fields = ('overlayed_image', ) #Must be tuple
+
+    def overlayed_image(self, obj):
+        return format_html('<img src="{}" alt="Rendered Image Label"></>' , '/webclient/get_overlayed_category_image/%d' % obj.id)
+
+
 @admin.register(ImageLabel)
 class ImageLabelAdmin(admin.ModelAdmin):
     list_display = ('parentImage', 'imageWindow', 'labeler', 'timeTaken', 'pub_date')
-    readonly_fields = ('overlayed_image', )
+    readonly_fields = ('overlayed_image', ) #Must be tuple
     inlines = [CategoryLabelInline]
 
     def overlayed_image(self, obj):
-        return format_html('<img src="{}" alt="Rendered Image Label"></>' , '/webclient/get_overlayed_image/%d' % obj.id)
+        return format_html('<img src="{}" alt="Rendered Image Label"></>' , '/webclient/get_overlayed_combined_image/%d' % obj.id)
         # blob = RenderSVGString(SVGString(obj.labelShapes))
         # b64 = base64.b64encode(blob)
         # return format_html('<img src="data:image/png;base64,{}" alt="Rendered Image Label"></>',

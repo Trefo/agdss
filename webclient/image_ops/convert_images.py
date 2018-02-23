@@ -1,7 +1,7 @@
 from wand.image import Image as WandImage
 from wand.color import Color as WandColor
 import io
-from webclient.models import Image, ImageLabel
+from webclient.models import Image, ImageLabel, CategoryLabel
 from django.conf import settings
 import re
 import wand.exceptions
@@ -96,17 +96,27 @@ def SVGStringToImageBlob(svg):
     except wand.exceptions.WandError as e:
         print(('Failed to convert ' + svg + ': ' + str(e)))
 
-def labelToSVGStringFile(str):
-    SVGStringFile = io.StringIO(SVGString(str))
-    SVGStringFile.seek(0)
-    return SVGStringFile.read().encode('utf-8')
+def image_label_to_SVG_String_file(label):
+    SVG_string_file = io.StringIO(image_label_string_to_SVG_string(label.combined_labelShapes))
+    SVG_string_file.seek(0)
+    return SVG_string_file.read().encode('utf-8')
 
-def RenderSVGString(svg):
-    if not svg:
-        return
-    svgFile = labelToSVGStringFile(svg)
+def category_label_to_SVG_String_file(label):
+    SVG_string_file = io.StringIO(category_label_string_to_SVG_string(label))
+    SVG_string_file.seek(0)
+    return SVG_string_file.read().encode('utf-8')
+
+def render_SVG_from_label(label):
+    if isinstance(label, ImageLabel):
+        svg = label.combined_labelShapes
+        svg_file = image_label_to_SVG_String_file(label)
+    elif isinstance(label, CategoryLabel):
+        svg = label.labelShapes
+        svg_file = category_label_to_SVG_String_file(label)
+    else:
+        raise ValueError("label must be an ImageLabel or CategoryLabel, it is instead an {}".format(type(label)))
     try:
-        with WandImage(blob=svgFile) as img:
+        with WandImage(blob=svg_file) as img:
             img.format = 'png'
             return img.make_blob()
     except wand.exceptions.CoderError as e:
@@ -125,7 +135,7 @@ def separatePaths(svg):
     image, height, width = SVGDimensions(svg)
     images = []
     for path in paths:
-        images.append(SVGStringToImageBlob(SVGString(path, height, width)))
+        images.append(SVGStringToImageBlob(image_label_string_to_SVG_string(path, height, width)))
     return images
 
 def SVGDimensions(str):
@@ -146,7 +156,7 @@ def SVGDimensions(str):
 
 #If height and width are defined, image tag is not removed
 #Otherwise, height and width are extracted from it and it is removed
-def SVGString(DBStr, height=None, width=None, keepImage=False):
+def image_label_string_to_SVG_string(DBStr, height=None, width=None, keepImage=False):
     addedStr = DBStr
     if height == None or width == None:
         image, height, width = SVGDimensions(DBStr)
@@ -158,20 +168,39 @@ def SVGString(DBStr, height=None, width=None, keepImage=False):
             ' xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve" height="%s"' \
              ' width="%s">%s</svg>\n' %(height, width, addedStr)
 
+def category_label_string_to_SVG_string(category_label, keepImage=False):
 
-def convertSVGs(LabelList, reconvert=False):
-    return [convert_image_label_to_SVG(label, reconvert) for label in LabelList if label is not None]
+    addedStr = category_label.labelShapes
+    image, height, width = SVGDimensions(category_label.parent_label.combined_labelShapes)
+    if keepImage:
+        addedStr = image + addedStr
+    addedStr = addedStr.encode('utf-8')
+    return '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' \
+             '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"' \
+            ' xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve" height="%s"' \
+             ' width="%s">%s</svg>\n' %(height, width, addedStr)
+def convert_image_labels_to_SVGs(label_list, reconvert=False):
+    return [convert_image_label_to_SVG(label, reconvert) for label in label_list if label is not None]
 
+def convert_category_labels_to_SVGs(label_list, reconvert=False):
+    return [convert_category_label_to_SVG(label, reconvert) for label in label_list if label is not None]
 def convert_image_label_to_SVG(image_label, reconvert=False):
-    return convertSVGtoPNG(img_file=labelToSVGStringFile(image_label.combined_labelShapes), foldername="combined_image_labels",
+    return convertSVGtoPNG(img_file=image_label_to_SVG_String_file(image_label),
+                           foldername="combined_image_labels",
                            filename=image_label_filename(image_label),
+                           reconvert=reconvert)
+
+def convert_category_label_to_SVG(category_label, reconvert=False):
+    return convertSVGtoPNG(img_file=category_label_to_SVG_String_file(category_label),
+                           foldername=category_label.categoryTypes.category_name,
+                           filename=image_label_filename(category_label),
                            reconvert=reconvert)
 
 def image_label_filename(label):
     return 'P%iL%iI%s' % (
             label.parentImage.id, label.id, label.parentImage.name)
 def convertAll(reconvert=False):
-    convertSVGs(ImageLabel.objects.all(), reconvert=reconvert)
+    convert_image_labels_to_SVGs(ImageLabel.objects.all(), reconvert=reconvert)
 
 
 def countableLabel(svgString):
