@@ -30,7 +30,7 @@ from . import helper_ops
 from .image_ops.convert_images import image_label_string_to_SVG_string, render_SVG_from_label
 from webclient.image_ops import crop_images
 from .models import *
-from webclient.image_ops.convert_images import convert_image_label_to_SVG
+from webclient.image_ops.convert_images import convert_image_label_to_SVG, convert_category_label_to_SVG
 
 import csv
 
@@ -150,9 +150,9 @@ def applyLabels(request):
                                        labeler=labeler)
         image_filter_obj.save()
 
+        convert_category_label_to_SVG(category_label)
 
-
-        convert_image_label_to_SVG(labelObject)
+    convert_image_label_to_SVG(labelObject)
 
 
 
