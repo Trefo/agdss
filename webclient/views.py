@@ -25,6 +25,7 @@ from django.http import JsonResponse
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
+from django.core import serializers
 
 from . import helper_ops
 from .image_ops.convert_images import image_label_string_to_SVG_string, render_SVG_from_label
@@ -610,3 +611,46 @@ def print_label_data(request):
             writer.writerow(labelDict)
     return HttpResponse("Printed")
 
+@csrf_exempt
+@require_POST
+def add_tiled_label(request):
+
+    request_json = json.load(request)
+    
+    tiled_label = TiledLabel()
+    tiled_label.northeast_Lat = request_json["northeast_lat"]
+    tiled_label.northeast_Lng = request_json["northeast_lng"]
+    tiled_label.southwest_Lat = request_json["southwest_lat"]
+    tiled_label.southwest_Lng = request_json["southwest_lng"]
+    #tiled_label.category_name = request_json["category_name"]
+    tiled_label.label_type = request_json["label_type"]
+    tiled_label.label_json = request_json["geoJSON"]
+    tiled_label.save()
+
+
+    #Send the response
+
+    resp_obj = {}
+    resp_obj["status"] = "success"
+    resp_obj["category_name"] = request_json["category_name"]
+    return JsonResponse(resp_obj)
+
+@csrf_exempt
+@require_GET
+def get_all_tiled_labels(request):
+    response_obj = []
+
+
+    for tiled_label in TiledLabel.objects.all():
+        response_dict = {}
+
+        response_dict["northeast_lat"] = tiled_label.northeast_Lat
+        response_dict["northeast_lng"] = tiled_label.northeast_Lat
+        response_dict["southwest_lat"] = tiled_label.northeast_Lat
+        response_dict["southwest_lng"] = tiled_label.northeast_Lat
+        response_dict["label_type"] = tiled_label.label_type
+        response_dict["geoJSON"] = tiled_label.label_json
+        response_obj.append(response_dict);
+
+    #response = serializers.serialize("json", TiledLabel.objects.all())
+    return JsonResponse(response_obj,safe=False)

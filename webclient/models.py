@@ -6,6 +6,7 @@ from unicodedata import decimal
 from django.db import models
 from django.core.validators import MaxValueValidator
 import random
+from django.contrib.postgres.fields import JSONField
 
 class Color(models.Model):
     red = models.PositiveSmallIntegerField(default=0, validators=[MaxValueValidator(255)])
@@ -139,4 +140,18 @@ class ImageFilter(models.Model):
     def __str__(self):
         return 'ImageFilter: brightness:' + str(self.brightness) + ' contrast: ' + str(self.contrast)\
                + ' saturation: ' + str(self.saturation) + ' labeler: ' + str(self.labeler)
+
+class TiledCategory(models.Model):
+    category_name = models.CharField(max_length=100, unique=True)
+
+
+class TiledLabel(models.Model):
+    northeast_Lat = models.DecimalField(max_digits=17, decimal_places=14)
+    northeast_Lng = models.DecimalField(max_digits=17, decimal_places=14)
+    southwest_Lat = models.DecimalField(max_digits=17, decimal_places=14)
+    southwest_Lng = models.DecimalField(max_digits=17, decimal_places=14)
+    category_name = models.ForeignKey(TiledCategory, on_delete=models.CASCADE, max_length=100, null=True, blank=True)
+    label_json = JSONField()
+
+    label_type = models.CharField(max_length=100)
 
