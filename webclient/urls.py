@@ -33,4 +33,5 @@ urlpatterns = [
     url(r'^get_overlayed_category_image/(?P<category_label_id>[0-9]*)$', views.get_overlayed_category_image),
     path('addTiledLabel', views.add_tiled_label),
     path('TiledLables',views.get_all_tiled_labels),
+    path('addTiledImage', views.add_train_image_label),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

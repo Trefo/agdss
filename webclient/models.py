@@ -150,6 +150,7 @@ class TiledLabel(models.Model):
     northeast_Lng = models.DecimalField(max_digits=17, decimal_places=14)
     southwest_Lat = models.DecimalField(max_digits=17, decimal_places=14)
     southwest_Lng = models.DecimalField(max_digits=17, decimal_places=14)
+    zoom_level = models.PositiveSmallIntegerField(default=23)
     category_name = models.ForeignKey(TiledCategory, on_delete=models.CASCADE, max_length=100, null=True, blank=True)
     label_json = JSONField()
 

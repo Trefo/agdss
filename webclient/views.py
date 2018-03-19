@@ -34,6 +34,8 @@ from .models import *
 from webclient.image_ops.convert_images import convert_image_label_to_SVG
 
 import csv
+import base64
+import numpy as np
 
 
 ######
@@ -622,6 +624,7 @@ def add_tiled_label(request):
     tiled_label.northeast_Lng = request_json["northeast_lng"]
     tiled_label.southwest_Lat = request_json["southwest_lat"]
     tiled_label.southwest_Lng = request_json["southwest_lng"]
+    tiled_label.zoom_level = request_json["zoom_level"]
     #tiled_label.category_name = request_json["category_name"]
     tiled_label.label_type = request_json["label_type"]
     tiled_label.label_json = request_json["geoJSON"]
@@ -640,6 +643,9 @@ def add_tiled_label(request):
 def get_all_tiled_labels(request):
     response_obj = []
 
+    #TiledLabel.objects.all().delete()
+
+
 
     for tiled_label in TiledLabel.objects.all():
         response_dict = {}
@@ -648,9 +654,42 @@ def get_all_tiled_labels(request):
         response_dict["northeast_lng"] = tiled_label.northeast_Lat
         response_dict["southwest_lat"] = tiled_label.northeast_Lat
         response_dict["southwest_lng"] = tiled_label.northeast_Lat
+        response_dict["zoom_level"] = tiled_label.zoom_level
         response_dict["label_type"] = tiled_label.label_type
         response_dict["geoJSON"] = tiled_label.label_json
         response_obj.append(response_dict);
 
     #response = serializers.serialize("json", TiledLabel.objects.all())
     return JsonResponse(response_obj,safe=False)
+
+@csrf_exempt
+@require_POST
+def add_train_image_label(request):
+    request_json = json.load(request)
+    image_name = request_json["image_name"]
+    train_image_base64 = request_json["image_blob"]
+    train_label_base64 =  request_json["mask_blob"]
+
+    train_image_base64 = re.search(r'base64,(.*)', train_image_base64).group(1)
+    train_label_base64 = re.search(r'base64,(.*)', train_label_base64).group(1)
+    train_image_blob = io.BytesIO(base64.b64decode(train_image_base64))
+    train_label_blob = io.BytesIO(base64.b64decode(train_label_base64))
+    train_image = PILImage.open(train_image_blob)
+    train_label = PILImage.open(train_label_blob)
+
+    train_label = np.array(train_label)
+    train_label[train_label != 221] = 255
+    train_label[train_label == 221] = 0
+    
+    train_label = PILImage.fromarray(train_label)
+    
+    train_image.save("/home/ashreyas/aerialapps/trainset/"+ image_name +".png")
+    train_label.save("/home/ashreyas/aerialapps/trainset/"+ image_name +"_label.png")
+
+
+    resp_obj = {}
+    resp_obj["status"] = "success"
+    
+    return JsonResponse(resp_obj)
+
+
