@@ -34,4 +34,5 @@ urlpatterns = [
     path('addTiledLabel', views.add_tiled_label),
     path('TiledLables',views.get_all_tiled_labels),
     path('addTiledImage', views.add_train_image_label),
+    path('addTiledCategories', views.add_all_tiled_categories),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

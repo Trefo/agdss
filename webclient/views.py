@@ -625,7 +625,8 @@ def add_tiled_label(request):
     tiled_label.southwest_Lat = request_json["southwest_lat"]
     tiled_label.southwest_Lng = request_json["southwest_lng"]
     tiled_label.zoom_level = request_json["zoom_level"]
-    #tiled_label.category_name = request_json["category_name"]
+    category_names = TiledCategory.objects.all().filter(category_name=request_json["category_name"])
+    tiled_label.category_name = category_names[0]
     tiled_label.label_type = request_json["label_type"]
     tiled_label.label_json = request_json["geoJSON"]
     tiled_label.save()
@@ -657,6 +658,7 @@ def get_all_tiled_labels(request):
         response_dict["zoom_level"] = tiled_label.zoom_level
         response_dict["label_type"] = tiled_label.label_type
         response_dict["geoJSON"] = tiled_label.label_json
+        response_dict["category_name"] = tiled_label.category_name.category_name
         response_obj.append(response_dict);
 
     #response = serializers.serialize("json", TiledLabel.objects.all())
@@ -683,13 +685,44 @@ def add_train_image_label(request):
     
     train_label = PILImage.fromarray(train_label)
     
-    train_image.save("/home/ashreyas/aerialapps/trainset/"+ image_name +".png")
-    train_label.save("/home/ashreyas/aerialapps/trainset/"+ image_name +"_label.png")
+    train_image.save("/home/ashreyas/aerialapps/trainset/" + request_json["category_name"] + "/" + image_name +".png")
+    train_label.save("/home/ashreyas/aerialapps/trainset/" + request_json["category_name"] + "/" + image_name +"_label.png")
 
 
     resp_obj = {}
     resp_obj["status"] = "success"
     
     return JsonResponse(resp_obj)
+
+
+@csrf_exempt
+@require_GET
+def add_all_tiled_categories(request):
+    category = TiledCategory()
+    category.category_name = "amp"
+    category.save()
+
+    category = TiledCategory()
+    category.category_name = "tap"
+    category.save()
+
+    category = TiledCategory()
+    category.category_name = "car"
+    category.save()
+
+    category = TiledCategory()
+    category.category_name = "house"
+    category.save()
+
+    category = TiledCategory()
+    category.category_name = "tree"
+    category.save()
+
+    category = TiledCategory()
+    category.category_name = "road"
+    category.save()
+
+    return HttpResponse("Success")
+
 
 
