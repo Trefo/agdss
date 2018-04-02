@@ -75,7 +75,11 @@ def results(request):
     context = {}
     return HttpResponse(template.render(context, request))
 
-
+@login_required
+def map_label(request):
+    template = loader.get_template('webclient/map_label.html')
+    context = {}
+    return HttpResponse(template.render(context, request))
 ##################
 #POST/GET REQUESTS
 ##################

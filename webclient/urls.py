@@ -11,6 +11,7 @@ urlpatterns = [
     path('label', views.label, name='label'),
     path('results', views.results, name='results'),
     path('view_label', views.view_label, name='view_label'),
+    path('map_label', views.map_label, name='map_label'),
 
     #GET/POST URLs
 

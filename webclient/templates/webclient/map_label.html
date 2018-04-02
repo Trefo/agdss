@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>AgDSS Map</title>
+
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
+   integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+   crossorigin=""/>
+
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+  <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
+   integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+   crossorigin="">
+  </script>
+
+  <script type="text/javascript" src="dom-to-image.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.js"></script>
+
+  <script src="index.js"></script>
+
+   <script type="text/javascript">
+
+      //Global vars:
+      var R = 6378137;
+      var sphericalScale = 0.5 / (Math.PI * R);
+
+     extractImages = function(map){
+        bounds = map.getBounds();
+        //alert(bounds);
+        console.log(bounds);
+        var zoom = 23;
+
+        //north, west 
+        var min = project(bounds._northEast.lat,bounds._southWest.lng, zoom);
+        
+        //south, east
+        var max = project(bounds._southWest.lat, bounds._northEast.lng, zoom);
+
+
+        console.log(min);
+        console.log(max);
+        window.location.href = "/app/extract?minx=" + min.x +"&maxx=" +max.x + "&miny=" +min.y+ "&maxy=" + max.y;
+     };
+
+
+
+
+
+
+     function project(lat,lng,zoom) {
+      var d = Math.PI / 180,
+          max = 1 - 1E-15,
+          sin = Math.max(Math.min(Math.sin(lat * d), max), -max),
+          scale = 256 * Math.pow(2, zoom);
+
+      var point = {
+        x: R * lng * d,
+        y: R * Math.log((1 + sin) / (1 - sin)) / 2
+      };
+
+      point.x = tiled(scale * (sphericalScale * point.x + 0.5));
+      point.y = tiled(scale * (-sphericalScale * point.y + 0.5));
+
+      return point;
+    }
+
+
+     function tiled(num) {
+      return Math.floor(num/256);
+     }
+
+   </script>
+
+
+
+</head>
+<body>
+
+	Atlanta Flight Demo: <br/>
+	<div id="mapid" style ="height: 512px; width: 1024px; float:left"></div>
+	<div style = "height: 512px; width: 100px;float: left">
+		<form style="margin:15px">
+			<label><input type="radio" name="label_class" value = "amp" checked="true">amp </label><br/>
+			<label><input type="radio" name="label_class" value = "tap">tap</label><br/>
+			<label><input type="radio" name="label_class" value = "house">house</label><br/>
+			<label><input type="radio" name="label_class" value = "car">car</label><br/>
+			<label><input type="radio" name="label_class" value = "tree">tree</label><br/>
+			<label><input type="radio" name="label_class" value = "road">road</label><br/>
+
+		</form>
+	</div>
+ 
+
+
+	<script type="text/javascript">
+
+{#    var atlantaTiles = L.tileLayer('/static/aerialapps/tiles/{z}/{x}/{y}.png', {#}
+{#      attribution: 'Aerial Apps',#}
+{#      maxZoom: 23,#}
+{#      id: 'mapbox.streets'#}
+{#    });#}
+    var atlantaTiles = L.tileLayer('http://label.ag:8051/tiles/{z}/{x}/{y}.png', {
+      attribution: 'Aerial Apps',
+      maxZoom: 23,
+      id: 'mapbox.streets'
+    });
+
+    var predictTiles = L.tileLayer('http://label.ag:8051/preds_latest/rgba/{z}/{x}/{y}.png',{
+      minZoom:21,
+      maxZoom: 23,
+      id: 'mapbox.streets2'
+    });
+{#    var predictTiles = L.tileLayer('/static/aerialapps/preds_latest/rgba/{z}/{x}/{y}.png',{#}
+{#      minZoom:21,#}
+{#      maxZoom: 23,#}
+{#      id: 'mapbox.streets2'#}
+{#    });#}
+
+
+   	var map = L.map('mapid',{
+       minZoom: 13,
+       maxZoom: 23,
+       layers: [atlantaTiles,predictTiles]
+    });
+
+    map.setView([34.004263688375346, -84.39877241849901], 21);
+
+    //The layer for all the shapes
+    var drawnItems = L.featureGroup().addTo(map);
+
+    //Create the draw/edit control
+    var drawControl = new L.Control.Draw({
+    	edit: {
+         	edit:false,
+         	featureGroup: drawnItems,
+         	poly: {
+                allowIntersection: false
+            }
+         },
+         draw: {
+             polyline: false,
+             marker: false,
+             circlemarker: false
+         }
+     });
+
+    drawControl.addTo(map);
+   	
+    
+
+
+    var baseLayers = {
+     
+    };
+
+    var overlays = {
+      "Atlanta": atlantaTiles,
+      "Labels": drawnItems,
+      "Predictions" : predictTiles
+    };
+
+    L.control.layers(baseLayers, overlays).addTo(map);
+
+    //Initialize the easyPrint module
+
+    var printerOptions = {
+          sizeModes: ['Current'],
+          filename: 'myMap',
+          exportOnly: true,
+          position: 'bottomright'
+    };
+
+
+    var printer = L.easyPrint(printerOptions);
+    printer.addTo(map);
+
+
+
+    //Read the labels in the db and add it to the map
+    var xhttp_all = new XMLHttpRequest();
+    xhttp_all.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        resp_obj = JSON.parse(this.responseText);
+        console.log(JSON.parse(this.responseText));
+        for (i = 0; i < resp_obj.length; i++) {
+          if(resp_obj[i].label_type == "circle"){
+            var geoJsonResp = resp_obj[i].geoJSON;
+            circleLayer = L.circle([geoJsonResp.geometry.coordinates[1],geoJsonResp.geometry.coordinates[0]], geoJsonResp.properties.options);
+            console.log(circleLayer);
+            drawnItems.addLayer(circleLayer);
+          }else{
+            var geoJsonResp = resp_obj[i].geoJSON;
+            var geoJsonLayer = L.geoJSON(geoJsonResp);
+            drawnItems.addLayer(geoJsonLayer)
+
+          }
+        }
+        
+      }
+    };
+    
+    xhttp_all.open("GET", "../webclient/TiledLables", true);
+    xhttp_all.send();
+
+
+
+   
+
+
+
+
+    map.on(L.Draw.Event.CREATED, function (event) {
+        var layer = event.layer;
+        var geoJson = layer.toGeoJSON();
+
+        var ne_lat;
+        var ne_lng;
+        var sw_lat;
+        var sw_lng;
+
+        var propJSON = {};
+
+        if(event.layerType == "circle"){
+          ne_lat = layer._latlng.lat + layer._mRadius;
+          ne_lng = layer._latlng.lng + layer._mRadius;
+          sw_lat = layer._latlng.lat - layer._mRadius;
+          sw_lng = layer._latlng.lng - layer._mRadius;
+          propJSON.latlng = layer._latlng;
+          propJSON.radius = layer._mRadius;
+          geoJson.properties.shape_type = "circle";
+          geoJson.properties.radius = layer._mRadius;
+          geoJson.properties.options = layer.options;
+        }else{
+          ne_lat = layer._bounds._northEast.lat;
+          ne_lng = layer._bounds._northEast.lng;
+          sw_lat = layer._bounds._southWest.lat;
+          sw_lng = layer._bounds._southWest.lng;
+          propJSON.latlngs = layer._latlngs[0];
+        }
+
+        var radio_label_classes = document.getElementsByName('label_class');
+		var radio_label_class;
+		for(var i = 0; i < radio_label_classes.length; i++){
+		    if(radio_label_classes[i].checked){
+		        radio_label_class = radio_label_classes[i].value;
+		    }
+		}
+
+
+         requestObj = {
+          northeast_lat : ne_lat,
+          northeast_lng : ne_lng,
+          southwest_lat : sw_lat,
+          southwest_lng : sw_lng,
+          zoom_level : map.getZoom(),
+          label_type: event.layerType,
+          category_name: radio_label_class,
+          geoJSON: geoJson,
+          propJSON: propJSON
+        };
+        console.log(requestObj);
+
+
+        if(event.layerType == "circle"){
+          circleLayer = L.circle([geoJson.geometry.coordinates[1],geoJson.geometry.coordinates[0]], geoJson.properties.options);
+          console.log(circleLayer);
+          drawnItems.addLayer(circleLayer);
+        
+        }else{
+          var geoJsonLayer = L.geoJSON(geoJson);
+          drawnItems.addLayer(geoJsonLayer);
+        }
+
+        //Data to be used for printing of images
+        var maskData;
+        var imageData;
+        var printedImageName;
+
+        centerLatLng = map.getCenter();
+        centerXY = project(centerLatLng.lat,centerLatLng.lng,  map.getZoom());
+        printedImageName = map.getZoom().toString() + "_" + centerXY.x.toString() + "_" + centerXY.y.toString()
+        var checkBoxes =  document.getElementsByClassName('leaflet-control-layers-selector');
+
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            console.log(this.responseText);
+            
+
+            //Print the map
+            map.removeLayer(drawnItems);
+            printer.printMap('CurrentSize','test').then(function(result){
+                imageData = result;
+
+                map.addLayer(drawnItems);
+                map.removeLayer(atlantaTiles);
+
+                  printer.printMap('CurrentSize','test2').then(function(imResult){
+                    requestObj = {};
+                    maskData = imResult;
+                    requestObj.image_blob = imageData;
+                    requestObj.mask_blob = maskData;
+                    requestObj.image_name = printedImageName;
+                    requestObj.category_name = radio_label_class;
+                    
+                    map.addLayer(atlantaTiles);
+                    fetch("../webclient/addTiledImage", {
+                      body: JSON.stringify(requestObj), 
+                      headers: {
+                        'content-type': 'application/json'
+                      },
+                      method: 'POST'
+                    }).then(function(resp){
+                      console.log(resp)
+                    })
+                  })
+                //return result;
+            })
+            
+          }
+        };
+
+        xhttp.open("POST", "../webclient/addTiledLabel", true);
+        xhttp.setRequestHeader("Content-Type", "application/json");
+        xhttp.send(JSON.stringify(requestObj));
+    });
+
+
+  </script>
+  <br/>
+  
+  <!-- 
+  <button style= "display: block; clear: both;" type="button" onclick="extractImages(mymap)">Extract Images</button>
+	-->
+</body>
+</html>
