@@ -15,6 +15,7 @@
   <script src="/static/scripts/leaflet.draw/leaflet.draw.js"></script>
 
   <script src="/static/scripts/index.js"></script>
+    <script src="/static/scripts/jQuery/jquery-3.0.0.min.js"></script>
 
    <script type="text/javascript">
 
@@ -77,9 +78,9 @@
 	Atlanta Flight Demo: <br/>
 	<div id="mapid" style ="height: 512px; width: 1024px; float:left"></div>
 	<div style = "height: 512px; width: 100px;float: left" id="">
-		<form style="margin:15px">
+		<form style="margin:15px" id="class_select">
             {% for category in categories %}
-            <label>
+            <label style="color:{{ category.color }}">
                 <input type="radio" name="label_class" value = "{{ category.category_name }}">
                 {{ category.category_name }}
             </label><br/>
@@ -204,12 +205,6 @@
     xhttp_all.send();
 
 
-
-   
-
-
-
-
     map.on(L.Draw.Event.CREATED, function (event) {
         var layer = event.layer;
         var geoJson = layer.toGeoJSON();
@@ -322,6 +317,10 @@
         xhttp.open("POST", "/webclient/addTiledLabel", true);
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.send(JSON.stringify(requestObj));
+    });
+
+    $(document).ready(function () {
+        $("input:radio[name=label_class]:first").attr('checked', true);
     });
   </script>
   <br/>
