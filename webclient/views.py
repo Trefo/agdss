@@ -655,9 +655,9 @@ def get_all_tiled_labels(request):
     for tiled_label in TiledLabel.objects.all():
         response_dict = {}
         response_dict["northeast_lat"] = tiled_label.northeast_Lat
-        response_dict["northeast_lng"] = tiled_label.northeast_Lat
-        response_dict["southwest_lat"] = tiled_label.northeast_Lat
-        response_dict["southwest_lng"] = tiled_label.northeast_Lat
+        response_dict["northeast_lng"] = tiled_label.northeast_Lng
+        response_dict["southwest_lat"] = tiled_label.southwest_Lat
+        response_dict["southwest_lng"] = tiled_label.southwest_Lng
         response_dict["zoom_level"] = tiled_label.zoom_level
         response_dict["label_type"] = tiled_label.label_type
         response_dict["geoJSON"] = tiled_label.label_json
@@ -711,4 +711,28 @@ def add_all_tiled_categories(request):
     return HttpResponse("Success")
 
 
+def delete_tile_label(request):
+    request = json.load(request)
+    northeast_Lat = request.get("northeast_Lat")
+    northeast_Lng = request.get("northeast_lng")
+    southwest_Lat = request.get("southwest_lat")
+    southwest_Lng = request.get("southwest_lng")
+    category_name = request.get("category_name")
+    if northeast_Lat is None or northeast_Lng is None or\
+            southwest_Lat is None or southwest_Lng is None or category_name is None:
+        return HttpResponseBadRequest("Missing required field")
+    response_dict["zoom_level"] = tiled_label.zoom_level
+    response_dict["label_type"] = tiled_label.label_type
+    response_dict["geoJSON"] = tiled_label.label_json
+    response_dict["category"] = tiled_label.category.category_name
 
+    category = CategoryType.objects.get(category_name=category_name)
+    tile_label = TiledLabel.objects.filter(northeast_Lat=northeast_Lat,
+                   northeast_Lng=northeast_Lng, southwest_Lat=southwest_Lat, southwest_Lng=southwest_Lng, category=category)
+
+    if not tile_label:
+        return HttpResponseBadRequest("Label not found")
+    if len(tile_label) > 1:
+        return HttpResponseBadRequest("Request ambigous")
+    tile_label[0].delete()
+    return HttpResponse("Sucess")
