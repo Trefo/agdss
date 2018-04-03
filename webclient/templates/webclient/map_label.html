@@ -76,14 +76,21 @@
 
 	Atlanta Flight Demo: <br/>
 	<div id="mapid" style ="height: 512px; width: 1024px; float:left"></div>
-	<div style = "height: 512px; width: 100px;float: left">
+	<div style = "height: 512px; width: 100px;float: left" id="">
 		<form style="margin:15px">
-			<label><input type="radio" name="label_class" value = "amp" checked="true">amp </label><br/>
+            {% for category in categories %}
+            <label>
+                <input type="radio" name="label_class" value = "{{ category.category_name }}">
+                {{ category.category_name }}
+            </label><br/>
+            {% endfor %}
+
+			<!--<label><input type="radio" class="label_class" value = "amp" checked="true">amp </label><br/>
 			<label><input type="radio" name="label_class" value = "tap">tap</label><br/>
 			<label><input type="radio" name="label_class" value = "house">house</label><br/>
 			<label><input type="radio" name="label_class" value = "car">car</label><br/>
 			<label><input type="radio" name="label_class" value = "tree">tree</label><br/>
-			<label><input type="radio" name="label_class" value = "road">road</label><br/>
+			<label><input type="radio" name="label_class" value = "road">road</label><br/>-->
 
 		</form>
 	</div>
@@ -175,15 +182,12 @@
     //Read the labels in the db and add it to the map
     var xhttp_all = new XMLHttpRequest();
     xhttp_all.onreadystatechange = function() {
-        console.log('test')
       if (this.readyState == 4 && this.status == 200) {
         resp_obj = JSON.parse(this.responseText);
-        console.log(JSON.parse(this.responseText));
         for (i = 0; i < resp_obj.length; i++) {
           if(resp_obj[i].label_type == "circle"){
             var geoJsonResp = resp_obj[i].geoJSON;
             circleLayer = L.circle([geoJsonResp.geometry.coordinates[1],geoJsonResp.geometry.coordinates[0]], geoJsonResp.properties.options);
-            console.log(circleLayer);
             drawnItems.addLayer(circleLayer);
           }else{
             var geoJsonResp = resp_obj[i].geoJSON;
@@ -207,7 +211,6 @@
 
 
     map.on(L.Draw.Event.CREATED, function (event) {
-        console.log('test');
         var layer = event.layer;
         var geoJson = layer.toGeoJSON();
 
