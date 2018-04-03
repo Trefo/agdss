@@ -30,7 +30,8 @@ from django.core import serializers
 from . import helper_ops
 from .image_ops.convert_images import image_label_string_to_SVG_string, render_SVG_from_label
 from webclient.image_ops import crop_images
-from .models import *
+from .models import Color, CategoryType, ImageSourceType, Image, Labeler, ImageWindow, ImageLabel, CategoryLabel, ImageFilter, TiledLabel
+from  . import models
 from webclient.image_ops.convert_images import convert_image_label_to_SVG
 
 import csv
@@ -78,7 +79,9 @@ def results(request):
 @login_required
 def map_label(request):
     template = loader.get_template('webclient/map_label.html')
-    context = {}
+    context = {
+        'categories': None
+    }
     return HttpResponse(template.render(context, request))
 ##################
 #POST/GET REQUESTS
@@ -96,7 +99,7 @@ def applyLabels(request):
         category_labels = dict['category_labels']
         image_name = dict['image_name']
         path = dict['path']
-        #category_name = dict['category_name']
+        #category = dict['category']
         image_filters = dict['image_filters']
         subimage = dict['subimage']
         timeTaken = dict['timeTaken']
@@ -629,8 +632,7 @@ def add_tiled_label(request):
     tiled_label.southwest_Lat = request_json["southwest_lat"]
     tiled_label.southwest_Lng = request_json["southwest_lng"]
     tiled_label.zoom_level = request_json["zoom_level"]
-    category_names = TiledCategory.objects.all().filter(category_name=request_json["category_name"])
-    tiled_label.category_name = category_names[0]
+    tiled_label.category = CategoryType.objects.get(category_name=request_json["category_name"])
     tiled_label.label_type = request_json["label_type"]
     tiled_label.label_json = request_json["geoJSON"]
     tiled_label.save()
@@ -640,7 +642,7 @@ def add_tiled_label(request):
 
     resp_obj = {}
     resp_obj["status"] = "success"
-    resp_obj["category_name"] = request_json["category_name"]
+    resp_obj["category"] = request_json["category_name"]
     return JsonResponse(resp_obj)
 
 @csrf_exempt
@@ -650,11 +652,8 @@ def get_all_tiled_labels(request):
 
     #TiledLabel.objects.all().delete()
 
-
-
     for tiled_label in TiledLabel.objects.all():
         response_dict = {}
-
         response_dict["northeast_lat"] = tiled_label.northeast_Lat
         response_dict["northeast_lng"] = tiled_label.northeast_Lat
         response_dict["southwest_lat"] = tiled_label.northeast_Lat
@@ -662,8 +661,8 @@ def get_all_tiled_labels(request):
         response_dict["zoom_level"] = tiled_label.zoom_level
         response_dict["label_type"] = tiled_label.label_type
         response_dict["geoJSON"] = tiled_label.label_json
-        response_dict["category_name"] = tiled_label.category_name.category_name
-        response_obj.append(response_dict);
+        response_dict["category"] = tiled_label.category.category_name
+        response_obj.append(response_dict)
 
     #response = serializers.serialize("json", TiledLabel.objects.all())
     return JsonResponse(response_obj,safe=False)
@@ -689,8 +688,8 @@ def add_train_image_label(request):
     
     train_label = PILImage.fromarray(train_label)
     
-    train_image.save("/home/ashreyas/aerialapps/trainset/" + request_json["category_name"] + "/" + image_name +".png")
-    train_label.save("/home/ashreyas/aerialapps/trainset/" + request_json["category_name"] + "/" + image_name +"_label.png")
+    #train_image.save("/home/ashreyas/aerialapps/trainset/" + request_json["category"] + "/" + image_name +".png")
+    #train_label.save("/home/ashreyas/aerialapps/trainset/" + request_json["category"] + "/" + image_name +"_label.png")
 
 
     resp_obj = {}
@@ -700,31 +699,14 @@ def add_train_image_label(request):
 
 
 @csrf_exempt
-@require_GET
+@require_POST
 def add_all_tiled_categories(request):
-    category = TiledCategory()
-    category.category_name = "amp"
-    category.save()
-
-    category = TiledCategory()
-    category.category_name = "tap"
-    category.save()
-
-    category = TiledCategory()
-    category.category_name = "car"
-    category.save()
-
-    category = TiledCategory()
-    category.category_name = "house"
-    category.save()
-
-    category = TiledCategory()
-    category.category_name = "tree"
-    category.save()
-
-    category = TiledCategory()
-    category.category_name = "road"
-    category.save()
+    for cat_name in ["amp", "tap", "car", "house", "tree", "road"]:
+        category = CategoryType()
+        category.category_name = cat_name
+        category.color = models.get_color()
+        category.label_type = "A"
+        category.save()
 
     return HttpResponse("Success")
 

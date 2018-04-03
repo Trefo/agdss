@@ -13,6 +13,7 @@ admin.site.register(ImageSourceType)
 admin.site.register(CategoryType)
 admin.site.register(ImageFilter)
 admin.site.register(Color)
+admin.site.register(TiledLabel)
 
 class CategoryLabelInline(admin.TabularInline):
     model = CategoryLabel

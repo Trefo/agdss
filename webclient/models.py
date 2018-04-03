@@ -48,6 +48,8 @@ class CategoryType(models.Model):
     label_type_enum = (
         ("R", "Rectangle"),
         ("C", "Circle"),
+        ("P", "Polygon"),
+        ("A", "Any")
     )
     label_type = models.CharField(
         max_length=1,
@@ -141,17 +143,13 @@ class ImageFilter(models.Model):
         return 'ImageFilter: brightness:' + str(self.brightness) + ' contrast: ' + str(self.contrast)\
                + ' saturation: ' + str(self.saturation) + ' labeler: ' + str(self.labeler)
 
-class TiledCategory(models.Model):
-    category_name = models.CharField(max_length=100, unique=True)
-
-
 class TiledLabel(models.Model):
     northeast_Lat = models.DecimalField(max_digits=17, decimal_places=14)
     northeast_Lng = models.DecimalField(max_digits=17, decimal_places=14)
     southwest_Lat = models.DecimalField(max_digits=17, decimal_places=14)
     southwest_Lng = models.DecimalField(max_digits=17, decimal_places=14)
     zoom_level = models.PositiveSmallIntegerField(default=23)
-    category_name = models.ForeignKey(TiledCategory, on_delete=models.CASCADE, max_length=100, null=True, blank=True)
+    category = models.ForeignKey(CategoryType, on_delete=models.CASCADE, max_length=100, null=True, blank=True)
     label_json = JSONField()
 
     label_type = models.CharField(max_length=100)

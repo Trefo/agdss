@@ -14,7 +14,7 @@ from webclient.image_ops import crop_images
 IMAGE_FILE_EXTENSION = '.png'
 
 def getLabelImagePILFile(label):
-    #foldername = settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + '/' + label.categoryType.category_name + '/'
+    #foldername = settings.STATIC_ROOT +  settings.LABEL_FOLDER_NAME + '/' + label.categoryType.category + '/'
     #filename = labelFilename(label) + IMAGE_FILE_EXTENSION
     #if not os.path.exists(foldername + filename):
     #    return None
