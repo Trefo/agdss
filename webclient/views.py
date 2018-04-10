@@ -81,7 +81,8 @@ def map_label(request):
     template = loader.get_template('webclient/map_label.html')
     #str(cat.color)
     context = {
-        'categories': [{"category_name":cat.category_name, "color":str(cat.color)} for cat in CategoryType.objects.all()]
+        #'categories': [{"category_name":cat.category_name, "color":str(cat.color)} for cat in CategoryType.objects.all()]
+        'categories': {cat.category_name:str(cat.color) for cat in CategoryType.objects.all()}
 
     }
     return HttpResponse(template.render(context, request))
