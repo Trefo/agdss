@@ -175,16 +175,24 @@ Atlanta Flight Demo: <br/>
             circleLayer = L.circle([geoJson.geometry.coordinates[1], geoJson.geometry.coordinates[0]], geoJson.properties.options);
             drawnItems.addLayer(circleLayer);
         } else if (label_type == "rectangle") {
-            var rectLayer = L.rectangle([[resp_obj[i].northeast_lat, resp_obj[i].northeast_lng],
-                [resp_obj[i].southwest_lat, resp_obj[i].southwest_lng]], geoJson.properties.options);
+            console.log(geoJson);
+
+            var rectLayer = L.rectangle([[geoJson.geometry.coordinates[0][0].slice().reverse(), geoJson.geometry.coordinates[0][1].slice().reverse(),
+                geoJson.geometry.coordinates[0][2].slice().reverse(), geoJson.geometry.coordinates[0][3].slice().reverse()]], geoJson.properties.options);
             drawnItems.addLayer(rectLayer);
         } else if (label_type == "polygon") {
-            coords = geoJson.geometry.coordinates;
-            for (j = 0; j < coords.length; j++) {
-                for (k = 0; k < coords[j].length; k++)
-                    coords[j][k].reverse();
+            coords = [];
+            console.log(geoJson.geometry.coordinates);
+            for (j = 0; j < geoJson.geometry.coordinates.length; j++) {
+                coords.push([]);
+                for (k = 0; k < geoJson.geometry.coordinates[j].length; k++) {
+                    coords[j].push(geoJson.geometry.coordinates[j][k].slice().reverse());
+                }
+
             }
-            var polyLayer = L.polygon([geoJson.geometry.coordinates], geoJson.properties.options);
+            console.log(coords);
+            var polyLayer = L.polygon(coords, geoJson.properties.options);
+            console.log(coords);
             drawnItems.addLayer(polyLayer);
         } else {
             var geoJsonLayer = L.geoJSON(geoJson, geoJson.properties.options);
