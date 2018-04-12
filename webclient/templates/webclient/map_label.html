@@ -179,18 +179,12 @@ Atlanta Flight Demo: <br/>
                 [resp_obj[i].southwest_lat, resp_obj[i].southwest_lng]], geoJson.properties.options);
             drawnItems.addLayer(rectLayer);
         } else if (label_type == "polygon") {
-            console.log(geoJson.geometry.coordinates);
             coords = geoJson.geometry.coordinates;
-            console.log(coords);
-            console.log(coords.length);
             for (j = 0; j < coords.length; j++) {
                 for (k = 0; k < coords[j].length; k++)
                     coords[j][k].reverse();
-                console.log(coords[j][k])
             }
-            console.log(coords);
             var polyLayer = L.polygon([geoJson.geometry.coordinates], geoJson.properties.options);
-            console.log(polyLayer);
             drawnItems.addLayer(polyLayer);
         } else {
             var geoJsonLayer = L.geoJSON(geoJson, geoJson.properties.options);
@@ -327,7 +321,7 @@ Atlanta Flight Demo: <br/>
     });
 
     $(document).ready(function () {
-        $("input:radio[name=label_class]").on('change load', function () {
+        set_label_draw_color = function () {
             var color = $(this).parent().css('color');
             drawControl.setDrawingOptions({
                 rectangle: {
@@ -346,9 +340,9 @@ Atlanta Flight Demo: <br/>
                     }
                 }
             });
-        });
-        $("input:radio[name=label_class]:first").attr('checked', true);
-
+        };
+        $("input:radio[name=label_class]").on('change load', set_label_draw_color);
+        $("input:radio[name=label_class]:first").attr('checked', true).trigger('change');
     });
 </script>
 <br/>
