@@ -1,132 +1,126 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>AgDSS Map</title>
+    <title>AgDSS Map</title>
 
-	<link rel="stylesheet" href="/static/scripts/leaflet/leaflet.css"/>
+    <link rel="stylesheet" href="/static/scripts/leaflet/leaflet.css"/>
 
     <!-- Make sure you put this AFTER Leaflet's CSS -->
-  <script src="/static/scripts/leaflet/leaflet.js">
-  </script>
+    <script src="/static/scripts/leaflet/leaflet.js">
+    </script>
 
-  <script type="text/javascript" src="/static/scripts/dom-to-image.min.js"></script>
+    <script type="text/javascript" src="/static/scripts/dom-to-image.min.js"></script>
 
-  <link rel="stylesheet" href="/static/scripts/leaflet.draw/leaflet.draw.css"/>
-  <script src="/static/scripts/leaflet.draw/leaflet.draw.js"></script>
+    <link rel="stylesheet" href="/static/scripts/leaflet.draw/leaflet.draw.css"/>
+    <script src="/static/scripts/leaflet.draw/leaflet.draw.js"></script>
 
-  <script src="/static/scripts/index.js"></script>
+    <script src="/static/scripts/index.js"></script>
     <script src="/static/scripts/jQuery/jquery-3.0.0.min.js"></script>
 
-   <script type="text/javascript">
+    <script type="text/javascript">
 
-      //Global vars:
-      var R = 6378137;
-      var sphericalScale = 0.5 / (Math.PI * R);
+        //Global vars:
+        var R = 6378137;
+        var sphericalScale = 0.5 / (Math.PI * R);
 
-     extractImages = function(map){
-        bounds = map.getBounds();
-        //alert(bounds);
-        console.log(bounds);
-        var zoom = 23;
+        extractImages = function (map) {
+            bounds = map.getBounds();
+            //alert(bounds);
+            console.log(bounds);
+            var zoom = 23;
 
-        //north, west 
-        var min = project(bounds._northEast.lat,bounds._southWest.lng, zoom);
-        
-        //south, east
-        var max = project(bounds._southWest.lat, bounds._northEast.lng, zoom);
+            //north, west
+            var min = project(bounds._northEast.lat, bounds._southWest.lng, zoom);
 
-
-        console.log(min);
-        console.log(max);
-        window.location.href = "/app/extract?minx=" + min.x +"&maxx=" +max.x + "&miny=" +min.y+ "&maxy=" + max.y;
-     };
+            //south, east
+            var max = project(bounds._southWest.lat, bounds._northEast.lng, zoom);
 
 
+            console.log(min);
+            console.log(max);
+            window.location.href = "/app/extract?minx=" + min.x + "&maxx=" + max.x + "&miny=" + min.y + "&maxy=" + max.y;
+        };
 
 
+        function project(lat, lng, zoom) {
+            var d = Math.PI / 180,
+                max = 1 - 1E-15,
+                sin = Math.max(Math.min(Math.sin(lat * d), max), -max),
+                scale = 256 * Math.pow(2, zoom);
+
+            var point = {
+                x: R * lng * d,
+                y: R * Math.log((1 + sin) / (1 - sin)) / 2
+            };
+
+            point.x = tiled(scale * (sphericalScale * point.x + 0.5));
+            point.y = tiled(scale * (-sphericalScale * point.y + 0.5));
+
+            return point;
+        }
 
 
-     function project(lat,lng,zoom) {
-      var d = Math.PI / 180,
-          max = 1 - 1E-15,
-          sin = Math.max(Math.min(Math.sin(lat * d), max), -max),
-          scale = 256 * Math.pow(2, zoom);
+        function tiled(num) {
+            return Math.floor(num / 256);
+        }
 
-      var point = {
-        x: R * lng * d,
-        y: R * Math.log((1 + sin) / (1 - sin)) / 2
-      };
-
-      point.x = tiled(scale * (sphericalScale * point.x + 0.5));
-      point.y = tiled(scale * (-sphericalScale * point.y + 0.5));
-
-      return point;
-    }
-
-
-     function tiled(num) {
-      return Math.floor(num/256);
-     }
-
-   </script>
-
+    </script>
 
 
 </head>
 <body>
 
-	Atlanta Flight Demo: <br/>
-	<div id="mapid" style ="height: 512px; width: 1024px; float:left"></div>
-	<div style = "height: 512px; width: 100px;float: left" id="">
-		<form style="margin:15px" id="class_select">
-            {% for category_name, color in categories.items %}
+Atlanta Flight Demo: <br/>
+<div id="mapid" style="height: 512px; width: 1024px; float:left"></div>
+<div style="height: 512px; width: 100px;float: left" id="">
+    <form style="margin:15px" id="class_select">
+        {% for category_name, color in categories.items %}
             <label style="color:{{ color }}">
-                <input type="radio" name="label_class" value = "{{ category_name }}">
+                <input type="radio" name="label_class" value="{{ category_name }}">
                 {{ category_name }}
             </label><br/>
-            {% endfor %}
+        {% endfor %}
 
-			<!--<label><input type="radio" class="label_class" value = "amp" checked="true">amp </label><br/>
-			<label><input type="radio" name="label_class" value = "tap">tap</label><br/>
-			<label><input type="radio" name="label_class" value = "house">house</label><br/>
-			<label><input type="radio" name="label_class" value = "car">car</label><br/>
-			<label><input type="radio" name="label_class" value = "tree">tree</label><br/>
-			<label><input type="radio" name="label_class" value = "road">road</label><br/>-->
+        <!--<label><input type="radio" class="label_class" value = "amp" checked="true">amp </label><br/>
+        <label><input type="radio" name="label_class" value = "tap">tap</label><br/>
+        <label><input type="radio" name="label_class" value = "house">house</label><br/>
+        <label><input type="radio" name="label_class" value = "car">car</label><br/>
+        <label><input type="radio" name="label_class" value = "tree">tree</label><br/>
+        <label><input type="radio" name="label_class" value = "road">road</label><br/>-->
 
-		</form>
-	</div>
- 
+    </form>
+</div>
 
 
-	<script type="text/javascript">
+<script type="text/javascript">
 
-{#    var atlantaTiles = L.tileLayer('/static/aerialapps/tiles/{z}/{x}/{y}.png', {#}
-{#      attribution: 'Aerial Apps',#}
-{#      maxZoom: 23,#}
-{#      id: 'mapbox.streets'#}
-{#    });#}
+    {#    var atlantaTiles = L.tileLayer('/static/aerialapps/tiles/{z}/{x}/{y}.png', {#}
+    {#      attribution: 'Aerial Apps',#}
+    {#      maxZoom: 23,#}
+    {#      id: 'mapbox.streets'#}
+    {#    });#}
     var atlantaTiles = L.tileLayer('http://label.ag:8051/tiles/{z}/{x}/{y}.png', {
-      attribution: 'Aerial Apps',
-      maxZoom: 23,
-      id: 'mapbox.streets'
+        attribution: 'Aerial Apps',
+        maxZoom: 23,
+        id: 'mapbox.streets'
     });
 
-    var predictTiles = L.tileLayer('http://label.ag:8051/preds_latest/rgba/{z}/{x}/{y}.png',{
-      minZoom:21,
-      maxZoom: 23,
-      id: 'mapbox.streets2'
+    var predictTiles = L.tileLayer('http://label.ag:8051/preds_latest/rgba/{z}/{x}/{y}.png', {
+        minZoom: 21,
+        maxZoom: 23,
+        id: 'mapbox.streets2'
     });
-{#    var predictTiles = L.tileLayer('/static/aerialapps/preds_latest/rgba/{z}/{x}/{y}.png',{#}
-{#      minZoom:21,#}
-{#      maxZoom: 23,#}
-{#      id: 'mapbox.streets2'#}
-{#    });#}
+    {#    var predictTiles = L.tileLayer('/static/aerialapps/preds_latest/rgba/{z}/{x}/{y}.png',{#}
+    {#      minZoom:21,#}
+    {#      maxZoom: 23,#}
+    {#      id: 'mapbox.streets2'#}
+    {#    });#}
 
 
-   	var map = L.map('mapid',{
-       minZoom: 13,
-       maxZoom: 23,
-       layers: [atlantaTiles,predictTiles]
+    var map = L.map('mapid', {
+        minZoom: 13,
+        maxZoom: 23,
+        layers: [atlantaTiles, predictTiles]
     });
 
     map.setView([34.004263688375346, -84.39877241849901], 21);
@@ -136,31 +130,29 @@
 
     //Create the draw/edit control
     var drawControl = new L.Control.Draw({
-    	edit: {
-         	edit:false,
-         	featureGroup: drawnItems,
-         	poly: {
+        edit: {
+            edit: false,
+            featureGroup: drawnItems,
+            poly: {
                 allowIntersection: false
             }
-         },
-         draw: {
-             polyline: false,
-             marker: false,
-             circlemarker: false
-         }
-     });
+        },
+        draw: {
+            polyline: false,
+            marker: false,
+            circlemarker: false
+        }
+    });
 
     drawControl.addTo(map);
-   	
 
-    var baseLayers = {
-     
-    };
+
+    var baseLayers = {};
 
     var overlays = {
-      "Atlanta": atlantaTiles,
-      "Labels": drawnItems,
-      "Predictions" : predictTiles
+        "Atlanta": atlantaTiles,
+        "Labels": drawnItems,
+        "Predictions": predictTiles
     };
 
     L.control.layers(baseLayers, overlays).addTo(map);
@@ -168,54 +160,56 @@
     //Initialize the easyPrint module
 
     var printerOptions = {
-          sizeModes: ['Current'],
-          filename: 'myMap',
-          exportOnly: true,
-          position: 'bottomright'
+        sizeModes: ['Current'],
+        filename: 'myMap',
+        exportOnly: true,
+        position: 'bottomright'
     };
 
 
     var printer = L.easyPrint(printerOptions);
     printer.addTo(map);
 
-
+    draw_shapes = function (geoJson, label_type) {
+        if (label_type == "circle") {
+            circleLayer = L.circle([geoJson.geometry.coordinates[1], geoJson.geometry.coordinates[0]], geoJson.properties.options);
+            drawnItems.addLayer(circleLayer);
+        } else if (label_type == "rectangle") {
+            var rectLayer = L.rectangle([[resp_obj[i].northeast_lat, resp_obj[i].northeast_lng],
+                [resp_obj[i].southwest_lat, resp_obj[i].southwest_lng]], geoJson.properties.options);
+            drawnItems.addLayer(rectLayer);
+        } else if (label_type == "polygon") {
+            console.log(geoJson.geometry.coordinates);
+            coords = geoJson.geometry.coordinates;
+            console.log(coords);
+            console.log(coords.length);
+            for (j = 0; j < coords.length; j++) {
+                for (k = 0; k < coords[j].length; k++)
+                    coords[j][k].reverse();
+                console.log(coords[j][k])
+            }
+            console.log(coords);
+            var polyLayer = L.polygon([geoJson.geometry.coordinates], geoJson.properties.options);
+            console.log(polyLayer);
+            drawnItems.addLayer(polyLayer);
+        } else {
+            var geoJsonLayer = L.geoJSON(geoJson, geoJson.properties.options);
+            drawnItems.addLayer(geoJsonLayer);
+        }
+    };
 
     //Read the labels in the db and add it to the map
     var xhttp_all = new XMLHttpRequest();
-    xhttp_all.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        resp_obj = JSON.parse(this.responseText);
-        for (i = 0; i < resp_obj.length; i++) {
-            var geoJsonResp = resp_obj[i].geoJSON;
-            //console.log(resp_obj[i]);
-          if(resp_obj[i].label_type == "circle"){
-            circleLayer = L.circle([geoJsonResp.geometry.coordinates[1],geoJsonResp.geometry.coordinates[0]], geoJsonResp.properties.options);
-            drawnItems.addLayer(circleLayer);
-          }else if (resp_obj[i].label_type == "rectangle"){
-            var rectLayer = L.rectangle([[resp_obj[i].northeast_lat, resp_obj[i].northeast_lng],
-                [resp_obj[i].southwest_lat, resp_obj[i].southwest_lng]], geoJsonResp.properties.options);
-            drawnItems.addLayer(rectLayer);
-          }else if (resp_obj[i].label_type == "polygon"){
-           console.log(geoJsonResp.geometry.coordinates);
-           coords = geoJsonResp.geometry.coordinates;
-           console.log(coords.length);
-           for (j = 0; j < coords.length; j++) {
-               for (k = 0; k < coords[j].length; k++)
-                    coords[i][k].reverse();
-                    console.log(coords[i][k])
-           }
-           console.log(coords);
-            var polyLayer = L.polygon([geoJsonResp.geometry.coordinates], geoJsonResp.properties.options);
-            console.log(polyLayer);
-            drawnItems.addLayer(polyLayer);
-          }else {
-             var geoJsonLayer = L.geoJSON(geoJsonResp, geoJsonResp.properties.options);
-            drawnItems.addLayer(geoJsonLayer);
-          }
+    xhttp_all.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            resp_obj = JSON.parse(this.responseText);
+            for (i = 0; i < resp_obj.length; i++) {
+                var geoJsonResp = resp_obj[i].geoJSON;
+                draw_shapes(geoJsonResp, resp_obj[i].label_type)
+            }
         }
-      }
     };
-    
+
     xhttp_all.open("GET", "/webclient/TiledLables", true);
     xhttp_all.send();
 
@@ -231,49 +225,49 @@
 
         var propJSON = {};
         console.log(layer.options);
-        if(event.layerType == "circle"){
-          ne_lat = layer._latlng.lat + layer._mRadius;
-          ne_lng = layer._latlng.lng + layer._mRadius;
-          sw_lat = layer._latlng.lat - layer._mRadius;
-          sw_lng = layer._latlng.lng - layer._mRadius;
-          propJSON.latlng = layer._latlng;
-          propJSON.radius = layer._mRadius;
-          geoJson.properties.shape_type = "circle";
-          geoJson.properties.radius = layer._mRadius;
-        }else{
-          ne_lat = layer._bounds._northEast.lat;
-          ne_lng = layer._bounds._northEast.lng;
-          sw_lat = layer._bounds._southWest.lat;
-          sw_lng = layer._bounds._southWest.lng;
-          propJSON.latlngs = layer._latlngs[0];
+        if (event.layerType == "circle") {
+            ne_lat = layer._latlng.lat + layer._mRadius;
+            ne_lng = layer._latlng.lng + layer._mRadius;
+            sw_lat = layer._latlng.lat - layer._mRadius;
+            sw_lng = layer._latlng.lng - layer._mRadius;
+            propJSON.latlng = layer._latlng;
+            propJSON.radius = layer._mRadius;
+            geoJson.properties.shape_type = "circle";
+            geoJson.properties.radius = layer._mRadius;
+        } else {
+            ne_lat = layer._bounds._northEast.lat;
+            ne_lng = layer._bounds._northEast.lng;
+            sw_lat = layer._bounds._southWest.lat;
+            sw_lng = layer._bounds._southWest.lng;
+            propJSON.latlngs = layer._latlngs[0];
         }
-      geoJson.properties.options = layer.options;
+        geoJson.properties.options = layer.options;
 
-		var radio_label_class = $("input:radio[name=label_class]:checked").val();
+        var radio_label_class = $("input:radio[name=label_class]:checked").val();
 
-         requestObj = {
-          northeast_lat : ne_lat,
-          northeast_lng : ne_lng,
-          southwest_lat : sw_lat,
-          southwest_lng : sw_lng,
-          zoom_level : map.getZoom(),
-          label_type: event.layerType,
-          category_name: radio_label_class,
-          geoJSON: geoJson,
-          propJSON: propJSON
+        requestObj = {
+            northeast_lat: ne_lat,
+            northeast_lng: ne_lng,
+            southwest_lat: sw_lat,
+            southwest_lng: sw_lng,
+            zoom_level: map.getZoom(),
+            label_type: event.layerType,
+            category_name: radio_label_class,
+            geoJSON: geoJson,
+            propJSON: propJSON
         };
         console.log(requestObj);
 
-
-        if(event.layerType == "circle"){
-          circleLayer = L.circle([geoJson.geometry.coordinates[1],geoJson.geometry.coordinates[0]], geoJson.properties.options);
-          drawnItems.addLayer(circleLayer);
-          console.log('geoJson');
-        
-        }else{
-          var geoJsonLayer = L.geoJSON(geoJson);
-          drawnItems.addLayer(geoJsonLayer);
-        }
+        draw_shapes(geoJson, event.layerType);
+{#        if (event.layerType == "circle") {#}
+{#            circleLayer = L.circle([geoJson.geometry.coordinates[1], geoJson.geometry.coordinates[0]], geoJson.properties.options);#}
+{#            drawnItems.addLayer(circleLayer);#}
+{#            console.log('geoJson');#}
+{##}
+{#        } else {#}
+{#            var geoJsonLayer = L.geoJSON(geoJson);#}
+{#            drawnItems.addLayer(geoJsonLayer);#}
+{#        }#}
 
         //Data to be used for printing of images
         var maskData;
@@ -281,45 +275,45 @@
         var printedImageName;
 
         centerLatLng = map.getCenter();
-        centerXY = project(centerLatLng.lat,centerLatLng.lng,  map.getZoom());
+        centerXY = project(centerLatLng.lat, centerLatLng.lng, map.getZoom());
         printedImageName = map.getZoom().toString() + "_" + centerXY.x.toString() + "_" + centerXY.y.toString();
-        var checkBoxes =  document.getElementsByClassName('leaflet-control-layers-selector');
+        var checkBoxes = document.getElementsByClassName('leaflet-control-layers-selector');
 
         var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-          if (this.readyState == 4 && this.status == 200) {
-            console.log(this.responseText);
-            //Print the map
-            map.removeLayer(drawnItems);
-            printer.printMap('CurrentSize','test').then(function(result){
-                imageData = result;
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                console.log(this.responseText);
+                //Print the map
+                map.removeLayer(drawnItems);
+                printer.printMap('CurrentSize', 'test').then(function (result) {
+                    imageData = result;
 
-                map.addLayer(drawnItems);
-                map.removeLayer(atlantaTiles);
+                    map.addLayer(drawnItems);
+                    map.removeLayer(atlantaTiles);
 
-                  printer.printMap('CurrentSize','test2').then(function(imResult){
-                    requestObj = {};
-                    maskData = imResult;
-                    requestObj.image_blob = imageData;
-                    requestObj.mask_blob = maskData;
-                    requestObj.image_name = printedImageName;
-                    requestObj.category_name = radio_label_class;
-                    
-                    map.addLayer(atlantaTiles);
-                    fetch("../webclient/addTiledImage", {
-                      body: JSON.stringify(requestObj), 
-                      headers: {
-                        'content-type': 'application/json'
-                      },
-                      method: 'POST'
-                    }).then(function(resp){
-                      console.log(resp)
+                    printer.printMap('CurrentSize', 'test2').then(function (imResult) {
+                        requestObj = {};
+                        maskData = imResult;
+                        requestObj.image_blob = imageData;
+                        requestObj.mask_blob = maskData;
+                        requestObj.image_name = printedImageName;
+                        requestObj.category_name = radio_label_class;
+
+                        map.addLayer(atlantaTiles);
+                        fetch("../webclient/addTiledImage", {
+                            body: JSON.stringify(requestObj),
+                            headers: {
+                                'content-type': 'application/json'
+                            },
+                            method: 'POST'
+                        }).then(function (resp) {
+                            console.log(resp)
+                        })
                     })
-                  })
-                //return result;
-            })
-            
-          }
+                    //return result;
+                })
+
+            }
         };
 
         xhttp.open("POST", "/webclient/addTiledLabel", true);
@@ -336,31 +330,31 @@
         $("input:radio[name=label_class]").on('change load', function () {
             var color = $(this).parent().css('color');
             drawControl.setDrawingOptions({
-            rectangle: {
-                shapeOptions: {
-                    color: color
+                rectangle: {
+                    shapeOptions: {
+                        color: color
+                    }
+                },
+                circle: {
+                    shapeOptions: {
+                        color: color
+                    }
+                },
+                polygon: {
+                    shapeOptions: {
+                        color: color
+                    }
                 }
-            },
-            circle: {
-                shapeOptions: {
-                    color: color
-                }
-            },
-            polygon: {
-                shapeOptions: {
-                    color: color
-                }
-            }
-        });
+            });
         });
         $("input:radio[name=label_class]:first").attr('checked', true);
 
     });
-  </script>
-  <br/>
-  
-  <!-- 
-  <button style= "display: block; clear: both;" type="button" onclick="extractImages(mymap)">Extract Images</button>
-	-->
+</script>
+<br/>
+
+<!--
+<button style= "display: block; clear: both;" type="button" onclick="extractImages(mymap)">Extract Images</button>
+  -->
 </body>
 </html>
