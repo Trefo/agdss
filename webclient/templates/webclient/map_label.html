@@ -175,24 +175,19 @@ Atlanta Flight Demo: <br/>
             circleLayer = L.circle([geoJson.geometry.coordinates[1], geoJson.geometry.coordinates[0]], geoJson.properties.options);
             drawnItems.addLayer(circleLayer);
         } else if (label_type == "rectangle") {
-            console.log(geoJson);
 
             var rectLayer = L.rectangle([[geoJson.geometry.coordinates[0][0].slice().reverse(), geoJson.geometry.coordinates[0][1].slice().reverse(),
                 geoJson.geometry.coordinates[0][2].slice().reverse(), geoJson.geometry.coordinates[0][3].slice().reverse()]], geoJson.properties.options);
             drawnItems.addLayer(rectLayer);
         } else if (label_type == "polygon") {
             coords = [];
-            console.log(geoJson.geometry.coordinates);
             for (j = 0; j < geoJson.geometry.coordinates.length; j++) {
                 coords.push([]);
                 for (k = 0; k < geoJson.geometry.coordinates[j].length; k++) {
                     coords[j].push(geoJson.geometry.coordinates[j][k].slice().reverse());
                 }
-
             }
-            console.log(coords);
             var polyLayer = L.polygon(coords, geoJson.properties.options);
-            console.log(coords);
             drawnItems.addLayer(polyLayer);
         } else {
             var geoJsonLayer = L.geoJSON(geoJson, geoJson.properties.options);
@@ -226,8 +221,8 @@ Atlanta Flight Demo: <br/>
         var sw_lng;
 
         var propJSON = {};
-        console.log(layer.options);
         if (event.layerType == "circle") {
+            console.log(layer);
             ne_lat = layer._latlng.lat + layer._mRadius;
             ne_lng = layer._latlng.lng + layer._mRadius;
             sw_lat = layer._latlng.lat - layer._mRadius;
@@ -284,7 +279,6 @@ Atlanta Flight Demo: <br/>
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
-                console.log(this.responseText);
                 //Print the map
                 map.removeLayer(drawnItems);
                 printer.printMap('CurrentSize', 'test').then(function (result) {
@@ -325,7 +319,50 @@ Atlanta Flight Demo: <br/>
 
     map.on('draw:deleted', function (e) {
         console.log(e);
-        console.log(e.layers);
+        var request_obj = [];
+        e.layers.eachLayer(function (layer) {
+            if (layer instanceof  L.Rectangle) {
+                var label_type = "Rectangle";
+            }
+            else if (layer instanceof L.Circle) {
+            //Workaround from https://github.com/Leaflet/Leaflet.draw/issues/701
+                layer._map = layer._map || map;
+                var label_type = "Circle";
+            }
+            else if (layer instanceof L.Polygon) {
+                var label_type = "Polygon";
+            }
+            else {
+                return //Not one of the possible label types
+            }
+            var bounds = layer.getBounds();
+            var northeast = bounds.getNorthEast();
+            var southwest = bounds.getSouthWest();
+            delete_layer_dict = {
+                northeast_lat: northeast.lat,
+                northeast_lng: northeast.lng,
+                southwest_lat: southwest.lat,
+                southwest_lng: southwest.lng,
+                label_type: label_type,
+                category_name: color_to_category[layer.options.color]
+            };
+            request_obj.push(delete_layer_dict);
+        });
+        console.log(request_obj);
+
+        $.ajax({
+            url: "/webclient/deleteTileLabels",
+            type: "POST",
+            dataType: "text",
+            data: JSON.stringify(request_obj),
+            success: function (data) {
+                console.log(data);
+            },
+            error: function (data) {
+                console.log(data)
+            }
+
+        });
     });
 
     $(document).ready(function () {
@@ -351,6 +388,12 @@ Atlanta Flight Demo: <br/>
         };
         $("input:radio[name=label_class]").on('change load', set_label_draw_color);
         $("input:radio[name=label_class]:first").attr('checked', true).trigger('change');
+        color_to_category = {};
+        $("input:radio[name=label_class]").each(function () {
+            color_to_category[$(this).parent().css('color')] = $(this).val();
+        });
+
+
     });
 </script>
 <br/>

@@ -713,29 +713,41 @@ def add_all_tiled_categories(request):
 
     return HttpResponse("Success")
 
-
+@csrf_exempt
+@require_POST
 def delete_tile_label(request):
-    request = json.load(request)
-    northeast_Lat = request.get("northeast_Lat")
-    northeast_Lng = request.get("northeast_lng")
-    southwest_Lat = request.get("southwest_lat")
-    southwest_Lng = request.get("southwest_lng")
-    category_name = request.get("category_name")
-    if northeast_Lat is None or northeast_Lng is None or\
-            southwest_Lat is None or southwest_Lng is None or category_name is None:
-        return HttpResponseBadRequest("Missing required field")
-    response_dict["zoom_level"] = tiled_label.zoom_level
-    response_dict["label_type"] = tiled_label.label_type
-    response_dict["geoJSON"] = tiled_label.label_json
-    response_dict["category"] = tiled_label.category.category_name
 
-    category = CategoryType.objects.get(category_name=category_name)
-    tile_label = TiledLabel.objects.filter(northeast_Lat=northeast_Lat,
-                   northeast_Lng=northeast_Lng, southwest_Lat=southwest_Lat, southwest_Lng=southwest_Lng, category=category)
+    float_tollerance = 1e-5
+    print(request)
+    request_list = json.load(request)
+    print(request_list)
+    to_delete = []
+    for request in request_list:
+        northeast_Lat = request.get("northeast_lat")
+        northeast_Lng = request.get("northeast_lng")
+        southwest_Lat = request.get("southwest_lat")
+        southwest_Lng = request.get("southwest_lng")
+        category_name = request.get("category_name")
+        if northeast_Lat is None or northeast_Lng is None or\
+                southwest_Lat is None or southwest_Lng is None or category_name is None:
+            return HttpResponseBadRequest("Missing required field")
+        category = CategoryType.objects.get(category_name=category_name)
+        print(category)
+        tile_label = TiledLabel.objects.filter(
+            northeast_Lat__range=(northeast_Lat - float_tollerance, northeast_Lat + float_tollerance),
+            northeast_Lng__range=(northeast_Lng - float_tollerance, northeast_Lng + float_tollerance),
+            southwest_Lat__range=(southwest_Lat - float_tollerance, southwest_Lat + float_tollerance),
+            southwest_Lng__range=(southwest_Lng - float_tollerance, southwest_Lng + float_tollerance),
+            category=category)
 
-    if not tile_label:
-        return HttpResponseBadRequest("Label not found")
-    if len(tile_label) > 1:
-        return HttpResponseBadRequest("Request ambigous")
-    tile_label[0].delete()
+        if not tile_label:
+            return HttpResponseBadRequest("Label not found")
+        if len(tile_label) > 1:
+            return HttpResponseBadRequest("Request ambigous")
+        to_delete.append(tile_label[0])
+
+    #Make sure all objects are okay to delete first
+    #If there's an error don't change database
+    for label in to_delete:
+        label.delete()
     return HttpResponse("Sucess")

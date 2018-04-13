@@ -36,4 +36,5 @@ urlpatterns = [
     path('TiledLables',views.get_all_tiled_labels),
     path('addTiledImage', views.add_train_image_label),
     path('addTiledCategories', views.add_all_tiled_categories),
+    path('deleteTileLabels', views.delete_tile_label),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
