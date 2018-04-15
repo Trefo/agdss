@@ -223,6 +223,10 @@ Atlanta Flight Demo: <br/>
         var propJSON = {};
         if (event.layerType == "circle") {
             console.log(layer);
+            layer._map = layer._map || map;
+            var bounds = layer.getBounds();
+            var northeast = bounds.getNorthEast();
+            var southwest = bounds.getSouthWest();
             ne_lat = layer._latlng.lat + layer._mRadius;
             ne_lng = layer._latlng.lng + layer._mRadius;
             sw_lat = layer._latlng.lat - layer._mRadius;
@@ -232,6 +236,7 @@ Atlanta Flight Demo: <br/>
             geoJson.properties.shape_type = "circle";
             geoJson.properties.radius = layer._mRadius;
         } else {
+            var bounds = layer.getBounds();
             ne_lat = layer._bounds._northEast.lat;
             ne_lng = layer._bounds._northEast.lng;
             sw_lat = layer._bounds._southWest.lat;
@@ -335,6 +340,7 @@ Atlanta Flight Demo: <br/>
             else {
                 return //Not one of the possible label types
             }
+            console.log(layer._map);
             var bounds = layer.getBounds();
             var northeast = bounds.getNorthEast();
             var southwest = bounds.getSouthWest();
@@ -347,6 +353,10 @@ Atlanta Flight Demo: <br/>
                 category_name: color_to_category[layer.options.color]
             };
             request_obj.push(delete_layer_dict);
+            if (layer._map != null) {
+                layer._map.removeLayer(layer);
+                console.log(layer);
+            }
         });
         console.log(request_obj);
 

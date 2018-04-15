@@ -636,7 +636,7 @@ def add_tiled_label(request):
     tiled_label.southwest_Lng = request_json["southwest_lng"]
     tiled_label.zoom_level = request_json["zoom_level"]
     tiled_label.category = CategoryType.objects.get(category_name=request_json["category_name"])
-    tiled_label.label_type = request_json["label_type"]
+    tiled_label.label_type = [K for (K, v) in TiledLabel.label_type_enum if request_json["label_type"].lower() == v.lower()][0]
     tiled_label.label_json = request_json["geoJSON"]
     tiled_label.save()
 
@@ -662,7 +662,8 @@ def get_all_tiled_labels(request):
         response_dict["southwest_lat"] = tiled_label.southwest_Lat
         response_dict["southwest_lng"] = tiled_label.southwest_Lng
         response_dict["zoom_level"] = tiled_label.zoom_level
-        response_dict["label_type"] = tiled_label.label_type
+        print(tiled_label.get_label_type_display())
+        response_dict["label_type"] = tiled_label.get_label_type_display()
         response_dict["geoJSON"] = tiled_label.label_json
         response_dict["category"] = tiled_label.category.category_name
         response_obj.append(response_dict)

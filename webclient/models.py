@@ -152,5 +152,16 @@ class TiledLabel(models.Model):
     category = models.ForeignKey(CategoryType, on_delete=models.CASCADE, max_length=100, null=True, blank=True)
     label_json = JSONField()
 
-    label_type = models.CharField(max_length=100)
+    label_type_enum = (
+        ("R", "Rectangle"),
+        ("C", "Circle"),
+        ("P", "Polygon"),
+        ("A", "Any")
+    )
+    label_type = models.CharField(
+        max_length=1,
+        choices=label_type_enum,
+        default="R"
+    )
+
 
