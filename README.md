@@ -8,11 +8,18 @@
 2. cd agdss
 3. docker-compose up
 
-##Additional steps needed in agdss web container, the first time for a composition
-0. docker exec -it agdss_web_1 bash
-1. ```python manage.py migrate --settings=agdss.settings.common` to create the tables in the database.```
-2. To create admin credentials (required to access /admin), run `python manage.py createsuperuser` and enter the requested information.
-3. The webapp can then be accessed at [http://172.10.0.3:8000](http://172.10.0.3:8000). For a list of available pages, see the file agdss/urls.py.
+## First-time additional steps needed in agdss web container named agdss_web 
+1. docker exec -it agdss_web_1 bash
+2. ```python manage.py migrate --settings=agdss.settings.common` to create the tables in the database.```
+3. ```python manage.py createsuperuser``` and enter the requested information.
 4. ```python manage.py collectstatic --settings=agdss.settings.common ```
-5. Copy addImages.sh to static-root/your-image-folder
-6. ```bash addImages.sh "[\"almond\"]" ```
+5. ```cp /app/addImages.sh  /app/static-root/small-tomatoes```
+6. ```bash addImages.sh "[\"small-tomatoes\"]" ```
+
+## Using the aannotation webapp 
+The webapp can then be accessed at [http://172.10.0.3:8000/webclient](http://172.10.0.3:8000/webclient). 
+
+Admin page is at [http://172.10.0.3:8000/admin](http://172.10.0.3:8000/admin)
+Use the credential you created for the superuser in item 3. for first-time additional steps.  
+
+For a list of available pages, see the file agdss/urls.py.
