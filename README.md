@@ -3,7 +3,7 @@
   Please note that this documentation is incomplete and may be out of date.
 
 
-##Setup
+## Setup
 The folder annotable/small-tomatoes has a set of example images. Accordingly, the /app/agdss/settings/common.py file assumes small-tomatoes as category. You need to specify your own folder and image category you want to label, as well as the name of folders where converted label masks will be stored (degault 'labels/'). Run the following commands once satisfied with the settings file. 
 
 1. git clone https://github.com/Trefo/agdss
