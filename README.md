@@ -4,12 +4,14 @@
 
 
 ##Setup
+The folder annotable/small-tomatoes has a set of example images. Accordingly, the /app/agdss/settings/common.py file assumes small-tomatoes as category. You need to specify your own folder and image category you want to label, as well as the name of folders where converted label masks will be stored (degault 'labels/'). Run the following commands once satisfied with the settings file. 
+
 1. git clone https://github.com/Trefo/agdss
 2. cd agdss
 3. docker-compose up  
 
 ## First-time additional steps needed in agdss web container named agdss_web 
-You need to edit /app/agdss/settings/common.py specifying correctly the image category you want to label, and the label folder name. Then, run the following commands. 
+On a different terminal. 
 1. ```docker exec -it agdss_web_1 bash```
 2. ```python manage.py migrate --settings=agdss.settings.common``` to create the tables in the database.
 3. ```python manage.py createsuperuser --settings=agdss.settings.common``` and enter the requested information.
@@ -18,8 +20,8 @@ You need to edit /app/agdss/settings/common.py specifying correctly the image ca
 6. ```cd /app/static-root/small-tomatoes/```
 7. ```bash addImages.sh "[\"small-tomatoes\"]" ```
 
-## Using the aannotation web app 
-The webapp can then be accessed at [http://172.10.0.3:8000](http://172.10.0.3:8000). 
+## On using the annotation web app 
+The web app can then be accessed at [http://172.10.0.3:8000](http://172.10.0.3:8000). 
 
 Admin page is at [http://172.10.0.3:8000/admin](http://172.10.0.3:8000/admin)
 Use the credential you created for the superuser in item 3. for first-time additional steps.  
