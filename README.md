@@ -9,9 +9,10 @@
 3. docker-compose up  
 
 ## First-time additional steps needed in agdss web container named agdss_web 
+You need to edit /app/agdss/settings/common.py specifying correctly the image category you want to label, and the label folder name. Then, run the following commands. 
 1. ```docker exec -it agdss_web_1 bash```
-2. ```python manage.py migrate --settings=agdss.settings.common` to create the tables in the database.```
-3. ```python manage.py createsuperuser``` and enter the requested information.
+2. ```python manage.py migrate --settings=agdss.settings.common``` to create the tables in the database.
+3. ```python manage.py createsuperuser --settings=agdss.settings.common``` and enter the requested information.
 4. ```python manage.py collectstatic --settings=agdss.settings.common ```
 5. ```cp /app/addImages.sh  /app/static-root/small-tomatoes && cd /app/static-root/small-tomatoes/```
 6. ```bash addImages.sh "[\"small-tomatoes\"]" ```
