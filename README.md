@@ -4,11 +4,13 @@
 
 
 ## Setup
-The folder annotable/small-tomatoes has a set of example images. Accordingly, the /app/agdss/settings/common.py file assumes small-tomatoes as category. You need to specify your own folder and image category you want to label, as well as the name of folders where converted label masks will be stored (degault 'labels/'). Run the following commands once satisfied with the settings file. 
 
 1. git clone https://github.com/Trefo/agdss
 2. cd agdss
-3. docker-compose up  
+
+The folder annotable/small-tomatoes has a set of example images. Accordingly, the agdss/settings/common.py file assumes small-tomatoes as category. You need to specify your own folder and image category you want to label, as well as the name of folder where converted image label masks will be stored (default is 'labels/' in commons.py). Once, satisfied run docker-compose! 
+
+3. docker-compose up
 
 ## First-time additional steps needed in agdss web container named agdss_web 
 On a different terminal. 
@@ -38,4 +40,4 @@ Labels can be moved by dragging, and deleted by double-clicking.
 
 Submit when finished labeling an image. 
 
-Chose 'No labels in image' when there are no labels so that that the data is recorded correctly on the DB. 
+Choose 'No labels in image' when there are no labels so that that the data is recorded correctly on the DB. 
