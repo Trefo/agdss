@@ -28,3 +28,12 @@ For a list of available pages, see the file agdss/urls.py
 
 ## Viewing labels 
 Labels are stored in the folder specified in the settings file, default being 'labels', which should be in the static-root folder. Labels can also be inspected through the web app using the admin image labels page. 
+
+## UI Controls 
+You can resize the browser using standard browser controls (Ctrl+ and Ctrl-). Additionally, the app has sliders to control brightness, contrast, and hue. Adjust these to make the target objects clearer.
+
+Labels can be moved by dragging, and deleted by double-clicking.
+
+Submit when finished labeling an image. 
+
+Chose 'No labels in image' when there are no labels so that that the data is recorded correctly on the DB. 
