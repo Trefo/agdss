@@ -4,9 +4,9 @@
 
 
 ##Setup
-1. git clone https://github.com/dcunhas/agdss
+1. git clone https://github.com/Trefo/agdss
 2. cd agdss
-3. docker-compose up
+3. docker-compose up  
 
 ## First-time additional steps needed in agdss web container named agdss_web 
 1. ```docker exec -it agdss_web_1 bash```
