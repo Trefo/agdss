@@ -14,10 +14,11 @@ You need to edit /app/agdss/settings/common.py specifying correctly the image ca
 2. ```python manage.py migrate --settings=agdss.settings.common``` to create the tables in the database.
 3. ```python manage.py createsuperuser --settings=agdss.settings.common``` and enter the requested information.
 4. ```python manage.py collectstatic --settings=agdss.settings.common ```
-5. ```cp /app/addImages.sh  /app/static-root/small-tomatoes && cd /app/static-root/small-tomatoes/```
-6. ```bash addImages.sh "[\"small-tomatoes\"]" ```
+5. ```cp /app/addImages.sh  /app/static-root/small-tomatoes```
+6. ```cd /app/static-root/small-tomatoes/```
+7. ```bash addImages.sh "[\"small-tomatoes\"]" ```
 
-## Using the aannotation webapp 
+## Using the aannotation web app 
 The webapp can then be accessed at [http://172.10.0.3:8000](http://172.10.0.3:8000). 
 
 Admin page is at [http://172.10.0.3:8000/admin](http://172.10.0.3:8000/admin)
