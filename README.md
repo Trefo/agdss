@@ -14,5 +14,5 @@
 2. To create admin credentials (required to access /admin), run `python manage.py createsuperuser` and enter the requested information.
 3. The webapp can then be accessed at [http://172.10.0.3:8000](http://172.10.0.3:8000). For a list of available pages, see the file agdss/urls.py.
 4. python manage.py collectstatic --settings=agdss.settings.common 
-5. Copy addImages.sh to static-root/<your-image-folder>
+5. Copy addImages.sh to static-root/your-image-folder
 6. bash addImages.sh "\"category-name"\"
