@@ -12,7 +12,7 @@ services:
     volumes:
       - ./:/app
     working_dir: /app
-    command: bash -c "cp -r annotable/almond webclient/static/ && python3 manage.py runserver 0.0.0.0:8000 --settings=agdss.settings.common"
+    command: bash -c "cp -r annotable/small-tomatoes webclient/static/ && python3 manage.py runserver 0.0.0.0:8000 --settings=agdss.settings.common"
 
 
 networks:  

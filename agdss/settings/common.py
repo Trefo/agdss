@@ -132,5 +132,5 @@ LOGIN_REDIRECT_URL = '/webclient'
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = "/app/static-root/"
-CATEGORY_TO_LABEL = 'almond'
+CATEGORY_TO_LABEL = 'small-tomatoes'
 LABEL_FOLDER_NAME = 'labels/'
