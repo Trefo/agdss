@@ -17,7 +17,7 @@
 6. ```bash addImages.sh "[\"small-tomatoes\"]" ```
 
 ## Using the aannotation webapp 
-The webapp can then be accessed at [http://172.10.0.3:8000/webclient](http://172.10.0.3:8000/webclient). 
+The webapp can then be accessed at [http://172.10.0.3:8000](http://172.10.0.3:8000). 
 
 Admin page is at [http://172.10.0.3:8000/admin](http://172.10.0.3:8000/admin)
 Use the credential you created for the superuser in item 3. for first-time additional steps.  
