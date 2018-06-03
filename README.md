@@ -9,7 +9,7 @@
 3. docker-compose up
 
 ## First-time additional steps needed in agdss web container named agdss_web 
-1. docker exec -it agdss_web_1 bash
+1. ```docker exec -it agdss_web_1 bash```
 2. ```python manage.py migrate --settings=agdss.settings.common` to create the tables in the database.```
 3. ```python manage.py createsuperuser``` and enter the requested information.
 4. ```python manage.py collectstatic --settings=agdss.settings.common ```
