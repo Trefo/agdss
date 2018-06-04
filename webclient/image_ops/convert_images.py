@@ -192,13 +192,16 @@ def convert_image_label_to_SVG(image_label, reconvert=False):
 
 def convert_category_label_to_SVG(category_label, reconvert=False):
     return convertSVGtoPNG(img_file=category_label_to_SVG_String_file(category_label),
-                           foldername=category_label.categoryTypes.category_name,
-                           filename=image_label_filename(category_label),
+                           foldername=category_label.categoryType.category_name,
+                           filename=category_label_filename(category_label),
                            reconvert=reconvert)
 
 def image_label_filename(label):
     return 'P%iL%iI%s' % (
             label.parentImage.id, label.id, label.parentImage.name)
+def category_label_filename(label):
+    return 'C%sP%iL%iI%s' % (
+            label.categoryType.category_name, label.parent_label.parentImage.id, label.id, label.parent_label.parentImage.name)
 def convertAll(reconvert=False):
     convert_image_labels_to_SVGs(ImageLabel.objects.all(), reconvert=reconvert)
 
