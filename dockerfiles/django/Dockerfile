@@ -10,4 +10,4 @@ RUN apt-get install -y dnsutils
 RUN pip install django-adminplus
 RUN pip install django-extensions 
 RUN apt-get install -y postgresql-client-common 
-RUN apt-get install -y postgresql-client-9.4
+RUN apt-get install -y postgresql-client
