@@ -304,7 +304,7 @@ def getNewImage(request):
         'subimage': subimage,
             }
     if label_list:
-        response['labels'] = label_list.labelShapes
+        response['labels'] = label_list.combined_labelShapes
     else:
         response['labels'] = ''
 
