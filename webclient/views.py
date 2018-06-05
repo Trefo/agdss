@@ -7,6 +7,7 @@ import os
 from django.shortcuts import render
 
 from urllib.request import urlopen
+from urllib.parse import urljoin
 
 import re
 import sys
@@ -14,6 +15,7 @@ import io
 import urllib.request, urllib.parse, urllib.error
 from io import StringIO
 from PIL import Image as PILImage
+import requests
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -30,7 +32,7 @@ from django.core import serializers
 from . import helper_ops
 from .image_ops.convert_images import image_label_string_to_SVG_string, render_SVG_from_label
 from webclient.image_ops import crop_images
-from .models import Color, CategoryType, ImageSourceType, Image, Labeler, ImageWindow, ImageLabel, CategoryLabel, ImageFilter, TiledLabel
+from .models import Color, CategoryType, ImageSourceType, Image, Labeler, ImageWindow, ImageLabel, CategoryLabel, ImageFilter, TiledLabel, TileSet, Tile
 from  . import models
 from webclient.image_ops.convert_images import convert_image_label_to_SVG
 
@@ -756,3 +758,36 @@ def delete_tile_label(request):
     for label in to_delete:
         label.delete()
     return HttpResponse("Sucess")
+
+
+@csrf_exempt
+@require_POST
+def add_tileset(request):
+    if 'base_location' not in request.POST:
+        return HttpResponseBadRequest("base_location required for tileset")
+    tileset = TileSet(base_location=request.POST['base_location'])
+    tileset.save()
+
+    url_val = URLValidator()
+    try:
+        url_val(tileset.base_location)
+        url_location = True
+    except ValidationError:
+        url_location = False
+
+    if url_location and requests.head(
+            tileset.base_location).status_code != 200:
+        return HttpResponseBadRequest("Error: {} must be value url".format(tileset.base_location))
+    valid_zoom_levels = [z for z in range(30) if request.head(urljoin(tileset.base_location, z)).status_code == 200]
+
+
+
+@csrf_exempt
+@require_GET
+def get_tiled_label_coordinates(request):
+    lat_long = [{'category': tl.category.category_name,
+                 'latitude': (tl.northeast_Lat + tl.southwest_Lat)/2,
+                 'longitude': (tl.northeast_Lng + tl.southwest_Lng)/2}
+                for tl in TiledLabel.objects.all()]
+    print(lat_long)
+    return JsonResponse(lat_long, safe=False)

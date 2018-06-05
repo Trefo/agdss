@@ -212,14 +212,13 @@ Atlanta Flight Demo: <br/>
     draw_shapes = function (geoJson, label_type) {
         geoJson.properties.options.weight = 0.5;
         if (label_type == "circle") {
-            circleLayer = L.circle([geoJson.geometry.coordinates[1], geoJson.geometry.coordinates[0]], geoJson.properties.options);
+           circleLayer = L.circle([geoJson.geometry.coordinates[1], geoJson.geometry.coordinates[0]], geoJson.properties.options);
             drawnItems.addLayer(circleLayer);
-        } else if (label_type == "rectangle") {
-
+        } else if (label_type.toLowerCase() == "rectangle") {
             var rectLayer = L.rectangle([[geoJson.geometry.coordinates[0][0].slice().reverse(), geoJson.geometry.coordinates[0][1].slice().reverse(),
                 geoJson.geometry.coordinates[0][2].slice().reverse(), geoJson.geometry.coordinates[0][3].slice().reverse()]], geoJson.properties.options);
             drawnItems.addLayer(rectLayer);
-        } else if (label_type == "polygon") {
+        } else if (label_type.toLowerCase() == "polygon") {
             coords = [];
             for (j = 0; j < geoJson.geometry.coordinates.length; j++) {
                 coords.push([]);
@@ -241,6 +240,7 @@ Atlanta Flight Demo: <br/>
     xhttp_all.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             resp_obj = JSON.parse(this.responseText);
+            console.log(resp_obj);
             for (i = 0; i < resp_obj.length; i++) {
                 var geoJsonResp = resp_obj[i].geoJSON;
                 draw_shapes(geoJsonResp, resp_obj[i].label_type)
@@ -268,10 +268,12 @@ Atlanta Flight Demo: <br/>
         var sw_lng;
 
         var propJSON = {};
+        console.log(event.layerType);
         if (event.layerType == "circle") {
             console.log(layer);
-            layer._map = layer._map || map;
+            layer.addTo(map);
             var bounds = layer.getBounds();
+            layer.removeFrom(map);
             var northeast = bounds.getNorthEast();
             var southwest = bounds.getSouthWest();
             ne_lat = layer._latlng.lat + layer._mRadius;
