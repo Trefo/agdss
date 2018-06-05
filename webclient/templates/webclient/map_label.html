@@ -81,6 +81,10 @@ Atlanta Flight Demo: <br/>
             </label><br/>
         {% endfor %}
 
+        <br/>
+        <br/>
+        <label>Current Zoom: </label><label id="currentZoomLabel">21</label>
+
         <!--<label><input type="radio" class="label_class" value = "amp" checked="true">amp </label><br/>
         <label><input type="radio" name="label_class" value = "tap">tap</label><br/>
         <label><input type="radio" name="label_class" value = "house">house</label><br/>
@@ -94,33 +98,24 @@ Atlanta Flight Demo: <br/>
 
 <script type="text/javascript">
 
-    {#    var atlantaTiles = L.tileLayer('/static/aerialapps/tiles/{z}/{x}/{y}.png', {#}
-    {#      attribution: 'Aerial Apps',#}
-    {#      maxZoom: 23,#}
-    {#      id: 'mapbox.streets'#}
-    {#    });#}
-    var atlantaTiles = L.tileLayer('http://label.ag:8051/tiles/{z}/{x}/{y}.png', {
+
+    var atlantaTiles = L.tileLayer('/static/aerialapps/tiles/{z}/{x}/{y}.png', {
         attribution: 'Aerial Apps',
         maxZoom: 23,
         id: 'mapbox.streets'
     });
 
-    var predictTiles = L.tileLayer('http://label.ag:8051/preds_latest/rgba/{z}/{x}/{y}.png', {
-        minZoom: 21,
+    var predictTiles = L.tileLayer('/static/aerialapps/preds_latest/house_rgba2/{z}/{x}/{y}.png', {
+        minZoom: 14,
         maxZoom: 23,
         id: 'mapbox.streets2'
     });
-    {#    var predictTiles = L.tileLayer('/static/aerialapps/preds_latest/rgba/{z}/{x}/{y}.png',{#}
-    {#      minZoom:21,#}
-    {#      maxZoom: 23,#}
-    {#      id: 'mapbox.streets2'#}
-    {#    });#}
 
 
     var map = L.map('mapid', {
         minZoom: 13,
         maxZoom: 23,
-        layers: [atlantaTiles, predictTiles]
+        layers: [atlantaTiles]
     });
 
     map.setView([34.004263688375346, -84.39877241849901], 21);
@@ -151,11 +146,47 @@ Atlanta Flight Demo: <br/>
 
     var overlays = {
         "Atlanta": atlantaTiles,
-        "Labels": drawnItems,
-        "Predictions": predictTiles
+        "House Prediction": predictTiles,
+        "Labels": drawnItems
     };
 
     L.control.layers(baseLayers, overlays).addTo(map);
+
+
+    var printAndSendTrainImage = function(fileName, catergoryClassName){
+        //Print the map
+        console.log("Printing map");
+        map.removeLayer(drawnItems);
+        map.removeLayer(predictTiles);
+        printer.printMap('CurrentSize', 'test').then(function (result) {
+            imageData = result;
+
+            map.addLayer(drawnItems);
+            map.removeLayer(atlantaTiles);
+
+
+            printer.printMap('CurrentSize', 'test2').then(function (imResult) {
+                var requestObj = {};
+                maskData = imResult;
+                requestObj.image_blob = imageData;
+                requestObj.mask_blob = maskData;
+                requestObj.image_name = fileName;
+                requestObj.category_name = catergoryClassName;
+
+                map.addLayer(atlantaTiles);
+                map.addLayer(predictTiles);
+                fetch("../webclient/addTiledImage", {
+                    body: JSON.stringify(requestObj),
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    method: 'POST'
+                }).then(function (resp) {
+                    console.log(resp)
+                })
+            })
+        })
+    }
 
     //Initialize the easyPrint module
 
@@ -163,7 +194,15 @@ Atlanta Flight Demo: <br/>
         sizeModes: ['Current'],
         filename: 'myMap',
         exportOnly: true,
-        position: 'bottomright'
+        position: 'bottomright',
+        buttonCallback: function(event){
+            var centerLatLng = map.getCenter();
+            var centerXY = project(centerLatLng.lat, centerLatLng.lng, map.getZoom());
+            var fileName = map.getZoom().toString() + "_" + centerXY.x.toString() + "_" + centerXY.y.toString();
+
+            console.log("Printing map from button click");
+            printAndSendTrainImage(fileName,"undefined");
+        }
     };
 
 
@@ -171,6 +210,7 @@ Atlanta Flight Demo: <br/>
     printer.addTo(map);
 
     draw_shapes = function (geoJson, label_type) {
+        geoJson.properties.options.weight = 0.5;
         if (label_type == "circle") {
             circleLayer = L.circle([geoJson.geometry.coordinates[1], geoJson.geometry.coordinates[0]], geoJson.properties.options);
             drawnItems.addLayer(circleLayer);
@@ -187,6 +227,7 @@ Atlanta Flight Demo: <br/>
                     coords[j].push(geoJson.geometry.coordinates[j][k].slice().reverse());
                 }
             }
+            
             var polyLayer = L.polygon(coords, geoJson.properties.options);
             drawnItems.addLayer(polyLayer);
         } else {
@@ -209,6 +250,12 @@ Atlanta Flight Demo: <br/>
 
     xhttp_all.open("GET", "/webclient/TiledLables", true);
     xhttp_all.send();
+
+
+    map.on("zoom",function(event){
+        var zoomLabel = $("#currentZoomLabel");
+        zoomLabel.text(map.getZoom().toString());
+    })
 
 
     map.on(L.Draw.Event.CREATED, function (event) {
@@ -243,6 +290,9 @@ Atlanta Flight Demo: <br/>
             sw_lng = layer._bounds._southWest.lng;
             propJSON.latlngs = layer._latlngs[0];
         }
+        
+        //layer.options.weight = 0.5;
+
         geoJson.properties.options = layer.options;
 
         var radio_label_class = $("input:radio[name=label_class]:checked").val();
@@ -284,36 +334,7 @@ Atlanta Flight Demo: <br/>
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
-                //Print the map
-                map.removeLayer(drawnItems);
-                printer.printMap('CurrentSize', 'test').then(function (result) {
-                    imageData = result;
-
-                    map.addLayer(drawnItems);
-                    map.removeLayer(atlantaTiles);
-
-                    printer.printMap('CurrentSize', 'test2').then(function (imResult) {
-                        requestObj = {};
-                        maskData = imResult;
-                        requestObj.image_blob = imageData;
-                        requestObj.mask_blob = maskData;
-                        requestObj.image_name = printedImageName;
-                        requestObj.category_name = radio_label_class;
-
-                        map.addLayer(atlantaTiles);
-                        fetch("../webclient/addTiledImage", {
-                            body: JSON.stringify(requestObj),
-                            headers: {
-                                'content-type': 'application/json'
-                            },
-                            method: 'POST'
-                        }).then(function (resp) {
-                            console.log(resp)
-                        })
-                    })
-                    //return result;
-                })
-
+                printAndSendTrainImage(printedImageName, radio_label_class);
             }
         };
 

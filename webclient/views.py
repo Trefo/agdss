@@ -687,14 +687,18 @@ def add_train_image_label(request):
     train_label = PILImage.open(train_label_blob)
 
     train_label = np.array(train_label)
-    train_label[train_label != 221] = 255
-    train_label[train_label == 221] = 0
+    #train_label[train_label != 221] = 255
+    #train_label[train_label == 221] = 0
     
     train_label = PILImage.fromarray(train_label)
-    
-    #train_image.save("/home/ashreyas/aerialapps/trainset/" + request_json["category"] + "/" + image_name +".png")
-    #train_label.save("/home/ashreyas/aerialapps/trainset/" + request_json["category"] + "/" + image_name +"_label.png")
 
+    img_name = "/home/ashreyas/aerialapps/trainset/" + request_json["category_name"] + "/" + image_name +".png"
+    label_name = "/home/ashreyas/aerialapps/trainset/" + request_json["category_name"] + "/" + image_name +"_label.png"
+    
+    train_image.save(img_name )
+    train_label.save(label_name)
+    print("saved: "+  img_name)
+    print("saved: "+ label_name)
 
     resp_obj = {}
     resp_obj["status"] = "success"

@@ -134,4 +134,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = "/app/static-root/"
 CATEGORY_TO_LABEL = 'tomato'
 LABEL_FOLDER_NAME = 'labels'
+STATICFILES_DIRS = (
+'/home/ashreyas/',
+)
 
