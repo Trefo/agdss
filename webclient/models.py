@@ -6,7 +6,7 @@ from unicodedata import decimal
 from django.db import models
 from django.core.validators import MaxValueValidator
 import random
-from django.contrib.postgres.fields import JSONField
+from django.contrib.postgres.fields import JSONField, ArrayField
 
 class Color(models.Model):
     red = models.PositiveSmallIntegerField(default=0, validators=[MaxValueValidator(255)])
@@ -164,4 +164,13 @@ class TiledLabel(models.Model):
         default="R"
     )
 
+
+class TileSet(models.Model):
+    base_location = models.CharField(max_length=600)
+
+class Tile(models.Model):
+    zoom_level = models.IntegerField()
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    tile_set = models.ForeignKey(TileSet, on_delete=models.CASCADE)
 
