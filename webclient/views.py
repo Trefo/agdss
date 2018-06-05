@@ -781,6 +781,9 @@ def add_tileset(request):
 @csrf_exempt
 @require_GET
 def get_tiled_label_coordinates(request):
-    lat_long = [((tl.northeast_Lat + tl.southwest_Lat)/2, (tl.northeast_Lng + tl.southwest_Lng)/2) for tl in TiledLabel.objects.all()]
+    lat_long = [{'category': tl.category.category_name,
+                 'latitude': (tl.northeast_Lat + tl.southwest_Lat)/2,
+                 'longitude': (tl.northeast_Lng + tl.southwest_Lng)/2}
+                for tl in TiledLabel.objects.all()]
     print(lat_long)
     return JsonResponse(lat_long, safe=False)

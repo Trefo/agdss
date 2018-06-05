@@ -173,4 +173,3 @@ class Tile(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     tile_set = models.ForeignKey(TileSet, on_delete=models.CASCADE)
-
