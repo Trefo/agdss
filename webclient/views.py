@@ -508,7 +508,7 @@ def calculateEntropyMap(request):
 ############
 re_image_path = re.compile(r'/%s%s(.*)' %('webclient', settings.STATIC_URL))
 
-
+@csrf_exempt
 @require_GET
 def get_overlayed_combined_image(request, image_label_id):
     image_label = ImageLabel.objects.filter(id=image_label_id)
@@ -535,6 +535,7 @@ def get_overlayed_combined_image(request, image_label_id):
     background.save(output, format='png')
     return HttpResponse(output.getvalue(), content_type="image/png")
 
+@csrf_exempt
 @require_GET
 def get_overlayed_category_image(request, category_label_id):
     category_label = CategoryLabel.objects.filter(id=category_label_id)
