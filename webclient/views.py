@@ -5,7 +5,7 @@ from random import randint
 import subprocess
 import os
 from django.shortcuts import render
-
+from datetime import datetime
 from urllib.request import urlopen
 from urllib.parse import urljoin
 
@@ -413,7 +413,7 @@ def addImage(request):
     for cat in category_list:
         print(cat.color)
         if not cat.color:
-            cat.color = get_color()
+            cat.color = models.get_color()
             cat.save()
 
     imageList = Image.objects.all().filter(name=request.POST['image_name'], path=path, description=request.POST.get('description', default=''), source=sourceType)
@@ -771,6 +771,7 @@ def add_tileset(request):
     except ValidationError:
         url_location = False
 
+
     if url_location and requests.head(
             tileset.base_location).status_code != 200:
         return HttpResponseBadRequest("Error: {} must be value url".format(tileset.base_location))
@@ -787,3 +788,14 @@ def get_tiled_label_coordinates(request):
                 for tl in TiledLabel.objects.all()]
     print(lat_long)
     return JsonResponse(lat_long, safe=False)
+
+
+
+@csrf_exempt
+@require_GET
+def get_combined_label_geojson(request):
+    combined_dict = {}
+    combined_dict['type'] = 'FeatureCollection'
+    combined_dict['features'] = [label.label_json for label in TiledLabel.objects.all()]
+    print(combined_dict)
+    return JsonResponse(combined_dict)

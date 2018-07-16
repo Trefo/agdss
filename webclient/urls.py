@@ -28,7 +28,7 @@ urlpatterns = [
     path('calculateEntropyMap', views.calculateEntropyMap),
     path('applyLabels', views.applyLabels),
     path('loadLabels', views.loadLabels),
-    path('fix_label_location', views.fix_label_location),
+    #path('fix_label_location', views.fix_label_location),
     path('print_label_data', views.print_label_data),
     url(r'^get_overlayed_combined_image/(?P<image_label_id>[0-9]*)$', views.get_overlayed_combined_image),
     url(r'^get_overlayed_category_image/(?P<category_label_id>[0-9]*)$', views.get_overlayed_category_image),
@@ -38,4 +38,5 @@ urlpatterns = [
     path('addTiledCategories', views.add_all_tiled_categories),
     path('deleteTileLabels', views.delete_tile_label),
     path('getTiledLabelCoordinates', views.get_tiled_label_coordinates),
+    path('getCombinedLabelGeojson', views.get_combined_label_geojson),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

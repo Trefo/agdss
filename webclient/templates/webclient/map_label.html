@@ -176,6 +176,7 @@ Atlanta Flight Demo: <br/>
         if (label_type.toLowerCase() == "circle") {
             console.log(geoJson);
             circleLayer = L.circle([geoJson.geometry.coordinates[1], geoJson.geometry.coordinates[0]], geoJson.properties.options);
+            console.log(circleLayer.toGeoJSON());
             drawnItems.addLayer(circleLayer);
         } else if (label_type.toLowerCase() == "rectangle") {
             var rectLayer = L.rectangle([[geoJson.geometry.coordinates[0][0].slice().reverse(), geoJson.geometry.coordinates[0][1].slice().reverse(),
@@ -268,6 +269,7 @@ Atlanta Flight Demo: <br/>
         draw_shapes(geoJson, event.layerType);
 {#        if (event.layerType == "circle") {#}
 {#            circleLayer = L.circle([geoJson.geometry.coordinates[1], geoJson.geometry.coordinates[0]], geoJson.properties.options);#}
+
 {#            drawnItems.addLayer(circleLayer);#}
 {#            console.log('geoJson');#}
 {##}

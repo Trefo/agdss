@@ -24,10 +24,33 @@
         var labelsLayer = new paper.Layer();
         var isActive = false;
         var aboveExistingLabel = false;
+        var drawingPolygon = false;
+        var currentPolygon = null;
         var labelsDrawn = 0; //Whether a label has been drawn on this image
         var prevLabels = 0;
 
+        var onMouseLeavePath = function(event, category) {
+                    aboveExistingLabel = false;
+                    this.style = category.style;
+                    this.opacity = category.opacity;
+                };
 
+
+        var onDoubleClickPath = function(event) {
+                    isActive = false;
+                    aboveExistingLabel = false;
+                    this.remove();
+                    //console.log(window.labelsLayer.exportSVG({embedImages: false, asString: false}));
+                    labelsDrawn -= 1;
+                };
+
+        var onMouseEnterPath = function(event) {
+                    if (!isActive) {
+                        aboveExistingLabel = true;
+                        this.opacity = 1;
+                        window.circlePath = this;
+                    }
+                };
         window.globals = {};
         category_groups = {};
         category_shapes = {};
@@ -145,29 +168,87 @@
         });
 
         function onMouseDown(event) {
-            if (!aboveExistingLabel) { //Create new label
-                startPoint = event.point;
-                isActive = true; //Whether the path is currently being created
-                var center = (startPoint + event.point) / 2;
-                    //window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
-                dragged = false; //Whether the path has been created with a click and dragged to be larger than a simgle point
-            } else {
-                dragStartPoint = event.point;
+            var category = $('input[name=category_select]:checked', '#categories').val();
+            var shape = category_shapes[category];
+            switch (event.event.button) {
+                case 0: //left click
+                    if (!aboveExistingLabel) { //Create new label
+                    if (!drawingPolygon) {
+                        startPoint = event.point;
+                        isActive = true; //Whether the path is currently being created
+
+                        if (shape == "Polygon") {
+                            console.log("Creating polygon");
+                            currentPolygon = new Path([startPoint]);
+
+                            currentPolygon.onMouseEnter = onMouseEnterPath;
+                            currentPolygon.onMouseLeave = function (event) {
+                                return onMouseLeavePath(event, category_groups[category]);
+
+                            };
+                            currentPolygon.onDoubleClick = onDoubleClickPath;
+
+                            window.circlePath = currentPolygon;
+                            drawingPolygon = true;
+
+                        }
+                    }
+                    else { //if drawingPolygon
+                        console.log("Updating polygon");
+                        currentPolygon.add(event.point);
+                        currentPolygon.selected = true;
+                        console.log(currentPolygon);
+                    }
+                    dragged = false; //Whether the path has been created with a click and dragged to be larger than a simgle point
+                    } else {
+                        dragStartPoint = event.point;
+                    }
+                    break;
+                case 2: //right click
+                    if (drawingPolygon) {
+                        console.log("Finishing polygon");
+                        currentPolygon.add(startPoint);
+                        console.log(category);
+                        currentPolygon.style = category_groups[category].style;
+                        currentPolygon.selected = false;
+                        currentPolygon = null;
+                        drawingPolygon = false;
+                        isActive = false;
+                    }
+                    break;
             }
 
+
+        }
+        
+        function onRightClick() {
+            
         }
 
         function onMouseDrag(event) {
+            if(event.event.button != 0) { //Not left mouse button
+                return;
+            }
             var category = $('input[name=category_select]:checked', '#categories').val();
             var shape = category_shapes[category];
+            console.log(isActive);
+            if(drawingPolygon) {
+                var num_segments = currentPolygon.segments.length;
+                currentPolygon.removeSegment(num_segments - 1);
+                currentPolygon.add(event.point);
+                return;
+            }
             if (isActive) {
                 var center = (startPoint + event.point) / 2;
                 if (!dragged) {
                     if(shape == "Circle"){
                         window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point) / 2);
                     }
-                    else {
+                    else if (shape == "Rectangle"){
                         window.circlePath = new Path.Rectangle(startPoint, event.point);
+                    }
+                    else {
+
                     }
                     dragged = true;
                     labelsDrawn += 1;
@@ -178,32 +259,19 @@
                 if(shape == "Circle"){
                     newPath = new Path.Circle(center, startPoint.getDistance(event.point) / 2);
                 }
-                else {
+                else if (shape == "Rectangle"){
                     newPath = new Path.Rectangle(startPoint, event.point);
+                }
+                else {
+
                 }
                 category_groups[category].addChild(newPath);
                 newPath.style = category_groups[category].style;
                 newPath.opacity = 1;
 
-                newPath.onMouseEnter = function(event) {
-                    if (!isActive) {
-                        aboveExistingLabel = true;
-                        this.opacity = 1;
-                        window.circlePath = this;
-                    }
-                };
-                newPath.onMouseLeave = function(event) {
-                    aboveExistingLabel = false;
-                    this.style = category_groups[category].style;
-                    this.opacity = category_groups[category].opacity;
-                };
-                newPath.onDoubleClick = function(event) {
-                    isActive = false;
-                    aboveExistingLabel = false;
-                    this.remove();
-                    //console.log(window.labelsLayer.exportSVG({embedImages: false, asString: false}));
-                    labelsDrawn -= 1;
-                };
+                newPath.onMouseEnter = onMouseEnterPath;
+                newPath.onMouseLeave = onMouseLeavePath;
+                newPath.onDoubleClick = onDoubleClickPath;
                 window.circlePath.remove();
                 window.circlePath = newPath;
 
