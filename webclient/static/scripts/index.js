@@ -66,7 +66,13 @@
         var btn = L.DomUtil.create('li', 'easyPrintSizeMode', this.holder);
         btn.title = sizeMode.name;
         var link = L.DomUtil.create('a', sizeMode.className, btn);
-        L.DomEvent.addListener(btn, 'click', this.printMap, this);
+        var buttonCallback = this.printMap;
+        if(this.options.buttonCallback === undefined){
+          buttonCallback = this.printMap;
+        }else{
+          buttonCallback = this.options.buttonCallback;
+        }
+        L.DomEvent.addListener(btn, 'click',buttonCallback, this);
       }, this);
 
       L.DomEvent.disableClickPropagation(container);
