@@ -45,6 +45,7 @@
                 };
 
         var onMouseEnterPath = function(event) {
+                    console.log("test");
                     if (!isActive) {
                         aboveExistingLabel = true;
                         this.opacity = 1;
@@ -180,7 +181,6 @@
                         if (shape == "Polygon") {
                             console.log("Creating polygon");
                             currentPolygon = new Path([startPoint]);
-
                             currentPolygon.onMouseEnter = onMouseEnterPath;
                             currentPolygon.onMouseLeave = function (event) {
                                 return onMouseLeavePath(event, category_groups[category]);
@@ -206,14 +206,22 @@
                     break;
                 case 2: //right click
                     if (drawingPolygon) {
+                        if(currentPolygon.segments.length < 2) {
+                            isActive = false;
+                            aboveExistingLabel = false;
+                            currentPolygon.remove();
+                            labelsDrawn -= 1;
+                        }
                         console.log("Finishing polygon");
                         currentPolygon.add(startPoint);
                         console.log(category);
                         currentPolygon.style = category_groups[category].style;
+                        currentPolygon.opacity = 1;
                         currentPolygon.selected = false;
                         currentPolygon = null;
                         drawingPolygon = false;
                         isActive = false;
+                        labelsDrawn += 1;
                     }
                     break;
             }
@@ -221,9 +229,6 @@
 
         }
         
-        function onRightClick() {
-            
-        }
 
         function onMouseDrag(event) {
             if(event.event.button != 0) { //Not left mouse button
@@ -455,7 +460,7 @@
                 $('#contrastControl').val("1").trigger('input');
                 $('#saturationControl').val("1").trigger('input');
             });
-
+            $('body').on('contextmenu', '#canvas', function(e){ return false; });
         });
     </script>
 
