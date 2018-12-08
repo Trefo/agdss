@@ -1,603 +1,549 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>AgDSS Web</title>
-    <!--<link rel="stylesheet" href="/static/scripts/paperjs/examples/css/style.css"> -->
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>AgDSS Web</title>
+		<!--<link rel="stylesheet" href="/static/scripts/paperjs/examples/css/style.css"> -->
 
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link href="/static/css/simple-sidebar.css" rel="stylesheet">
+		<link rel="stylesheet" href="/static/css/style.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link href="/static/css/simple-sidebar.css" rel="stylesheet">
 
-    <script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.min.js"></script>
-    <!-- <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script> -->
-    <script type='text/javascript' src='/static/scripts/jQuery/jquery-3.0.0.min.js'></script>
-    <!--<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"> -->
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+		<script type="text/javascript" src="/static/scripts/paperjs/dist/paper-full.min.js"></script>
+		<!-- <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script> -->
+		<script type='text/javascript' src='/static/scripts/jQuery/jquery-3.0.0.min.js'></script>
+		<!--<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"> -->
+		<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
-    <script type="text/paperscript" canvas="canvas">
-        var startPoint;
-        var raster;
-        var labelsLayer = new paper.Layer();
-        var isActive = false;
-        var aboveExistingLabel = false;
-        var labelsDrawn = 0; //Whether a label has been drawn on this image
-        var prevLabels = 0;
+		<script type="text/paperscript" canvas="canvas">
+var startPoint;
+	var raster;
+	var labelsLayer = new paper.Layer();
+	var isActive = false;
+	var aboveExistingLabel = false;
+	var labelsDrawn = 0; //Whether a label has been drawn on this image
+	var prevLabels = 0;
 
 
-        window.globals = {};
-        category_groups = {};
-        category_shapes = {};
-        var create_groups_shapes = function(categories, colors, shapes) {
-            var groups = {};
-            for (i = 0; i < categories.length; i++) {
-                groups[categories[i]] = new Group({
-                    name: categories[i],
-                    strokeColor: colors[i],
-                    fillColor: colors[i],
-                    strokeWidth: 2,
-                    opacity: 0.5,
-                    visible: true
-                });
-                category_shapes[categories[i]] = shapes[i];
-            }
-            category_groups = groups;
-        };
+	window.globals = {};
+	category_groups = {};
+	category_shapes = {};
+	var create_groups_shapes = function(categories, colors, shapes) {
+	    var groups = {};
+	    for (i = 0; i < categories.length; i++) {
+		groups[categories[i]] = new Group({
+		    name: categories[i],
+		    strokeColor: colors[i],
+		    fillColor: colors[i],
+		    strokeWidth: 2,
+		    opacity: 0.5,
+		    visible: true
+		});
+		category_shapes[categories[i]] = shapes[i];
+	    }
+	    category_groups = groups;
+	};
 
-        globals.create_groups_shapes = create_groups_shapes;
+	globals.create_groups_shapes = create_groups_shapes;
 
-        $(document).ready(function() {
-            $("#applyLabels").click(function() {
-                endTime = Date.now();
-                timeTaken = endTime - startTime;
+	$(document).ready(function() {
+	    $("#applyLabels").click(function() {
+		endTime = Date.now();
+		timeTaken = endTime - startTime;
 
-                //Check if there are labels or if the no label checkbox is checked
-                if (labelsDrawn <= 0 && !$('#noLabels').prop('checked')) {
-                    alert('No labels drawn in image. If there are no labelable features in this image,' +
-                        ' check the "No Labels in image" checkbox');
-                    return false;
-                }
-                //var updated_category = $("#categories").val();
-                //selectedImage = JSON.parse($('#imageCombo').val().toString());
-                $('#noLabels').prop('checked', false);
-                prevLabels = labelsDrawn;
-                labelsDrawn = 0;
+		//Check if there are labels or if the no label checkbox is checked
+		if (labelsDrawn <= 0 && !$('#noLabels').prop('checked')) {
+		    alert('No labels drawn in image. If there are no labelable features in this image,' +
+			' check the "No Labels in image" checkbox');
+		    return false;
+		}
+		//var updated_category = $("#categories").val();
+		//selectedImage = JSON.parse($('#imageCombo').val().toString());
+		$('#noLabels').prop('checked', false);
+		prevLabels = labelsDrawn;
+		labelsDrawn = 0;
 
-                var group_svgs = {};
-                for (var key in category_groups) {
-                    var g_svg = category_groups[key].exportSVG({
-                    embedImages: false,
-                    asString: true,
-                    matchShapes: true
-                });
-                    group_svgs[key] = g_svg;
+		var group_svgs = {};
+		for (var key in category_groups) {
+		    var g_svg = category_groups[key].exportSVG({
+		    embedImages: false,
+		    asString: true,
+		    matchShapes: true
+		});
+		    group_svgs[key] = g_svg;
 
-                }
-                console.log(group_svgs);
-                var svg = window.labelsLayer.exportSVG({
-                    embedImages: false,
-                    asString: false,
-                    matchShapes: true
-                });
+		}
+		console.log(group_svgs);
+		var svg = window.labelsLayer.exportSVG({
+		    embedImages: false,
+		    asString: false,
+		    matchShapes: true
+		});
 
-                //Align circles to original image
-                svg.getElementsByTagName('image')[0].remove(); //Remove embedded image
-                var x = parseInt(imageX) - parseInt(imagePadding);
-                var y = parseInt(imageY) - parseInt(imagePadding);
-                for (i = 0, circles = svg.getElementsByTagName('circle'); i < circles.length; i++) {
-                    circles[i].setAttribute('transform', 'translate(' + (x) + ',' + (y) + ')');
-                }
-                for (i = 0, rectangles = svg.getElementsByTagName('rectangle'); i < rectangles.length; i++) {
-                    rectangles[i].setAttribute('transform', 'translate(' + (x) + ',' + (y) + ')');
-                }
-                var orig_img = svg.getElementsByTagName('image')[0];
-                console.log(orig_img);
-                orig_img.setAttribute('x', '0');
-                orig_img.setAttribute('y', '0');
-                xmlSer = new XMLSerializer();
-                svg = xmlSer.serializeToString(svg);
-                console.log(svg);
-                $('#debug').text('loading next image...');
-                $.ajax({
-                    url: "/webclient/applyLabels",
-                    type: "POST",
-                    dataType: 'text',
-                    data: JSON.stringify({
-                        image_name: currentImage.image_name,
-                        path: currentImage.path,
-                        label_list: svg,
-                        category_labels: group_svgs,
-                        subimage: {
-                            x: imageX,
-                            y: imageY,
-                            width: imageWidth,
-                            height: imageHeight
-                        },
-                        image_filters: {
-                            brightness: $('#brightnessControl').val(),
-                            contrast: $('#brightnessControl').val(),
-                            saturation: $('#brightnessControl').val()
-                        },
-                        timeTaken: timeTaken
-                    }),
-                    success: function(data) {
-                        $('#debug').text('');
-                        if (window.labelsLayer.hasChildren()) {
-                            window.labelsLayer.removeChildren();
-                        }
-                        aboveExistingLabel = false;
-                        //window.labelsLayer.importJSON(JSON.parse(data));
-                        //$('#noLabels').prop('checked', false);
-                        getNewImage();
-                    },
-                    error: function(xhr, errmsg, err) {
-                        console.log(xhr.status + ": " + xhr.responseText);
-                        alert(xhr.status + ": " + xhr.responseText);
-                        labelsDrawn = prevLabels;
+		//Align circles to original image
+		svg.getElementsByTagName('image')[0].remove(); //Remove embedded image
+		var x = parseInt(imageX) - parseInt(imagePadding);
+		var y = parseInt(imageY) - parseInt(imagePadding);
+		for (i = 0, circles = svg.getElementsByTagName('circle'); i < circles.length; i++) {
+		    circles[i].setAttribute('transform', 'translate(' + (x) + ',' + (y) + ')');
+		}
+		for (i = 0, rectangles = svg.getElementsByTagName('rectangle'); i < rectangles.length; i++) {
+		    rectangles[i].setAttribute('transform', 'translate(' + (x) + ',' + (y) + ')');
+		}
+		var orig_img = svg.getElementsByTagName('image')[0];
+		console.log(orig_img);
+		orig_img.setAttribute('x', '0');
+		orig_img.setAttribute('y', '0');
+		xmlSer = new XMLSerializer();
+		svg = xmlSer.serializeToString(svg);
+		console.log(svg);
+		$('#debug').text('loading next image...');
+		$.ajax({
+		    url: "/webclient/applyLabels",
+		    type: "POST",
+		    dataType: 'text',
+		    data: JSON.stringify({
+			image_name: currentImage.image_name,
+			path: currentImage.path,
+			label_list: svg,
+			category_labels: group_svgs,
+			subimage: {
+			    x: imageX,
+			    y: imageY,
+			    width: imageWidth,
+			    height: imageHeight
+			},
+			image_filters: {
+			    brightness: $('#brightnessControl').val(),
+			    contrast: $('#brightnessControl').val(),
+			    saturation: $('#brightnessControl').val()
+			},
+			timeTaken: timeTaken
+		    }),
+		    success: function(data) {
+			$('#debug').text('');
+			if (window.labelsLayer.hasChildren()) {
+			    window.labelsLayer.removeChildren();
+			}
+			aboveExistingLabel = false;
+			//window.labelsLayer.importJSON(JSON.parse(data));
+			//$('#noLabels').prop('checked', false);
+			getNewImage();
+		    },
+		    error: function(xhr, errmsg, err) {
+			console.log(xhr.status + ": " + xhr.responseText);
+			alert(xhr.status + ": " + xhr.responseText);
+			labelsDrawn = prevLabels;
 
-                    }
-                });
-                return false;
-            });
-        });
+		    }
+		});
+		return false;
+	    });
+	});
 
-/*        
-function onMouseDown(event) {
-            if (!aboveExistingLabel) { //Create new label
-                startPoint = event.point;
-                isActive = true; //Whether the path is currently being created
-                var center = (startPoint + event.point) / 2;
-                    //window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point)/2);
-                dragged = false; //Whether the path has been created with a click and dragged to be larger than a simgle point
-            } else {
-                dragStartPoint = event.point;
-            }
+	var path;
+	var types = ['point', 'handleIn', 'handleOut'];
+	function findHandle(point) {
+	    for (var i = 0, l = path.segments.length; i < l; i++) {
+		for (var j = 0; j < 3; j++) {
+		    var type = types[j];
+		    var segment = path.segments[i];
+		    var segmentPoint = type == 'point'
+			    ? segment.point
+			    : segment.point + segment[type];
+		    var distance = (point - segmentPoint).length;
+		    if (distance < 10) {
+			return {
+			    type: type,
+			    segment: segment
+			};
+		    }
+		}
+	    }
+	    return null;
+	}
 
-        }
+	var currentSegment, mode, type;
+	function onMouseDown(event) {
 
-        function onMouseDrag(event) {
-            var category = $('input[name=category_select]:checked', '#categories').val();
-            var shape = category_shapes[category];
-            if (isActive) {
-                var center = (startPoint + event.point) / 2;
-                if (!dragged) {
-                    if(shape == "Circle"){
-                        window.circlePath = new Path.Circle(center, startPoint.getDistance(event.point) / 2);
-                    }
-                    else {
-                        window.circlePath = new Path.Rectangle(startPoint, event.point);
-                    }
-                    dragged = true;
-                    labelsDrawn += 1;
-                    category_groups[category].addChild(window.circlePath);
-                    window.circlePath.style = category_groups[category].style;
-                    window.circlePath.opacity = 1;
-                }
-                if(shape == "Circle"){
-                    newPath = new Path.Circle(center, startPoint.getDistance(event.point) / 2);
-                }
-                else {
-                    newPath = new Path.Rectangle(startPoint, event.point);
-                }
-                category_groups[category].addChild(newPath);
-                newPath.style = category_groups[category].style;
-                newPath.opacity = 1;
+	    if(!aboveExistingLabel){
+	    if (currentSegment)
+		currentSegment.selected = false;
+	    mode = type = currentSegment = null;
 
-                newPath.onMouseEnter = function(event) {
-                    if (!isActive) {
-                        aboveExistingLabel = true;
-                        this.opacity = 1;
-                        window.circlePath = this;
-                    }
-                };
-                newPath.onMouseLeave = function(event) {
-                    aboveExistingLabel = false;
-                    this.style = category_groups[category].style;
-                    this.opacity = category_groups[category].opacity;
-                };
-                newPath.onDoubleClick = function(event) {
-                    isActive = false;
-                    aboveExistingLabel = false;
-                    this.remove();
-                    //console.log(window.labelsLayer.exportSVG({embedImages: false, asString: false}));
-                    labelsDrawn -= 1;
-                };
-                window.circlePath.remove();
-                window.circlePath = newPath;
+	    if (!path) {
+		path = new Path();
+		isActive = true;
+		path.fillColor = {
+		    hue: 360 * Math.random(),
+		    saturation: 1,
+		    brightness: 1,
+		    alpha: 0.5
+		};
+	    }
+	  }
 
-            } else {
-                window.circlePath.position += event.point - dragStartPoint;
-                dragStartPoint = event.point;
-
-            }
-
-        }
-
-        function onMouseUp(event) {
-            isActive = false;
-            if (!dragged) {
-                aboveExistingLabel = false;
-            } else {
-                window.circlePath.opacity = 0.3;
-            }
-
-        } */
-var path;
-        var types = ['point', 'handleIn', 'handleOut'];
-        function findHandle(point) {
-            for (var i = 0, l = path.segments.length; i < l; i++) {
-                for (var j = 0; j < 3; j++) {
-                    var type = types[j];
-                    var segment = path.segments[i];
-                    var segmentPoint = type == 'point'
-                            ? segment.point
-                            : segment.point + segment[type];
-                    var distance = (point - segmentPoint).length;
-                    if (distance < 10) {
-                        return {
-                            type: type,
-                            segment: segment
-                        };
-                    }
-                }
-            }
-            return null;
-        }
-
-        var currentSegment, mode, type;
-        function onMouseDown(event) {
-            if (currentSegment)
-                currentSegment.selected = false;
-            mode = type = currentSegment = null;
-
-            if (!path) {
-                path = new Path();
-                path.fillColor = {
-                    hue: 360 * Math.random(),
-                    saturation: 1,
-                    brightness: 1,
-                    alpha: 0.5
-                };
-            }
-
-            var result = findHandle(event.point);
-            if (result) {
-                currentSegment = result.segment;
-                type = result.type;
-                if (path.segments.length > 1 && result.type == 'point'
-                        && result.segment.index == 0) {
-                    mode = 'close';
+				  var result = findHandle(event.point);
+				  if (result) {
+				  currentSegment = result.segment;
+				  type = result.type;
+				  if (path.segments.length > 1 && result.type == 'point' && result.segment.index == 0) {
+		    mode = 'close';
+		    isActive = false;	
 		    var category = $('input[name=category_select]:checked', '#categories').val();
-                    var shape = category_shapes[category];
-                    labelsDrawn += 1;
-                    category_groups[category].addChild(path);
-                    path.style = category_groups[category].style;
-                    path.opacity = 1;
+		    var shape = category_shapes[category];
+		    labelsDrawn += 1;
+		    category_groups[category].addChild(path);
+		    path.style = category_groups[category].style;
+		    path.opacity = 1;
 		    path.closed = true;
-                    path.selected = false;
-                    path = null;
-                }
-            }
+		    path.selected = false;
+		path.onMouseEnter = function(event) {
+		    if (!isActive) {
+			aboveExistingLabel = true;
+			this.opacity = 1;
+			window.circlePath = this;
+		    }
+		};
+		path.onMouseLeave = function(event) {
+		    aboveExistingLabel = false;
+		    mode = null;
+		    this.style = category_groups[category].style;
+		    this.opacity = category_groups[category].opacity;
+		};
+		path.onDoubleClick = function(event) {
+		    isActive = false;
+		    aboveExistingLabel = false;
+		    this.remove();
 
-            if (mode != 'close') {
-                mode = currentSegment ? 'move' : 'add';
-                if (!currentSegment)
-                    currentSegment = path.add(event.point);
-                currentSegment.selected = true;
-            }
-        }
+		    //console.log(window.labelsLayer.exportSVG({embedImages: false, asString: false}));
+path = null;                    
+labelsDrawn -= 1;
+		};	
+		path = null;
+		}
+	    }
 
-        function onMouseDrag(event) {
-            if (mode == 'move' && type == 'point') {
-                currentSegment.point = event.point;
-            } else if (mode != 'close') {
-                var delta = event.delta.clone();
-                if (type == 'handleOut' || mode == 'add')
-                    delta = -delta;
-                currentSegment.handleIn += delta;
-                currentSegment.handleOut -= delta;
-            }
-        }
-    </script>
+	    if (mode != 'close') {
+		mode = currentSegment ? 'move' : 'add';
+		if (!currentSegment)
+		    currentSegment = path.add(event.point);
+		currentSegment.selected = true;
+	    }
+	}
 
-    <script type="text/javascript">
-        imageX = 0;
-        imageY = 0;
-        imageWidth = 0;
-        imageHeight = 0;
-        var currentImage = {};
+	function onMouseDrag(event) {
+
+	    if (mode == 'move' && type == 'point') {
+		currentSegment.point = event.point;
+	    } else if (mode != 'close') {
+		var delta = event.delta.clone();
+		if (type == 'handleOut' || mode == 'add')
+		    delta = -delta;
+		currentSegment.handleIn += delta;
+		currentSegment.handleOut -= delta;
+	    }
+	}
+		</script>
+
+		<script type="text/javascript">
+imageX = 0;
+imageY = 0;
+imageWidth = 0;
+imageHeight = 0;
+var currentImage = {};
 
 
-        function getNewImage() {
-            startTime = Date.now();
-            if (!window.labelsLayer) {
-                window.labelsLayer = new paper.Layer();
-            } else {
-                original_image_raster.remove();
-                raster.remove();
-            }
-            //selectedImage = JSON.parse($('#imageCombo').val());
-            $.ajax({
-                url: "/webclient/getNewImage",
-                type: "GET",
-                dataType: "json",
-                data: currentImage,
-                /*{
-                    image_name: selectedImage.image_name,
-                    path: selectedImage.path
-                }, */
-                success: function(response) {
-                    data = response.labels;
-                    if (data) {
-                        displayLabels(response.labels);
-                    }
-                    imageX = response.subimage.x;
-                    imageY = response.subimage.y;
-                    imageWidth = response.subimage.width;
-                    imageHeight = response.subimage.height;
-                    imagePadding = response.subimage.padding;
-                    if (typeof padding == 'undefined') {
-                        padding = 0;
-                    }
-                    displayImage(response.image_name, response.path, response.categories, response.shapes, response.colors,
-                        new paper.Point(response.subimage.x, response.subimage.y),
-                        imageWidth, imageHeight, imagePadding);
-                    currentImage = response
-                },
+function getNewImage() {
+	startTime = Date.now();
+	if (!window.labelsLayer) {
+		window.labelsLayer = new paper.Layer();
+	} else {
+		original_image_raster.remove();
+		raster.remove();
+	}
+	//selectedImage = JSON.parse($('#imageCombo').val());
+	$.ajax({
+		url: "/webclient/getNewImage",
+		type: "GET",
+		dataType: "json",
+		data: currentImage,
+		/*{
+		  image_name: selectedImage.image_name,
+		  path: selectedImage.path
+		  }, */
+		success: function(response) {
+			data = response.labels;
+			if (data) {
+				displayLabels(response.labels);
+			}
+			imageX = response.subimage.x;
+			imageY = response.subimage.y;
+			imageWidth = response.subimage.width;
+			imageHeight = response.subimage.height;
+			imagePadding = response.subimage.padding;
+			if (typeof padding == 'undefined') {
+				padding = 0;
+			}
+			displayImage(response.image_name, response.path, response.categories, response.shapes, response.colors,
+					new paper.Point(response.subimage.x, response.subimage.y),
+					imageWidth, imageHeight, imagePadding);
+			currentImage = response
+		},
 
-                error: function(xhr, errmsg, err) {
-                    alert(xhr.status + ": " + xhr.responseText);
-                }
-            });
-        }
-        //TODO: Input validation and error checking
-        function displayImage(image_name, image_path, categories, shapes, colors, point, width, height, padding) {
-            if (width <= 0 || height <= 0 || padding < 0) {
-                alert("Problem with width, height, or padding value");
-                return;
-            }
-            size = new paper.Size(width + 2 * padding, height + 2 * padding);
-            //Add new image and resize canvas to fit image
-            img = new Image();
-            img.onload = function() {
-                if (!img.complete || img.naturalWidth == 0) {
-                    alert("Could not load image");
-                    console.log(img);
-                    return;
-                }
-                if (point.x + width + padding > img.naturalWidth || point.y + height + padding > img.naturalHeight) {
-                    alert("Window out of bounds of image.");
-                    return;
-                }
-            };
-            img.crossOrigin = "Anonymous";
-            try {
-                img.src = image_path + image_name;
-            } catch (err) {
-                alert("Image cannot be opened. Note that currently external URLs cannot be used. Error: " + err.message)
-            }
+		error: function(xhr, errmsg, err) {
+			alert(xhr.status + ": " + xhr.responseText);
+		}
+	});
+}
+//TODO: Input validation and error checking
+function displayImage(image_name, image_path, categories, shapes, colors, point, width, height, padding) {
+	if (width <= 0 || height <= 0 || padding < 0) {
+		alert("Problem with width, height, or padding value");
+		return;
+	}
+	size = new paper.Size(width + 2 * padding, height + 2 * padding);
+	//Add new image and resize canvas to fit image
+	img = new Image();
+	img.onload = function() {
+		if (!img.complete || img.naturalWidth == 0) {
+			alert("Could not load image");
+			console.log(img);
+			return;
+		}
+		if (point.x + width + padding > img.naturalWidth || point.y + height + padding > img.naturalHeight) {
+			alert("Window out of bounds of image.");
+			return;
+		}
+	};
+	img.crossOrigin = "Anonymous";
+	try {
+		img.src = image_path + image_name;
+	} catch (err) {
+		alert("Image cannot be opened. Note that currently external URLs cannot be used. Error: " + err.message)
+	}
 
-            function setup_images() {
-                //paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
-                paper.view.setViewSize(size);
-                //paper.view.getViewSize();
-                $('#canvasWrapper').css('width', size.width).css('height', size.height);
-                //$('#canvas').css('box-shadow', " -20 -20 20px" +  imagePadding + "px rgba(255,0,0,0.5)");
-                point = new paper.Point(point.x - padding, point.y - padding);
-                console.log(point);
-                original_image_raster = new paper.Raster(img);
-                original_image_raster.id = "original image";
-                raster = original_image_raster.getSubRaster(new paper.Rectangle(point, size));
-                raster.position = paper.view.center;
-                original_image_raster.sendToBack();
-                raster.sendToBack();
-                original_image_raster.visible = false;
-                raster.id = "shifted image";
-                paper.view.update();
+	function setup_images() {
+		//paper.view.setViewSize(img.naturalWidth, img.naturalHeight);
+		paper.view.setViewSize(size);
+		//paper.view.getViewSize();
+		$('#canvasWrapper').css('width', size.width).css('height', size.height);
+		//$('#canvas').css('box-shadow', " -20 -20 20px" +  imagePadding + "px rgba(255,0,0,0.5)");
+		point = new paper.Point(point.x - padding, point.y - padding);
+		console.log(point);
+		original_image_raster = new paper.Raster(img);
+		original_image_raster.id = "original image";
+		raster = original_image_raster.getSubRaster(new paper.Rectangle(point, size));
+		raster.position = paper.view.center;
+		original_image_raster.sendToBack();
+		raster.sendToBack();
+		original_image_raster.visible = false;
+		raster.id = "shifted image";
+		paper.view.update();
 
-            }
-            if (img.complete) {
-                setup_images();
-            } else {
-                img.addEventListener('load', setup_images);
-                img.addEventListener('error', function() {
-                    alert('Error loading image');
-                })
-            }
+	}
+	if (img.complete) {
+		setup_images();
+	} else {
+		img.addEventListener('load', setup_images);
+		img.addEventListener('error', function() {
+			alert('Error loading image');
+		})
+	}
 
-            //Category selection setup
-            var output = [];
-            $('#categories_coll')[0].html = '';
-            $.each(categories, function(i, val) {
-                cat_list_item = '<li><input type="radio" name="category_select" value="' + val + '">' +
-                    ' <label for="' + val + '"><table style="width:100%"><tr><td><p>'+ val +
-                '</p></td><td><p><span class="circle" style="color:' + colors[i] + '; background-color:' + colors[i] +
-                    ';"></span></p></td></tr></table></label></li>';
+	//Category selection setup
+	var output = [];
+	$('#categories_coll')[0].html = '';
+	$.each(categories, function(i, val) {
+		cat_list_item = '<li><input type="radio" name="category_select" value="' + val + '">' +
+			' <label for="' + val + '"><table style="width:100%"><tr><td><p>'+ val +
+			'</p></td><td><p><span class="circle" style="color:' + colors[i] + '; background-color:' + colors[i] +
+			';"></span></p></td></tr></table></label></li>';
 
-                output.push(cat_list_item);
-            });
-            $('#categories_coll').html(output.join(''));
-            $("input:radio[name=category_select]:first").attr('checked', true);
-            //$("#categories").data("categories", categories);
-            //$('#categoryName').html(response.categories[0]);
+		output.push(cat_list_item);
+	});
+	$('#categories_coll').html(output.join(''));
+	$("input:radio[name=category_select]:first").attr('checked', true);
+	//$("#categories").data("categories", categories);
+	//$('#categoryName').html(response.categories[0]);
 
-            $('#image_name').html("Image name: " + image_name);
-            $('#image_info_name').html("Image name: " + image_name);
-            $('#image_info_path').html("Image path: " + image_path);
+	$('#image_name').html("Image name: " + image_name);
+	$('#image_info_name').html("Image name: " + image_name);
+	$('#image_info_path').html("Image path: " + image_path);
 
-            globals.create_groups_shapes(categories, colors, shapes);
+	globals.create_groups_shapes(categories, colors, shapes);
 
-        }
+}
 
-        //TODO: Make work for both JSON string and JSON object
-        function displayLabels(labels) {
-            //window.labelsLayer.importJSON(JSON.parse(data));
-        }
+//TODO: Make work for both JSON string and JSON object
+function displayLabels(labels) {
+	//window.labelsLayer.importJSON(JSON.parse(data));
+}
 
-        $('document').ready(function() {
+$('document').ready(function() {
 
-            //Canvas Controls
-            $('#brightnessControl').on('input', function() {
-                var brightness = $('#brightnessControl').val();
-                $('span#brightness').html(brightness);
-                cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' + $('#saturationControl').val() + ')';
-                $('#canvas').css('-webkit-filter', cssText).css('filter', cssText);
-            });
-            $('#contrastControl').on('input', function() {
-                var contrast = $('#contrastControl').val();
-                cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' + $('#saturationControl').val() + ')';
-                $('span#contrast').html($('#contrastControl').val());
-                $('#canvas').css('-webkit-filter', cssText).css('filter', cssText);
-            });
-            $('#saturationControl').on('input', function() {
-                var saturation = $('#saturationControl').val();
-                cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' + $('#saturationControl').val() + ')';
-                $('span#saturation').html($('#saturationControl').val());
-                $('#canvas').css('-webkit-filter', cssText).css('filter', cssText);
-            });
+	//Canvas Controls
+	$('#brightnessControl').on('input', function() {
+		var brightness = $('#brightnessControl').val();
+		$('span#brightness').html(brightness);
+		cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' + $('#saturationControl').val() + ')';
+				$('#canvas').css('-webkit-filter', cssText).css('filter', cssText);
+				});
+				$('#contrastControl').on('input', function() {
+					var contrast = $('#contrastControl').val();
+					cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' + $('#saturationControl').val() + ')';
+							$('span#contrast').html($('#contrastControl').val());
+							$('#canvas').css('-webkit-filter', cssText).css('filter', cssText);
+							});
+							$('#saturationControl').on('input', function() {
+								var saturation = $('#saturationControl').val();
+								cssText = 'brightness(' + $('#brightnessControl').val() + ')' + 'contrast(' + $('#contrastControl').val() + ')' + 'saturate(' + $('#saturationControl').val() + ')';
+										$('span#saturation').html($('#saturationControl').val());
+										$('#canvas').css('-webkit-filter', cssText).css('filter', cssText);
+										});
 
-            $('#resetImageControl').on('click', function() {
-                $('#brightnessControl').val("1").trigger('input');
-                $('#contrastControl').val("1").trigger('input');
-                $('#saturationControl').val("1").trigger('input');
-            });
+										$('#resetImageControl').on('click', function() {
+											$('#brightnessControl').val("1").trigger('input');
+											$('#contrastControl').val("1").trigger('input');
+											$('#saturationControl').val("1").trigger('input');
+										});
 
-        });
-    </script>
+										});
+		</script>
 
-</head>
+	</head>
 
-<body onload="getNewImage()" bgcolor="#c0c0c0">
-    <div id="wrapper"  class="toggled">
-        <!-- Sidebar -->
-        <div id="sidebar-wrapper">
-            <ul class="sidebar-nav">
-                <li class="sidebar-brand">
-                    <a href="#" style="font-size: 150%; text-align: center;">
-                        𝓁𝒶𝒷𝑒𝓁.𝒶𝑔
-                    </a>
-                </li>
+	<body onload="getNewImage()" bgcolor="#c0c0c0">
+		<div id="wrapper"  class="toggled">
+			<!-- Sidebar -->
+			<div id="sidebar-wrapper">
+				<ul class="sidebar-nav">
+					<li class="sidebar-brand">
+						<a href="#" style="font-size: 150%; text-align: center;">
+							𝓁𝒶𝒷𝑒𝓁.𝒶𝑔
+						</a>
+					</li>
 
-                <li data-toggle="collapse" data-target="#categories_coll" class="collapsed active">
-                      <p><i class="fa fa-list" aria-hidden="true"></i> Categories <span class="arrow"></span></p>
-                </li>
-                <form action="" id="categories">
-                    <ul class="sidebar-nav2 sub-menu collapse show" id="categories_coll">
-                    </ul>
-                </form>
+					<li data-toggle="collapse" data-target="#categories_coll" class="collapsed active">
+						<p><i class="fa fa-list" aria-hidden="true"></i> Categories <span class="arrow"></span></p>
+					</li>
+					<form action="" id="categories">
+						<ul class="sidebar-nav2 sub-menu collapse show" id="categories_coll">
+						</ul>
+					</form>
 
-                <li data-toggle="collapse" data-target="#image_ops" class="collapsed active">
-                      <p><i class="fa fa-picture-o" aria-hidden="true"></i> Image Operations <span class="arrow"></span></p>
-                </li>
-                <ul class="sidebar-nav2 sub-menu collapse" id="image_ops">
-                    <!-- <li class="active"><a href="#">CSS3 Animation</a></li> -->
-                    <li>
-                            <p><label id="brightnessLabel" style=" margin-bottom: 0px; ">Brightness:</label> <span id="brightness">1</span></p>
-                    </li>
-                    <li>
-                            <input type="range" min="1" max="10" step="0.1" value="1" id="brightnessControl" style="margin-left: 10%;" />
-                    </li>
-                    <li>
-                            <p><label id="contrastLabel" style=" margin-bottom: 0px; ">Contrast:</label> <span id="contrast">1</span></p>
-                    </li>
-                    <li>
-                            <input type="range" min="1" max="3" step="0.1" value="1" id="contrastControl" style="margin-left: 10%;" />
-                    </li>
-                    <li>
-                            <p><label id="saturationLabel" style=" margin-bottom: 0px; ">Saturation:</label> <span id="saturation">1</span></p>
-                    </li>
-                    <li>
-                            <input type="range" min="1" max="5" step="0.1" value="1" id="saturationControl" style="margin-left: 10%;" />
-                    </li>
-                    <li>
-                            <input type="button" id="resetImageControl" value="Reset" class="btn btn-warning" style="position: relative; left: 30%; ">
-                    </li>
-                </ul>
-                <li>
-                        <p><label><input type="checkbox" id="noLabels" /> No labels in image</label></p>
-                </li>
-            </ul>
+					<li data-toggle="collapse" data-target="#image_ops" class="collapsed active">
+						<p><i class="fa fa-picture-o" aria-hidden="true"></i> Image Operations <span class="arrow"></span></p>
+					</li>
+					<ul class="sidebar-nav2 sub-menu collapse" id="image_ops">
+						<!-- <li class="active"><a href="#">CSS3 Animation</a></li> -->
+						<li>
+							<p><label id="brightnessLabel" style=" margin-bottom: 0px; ">Brightness:</label> <span id="brightness">1</span></p>
+						</li>
+						<li>
+							<input type="range" min="1" max="10" step="0.1" value="1" id="brightnessControl" style="margin-left: 10%;" />
+						</li>
+						<li>
+							<p><label id="contrastLabel" style=" margin-bottom: 0px; ">Contrast:</label> <span id="contrast">1</span></p>
+						</li>
+						<li>
+							<input type="range" min="1" max="3" step="0.1" value="1" id="contrastControl" style="margin-left: 10%;" />
+						</li>
+						<li>
+							<p><label id="saturationLabel" style=" margin-bottom: 0px; ">Saturation:</label> <span id="saturation">1</span></p>
+						</li>
+						<li>
+							<input type="range" min="1" max="5" step="0.1" value="1" id="saturationControl" style="margin-left: 10%;" />
+						</li>
+						<li>
+							<input type="button" id="resetImageControl" value="Reset" class="btn btn-warning" style="position: relative; left: 30%; ">
+						</li>
+					</ul>
+					<li>
+						<p><label><input type="checkbox" id="noLabels" /> No labels in image</label></p>
+					</li>
+				</ul>
 
-            <form method="post" name="applyLabelsForm">
-                {% csrf_token %}
-                <input id="applyLabels" type="button" value="Submit labels" class="btn btn-success" style="position: absolute; bottom: 5%; left: 25%; ">
-            </form>
-        </div>
-        <!-- /#sidebar-wrapper -->
+				<form method="post" name="applyLabelsForm">
+					{% csrf_token %}
+					<input id="applyLabels" type="button" value="Submit labels" class="btn btn-success" style="position: absolute; bottom: 5%; left: 25%; ">
+				</form>
+			</div>
+			<!-- /#sidebar-wrapper -->
 
-        <!-- Page Content -->
-        <div id="page-content-wrapper">   
-            <div id="main>">
-                <!--<div id="toolbars">
-        <select id="imageCombo"  onchange="onImageFormChange()">
-            {#% for image in latest_image_list %#}
-                {#% ifequal image selected_image %#}
-                    <option value='{"image_name": "{#  #}{image.name}}", "path": "{#  #}{ image.path }}"}' selected="selected">{#  #}{image.name}}</option>
-                {#% else %#}
-                    <option value='{"image_name": "{#  #}{image.name}}", "path": "{#  #}{ image.path }}"}'>{#  #}{image.name}}</option>
-                {#% endifequal %#}
-            {#% endfor %#}
-        </select>
-    </div> -->
-                <div id="debug">
+			<!-- Page Content -->
+			<div id="page-content-wrapper">   
+				<div id="main>">
+					<!--<div id="toolbars">
+	     <select id="imageCombo"  onchange="onImageFormChange()">
+	     {#% for image in latest_image_list %#}
+	     {#% ifequal image selected_image %#}
+	     <option value='{"image_name": "{#  #}{image.name}}", "path": "{#  #}{ image.path }}"}' selected="selected">{#  #}{image.name}}</option>
+	     {#% else %#}
+	     <option value='{"image_name": "{#  #}{image.name}}", "path": "{#  #}{ image.path }}"}'>{#  #}{image.name}}</option>
+	     {#% endifequal %#}
+	     {#% endfor %#}
+	     </select>
+	     </div> -->
+	     <div id="debug">
 
-                </div>
+	     </div>
 
-                <div id="controls">
-                    <a href="/logout" class="btn btn-danger" style="position: absolute; top: 1%; right: 1%; "> Logout </a>
-                    <br/>
-                    <div id="tips">
-                        <p> <h3>Instructions</h3>
-                            <ul class="list-group">
-                              <li class="list-group-item">Click and draw bezier curve to select region.</li>
-                            </ul>
-                        </p>
-                    </div>
+	     <div id="controls">
+		     <a href="/logout" class="btn btn-danger" style="position: absolute; top: 1%; right: 1%; "> Logout </a>
+		     <br/>
+		     <div id="tips">
+			     <p> <h3>Instructions</h3>
+			     <ul class="list-group">
+				     <li class="list-group-item">Click and draw bezier curve to select region.</li>
+			     </ul>
+			     </p>
+		     </div>
 
-                </div>
-                <table id="displayTable">
-                    <tr>
-                        <td>
-                            <div id="canvasDiv">
-                                <!--<canvas id="canvas" resize></canvas> -->
-                                <div id="canvasWrapper">
-                                    <canvas id="canvas" width="1920" height="1080"></canvas>
-                                </div>
-                                <div id="image_info">
-                                    <p id="image_info_name"></p>
-                                    <p id="image_info_path"></p>
-                                </div>
+	     </div>
+	     <table id="displayTable">
+		     <tr>
+			     <td>
+				     <div id="canvasDiv">
+					     <!--<canvas id="canvas" resize></canvas> -->
+					     <div id="canvasWrapper">
+						     <canvas id="canvas" width="1920" height="1080"></canvas>
+					     </div>
+					     <div id="image_info">
+						     <p id="image_info_name"></p>
+						     <p id="image_info_path"></p>
+					     </div>
 
-                                <div>
-                                    <p>To report a bug, go to the github page <a href="https://github.com/dcunhas/agdss/issues" target="_blank">here</a> and open a new issue</p>
+					     <div>
+						     <p>To report a bug, go to the github page <a href="https://github.com/dcunhas/agdss/issues" target="_blank">here</a> and open a new issue</p>
 
-                                </div>
+					     </div>
 
-                            </div>
-                        </td>
+				     </div>
+			     </td>
 
-                    </tr>
-                </table>
-                <!-- <a href="#menu-toggle" class="btn btn-secondary" id="menu-toggle">Toggle Menu</a> -->
-            </div>
-        </div>
-    </div>
+		     </tr>
+	     </table>
+	     <!-- <a href="#menu-toggle" class="btn btn-secondary" id="menu-toggle">Toggle Menu</a> -->
+				</div>
+			</div>
+		</div>
 
-    <!-- Bootstrap core JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+		<!-- Bootstrap core JavaScript -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
 
-    <!-- Menu Toggle Script -->
-    <script>
-        $("#menu-toggle").click(function(e) {
-            e.preventDefault();
-            $("#wrapper").toggleClass("toggled");
-        });
-    </script>
+		<!-- Menu Toggle Script -->
+		<script>
+$("#menu-toggle").click(function(e) {
+	e.preventDefault();
+	$("#wrapper").toggleClass("toggled");
+});
+		</script>
 
-</body>
+	</body>
 
 </html>
