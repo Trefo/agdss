@@ -10,6 +10,7 @@ from PIL import Image as PILImage
 import numpy
 import SVGRegex
 from webclient.image_ops import crop_images
+import numpy as np
 
 IMAGE_FILE_EXTENSION = '.png'
 
@@ -101,6 +102,11 @@ def image_label_to_SVG_String_file(label):
     SVG_string_file.seek(0)
     return SVG_string_file.read().encode('utf-8')
 
+def image_string_to_SVG_string_file(svgStr):
+    SVG_string_file = io.StringIO(svgStr)
+    SVG_string_file.seek(0)
+    return SVG_string_file.read().encode('utf-8')
+
 def category_label_to_SVG_String_file(label):
     SVG_string_file = io.StringIO(category_label_string_to_SVG_string(label))
     SVG_string_file.seek(0)
@@ -167,6 +173,30 @@ def image_label_string_to_SVG_string(DBStr, height=None, width=None, keepImage=F
              '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"' \
             ' xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" xml:space="preserve" height="%s"' \
              ' width="%s">%s</svg>\n' %(height, width, addedStr)
+
+def image_labels_to_countable_npy():
+    labels = ImageLabel.objects.all()
+    foldername = 'annotations_npy'
+
+    for label in labels:
+        print(label)
+        svg = label.combined_labelShapes
+        paths = re.findall(SVGRegex.rePath, svg)
+        print(svg)
+        image, height, width = SVGDimensions(svg)
+        print(width)
+        masks_ndarray = np.zeros((len(paths), width, height))
+        for idx,path in enumerate(paths):
+            img=WandImage(blob=image_string_to_SVG_string_file(image_label_string_to_SVG_string(path, height, width)))
+            img.resize(width,height)
+            masks_ndarray[idx, :, :] = numpy.array(img.convert('png'))
+            print(label.parentImage)
+        filename='P%iL%iI%s' % (label.parentImage.id, label.id, label.parentImage.name)
+        outputFilename = (
+                    settings.STATIC_ROOT + settings.LABEL_FOLDER_NAME + foldername + '/' + filename + IMAGE_FILE_EXTENSION)
+        np.save(outputFilename)
+
+        print(("converted Image " + outputFilename))
 
 def category_label_string_to_SVG_string(category_label, keepImage=False):
 
